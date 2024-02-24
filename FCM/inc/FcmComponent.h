@@ -12,8 +12,8 @@
 #include <map>
 #include <queue>
 
-#include "../src/FcmMessage.h"
-#include "../src/FcmTimerInterface.h"
+#include "FcmMessage.h"
+#include "FcmTimerInterface.h"
 #include "FcmLogicalInterface.h"
 #include "FcmStateTransitionTable.h"
 

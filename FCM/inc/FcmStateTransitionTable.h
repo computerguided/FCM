@@ -5,7 +5,7 @@
 #ifndef FCM_PROTOTYPING_FCMSTATETRANSITIONTABLE_H
 #define FCM_PROTOTYPING_FCMSTATETRANSITIONTABLE_H
 
-#include "../src/FcmMessage.h"
+#include "FcmMessage.h"
 
 // ---------------------------------------------------------------------------------------------------------------------
 // State Transition Table
