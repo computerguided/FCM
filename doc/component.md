@@ -22,7 +22,7 @@ The _behavior_ of the component is expressed by a number of scenarios. From thes
 std::string currentState;
 ```
 
-The _transitions_ between the component's states can occur because of the component receiving a specific _message_ on a specific _interface_ (discussed in more detail in "Component interfacing"). These transitions are defined in the component's _state-transition table_ (STT) which is processed by a state-machine engine (discussed in more detail in "State-machine engine").
+The _transitions_ between the component's states can occur because of the component receiving a specific _message_ on a specific _interface_ (discussed in more detail in "[Component interfacing](#component-interfacing)"). These transitions are defined in the component's _state-transition table_ (STT) which is processed by a state-machine engine (discussed in more detail in "State-machine engine").
 
 ```cpp
 FcmStateTransitionTable stateTransitionTable;
@@ -109,16 +109,16 @@ Note that the overridden initialization methods cannot be called inside the cons
 ## Component interfacing
 A component can have one or more interfaces that depend on the design of the component.
 
-It is good engineering practice to define the interfaces beforehand as much as possible. This means; defining the messages and their parameters (see "Messages"). Doing this, allows for independently further defining the state-machine of the component.
+It is good engineering practice to define the interfaces beforehand as much as possible. This means; defining the messages and their parameters (see "[Messages](Messages.md)"). Doing this, allows for independently further defining the state-machine of the component.
 
-The interface completely shields the component from the environment in which it is running. A more detailed description is given in "Interface".
+The interface completely shields the component from the environment in which it is running. A more detailed description is given in "[Interface](Interfaces.md)".
 
 Note that grouping the messages into interfaces is technically not really necessary; some state-machine frameworks don't even specify interfaces, and for the method presented here, nothing prevents the developer from using only one interface containing all the messages. However, using interfaces has the following benefits:
 * It creates a more modular design.
 * Message names can be reused.
 * Logging becomes easier when the interface is specified.
 
-However, one of the most important advantages of using interfaces is that the state-machine engine can be more efficient as will be described in more detail in "State machine engine".
+However, one of the most important advantages of using interfaces is that the state-machine engine can be more efficient as will be described in more detail in "[State machine engine](StateMachineEngine.md)".
 
 All the interfaces a component uses are defined in its dictionary ```interfaces``` attribute.
 
@@ -126,7 +126,7 @@ All the interfaces a component uses are defined in its dictionary ```interfaces`
 std::map<std::string, const FcmComponent*> interfaces;
 ```
 
-As can be seen from the definition, an interface holds a reference to ```FcmComponent``` which is set when the interface is connected to the component (see "Connecting interfaces").
+As can be seen from the definition, an interface holds a reference to ```FcmComponent``` which is set when the interface is connected to the component (see "[Connect interfaces](#connect-interface)").
 
 To be able to use an interface (e.g. send the messages defined in the interface), the header file of the interface needs to be included. For example, by default the ```FcmComponent``` adds the "Logical" interface by including the ```FcmLogicalInterface.h```.
 
@@ -143,7 +143,7 @@ const std::shared_ptr<Settings> settings;
 Good practice is to define the structure holding the settings as an inner class of the component's class. Creating this ```Settings``` class is useful, especially because different components require different types of settings. Each component can have its own ```Settings``` inner class tailored to its specific needs and the constructor will have the corresponding parameter,
 
 ## Adding a transition
-As specified in "State transition table", a transition is uniquely defined by the combination of the state, interface and message. To add this combination to the state transition table and to specify the next state and the action, the component's ```addTransition()``` method must be called.
+As specified in "[State transition table](StateTransitionTable.md)", a transition is uniquely defined by the combination of the state, interface and message. To add this combination to the state transition table and to specify the next state and the action, the component's ```addTransition()``` method must be called.
 
 ```cpp
 void addTransition(const std::string& stateName,
@@ -333,7 +333,7 @@ Inside this method, the missing default parameters of the message must be set, s
 message->timestamp = std::chrono::duration_cast<std::chrono::milliseconds>(std::chrono::system_clock::now().time_since_epoch()).count();
 ```
 
-When constructing the message, the ``interfaceName`` property was already set (see "Messages") and can now be used to retrieve a connected receiver, but only if the interface was connected.
+When constructing the message, the ``interfaceName`` property was already set (see "[Messages](Messages.md)") and can now be used to retrieve a connected receiver, but only if the interface was connected.
 
 ```cpp
 try
@@ -356,13 +356,13 @@ messageQueue->push(message);
 
 ## Process message
 
-When a message was sent to one of the connected interfaces of the component, the state machine engine (see "State machine engine") will call the ``processMessage()`` of the component.
+When a message was sent to one of the connected interfaces of the component, the state machine engine (see "[State machine engine](StateMachineEngine.md)") will call the ``processMessage()`` of the component.
 
 ```cpp
 void processMessage(const FcmMessage& message)
 ```
 
-The first step is to get the names of the interface and the message, which were set during creation of the message (see "Messages").
+The first step is to get the names of the interface and the message, which were set during creation of the message (see "[Messages](Messages.md)").
 
 ```cpp
 auto interfaceName = message->interfaceName;
@@ -453,7 +453,7 @@ For the component itself, connecting means nothing more than setting the corresp
 interfaces[interfaceName] = remoteComponent;
 ```
 
-This method is called when the component structure is set-up during the construction of the device (see "Device construction"). In there, the ``connectInterface()`` for the components at both ends must be called. To simplify this, the ``FCM_CONNECT_INTERFACE`` is defined.
+This method is called when the component structure is set-up during the construction of the device (see "[Device](Device.md)"). In there, the ``connectInterface()`` for the components at both ends must be called. To simplify this, the ``FCM_CONNECT_INTERFACE`` is defined.
 
 ```cpp
 #define FCM_CONNECT_INTERFACE( INTERFACE, COMPONENT_1, COMPONENT_2 ) \
