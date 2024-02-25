@@ -5,19 +5,11 @@
 #include "Connector.h"
 #include "Transceiving.h"
 
-// ----------------------------------------------------------------------------
-// Constructor
-// ----------------------------------------------------------------------------
-Connector::Connector(std::string& name,
-                     const std::shared_ptr<FcmMessageQueue>& messageQueue,
-                     const std::shared_ptr<Settings>& settingsParam) :
-    FcmComponent(name, messageQueue),
-    settings(settingsParam),
-    clientId(settings->clientId),
-    serverId(0),
-    connectionId(0)
+// ---------------------------------------------------------------------------------------------------------------------
+// Override the setTransitions function to add the transitions.
+// ---------------------------------------------------------------------------------------------------------------------
+void Connector::setTransitions()
 {
-
     // ----------------------------------------------------------------------------
     // State Transition Table
     // ----------------------------------------------------------------------------
@@ -74,11 +66,16 @@ Connector::Connector(std::string& name,
     {
         connectionOk();
     });
+}
 
+// ---------------------------------------------------------------------------------------------------------------------
+// Set choice-points
+// ---------------------------------------------------------------------------------------------------------------------
+void Connector::setChoicePoints()
+{
     // ----------------------------------------------------------------------------
     // Choice Point Table
     // ----------------------------------------------------------------------------
-
     FCM_ADD_CHOICE_POINT( "Correct Server?",
     {
         // Determine whether the server is in the whitelist.

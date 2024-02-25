@@ -2,19 +2,15 @@
 // Created by Fred Dijkstra on 22/01/2024.
 // ---------------------------------------------------------------------------------------------------------------------
 
-#include "../inc/FcmComponent.h"
-#include "FcmTimerInterface.h"
-#include "../inc/FcmLogicalInterface.h"
+#include "FcmComponent.h"
 
 // ---------------------------------------------------------------------------------------------------------------------
-// Constructor
+// Initialize
 // ---------------------------------------------------------------------------------------------------------------------
-FcmComponent::FcmComponent(std::string& nameParam, const std::shared_ptr<FcmMessageQueue>& messageQueueParam) :
-    name(nameParam),
-    messageQueue(messageQueueParam)
+void FcmComponent::initialize()
 {
-    connectInterface("Logical", this);
-    connectInterface("Timer", this);
+    setTransitions();
+    setChoicePoints();
 
     // Find the first state in the state transition table.
     if (!stateTransitionTable.empty())
@@ -63,7 +59,8 @@ void FcmComponent::addChoicePoint(const std::string& choicePointName,
 {
     if (choicePointTable.find(choicePointName) != choicePointTable.end())
     {
-        throw std::runtime_error("Choice point already exists: " + choicePointName + " for component " + name);
+        throw std::runtime_error("Choice-point " + choicePointName +
+            " already exists " + " for component " + name);
     }
     choicePointTable[choicePointName] = evaluationFunction;
 }
@@ -84,12 +81,14 @@ void FcmComponent::sendMessage(const std::shared_ptr<FcmMessage>& message)
     message->timestamp =
             std::chrono::duration_cast<std::chrono::milliseconds>(
                     std::chrono::system_clock::now().time_since_epoch()).count();
-
-    auto interface = message->interfaceName;
-    checkInterface(interface);
-
-    message->receiver = interfaces[interface];
-    message->sender = this;
+    try
+    {
+        message->receiver = interfaces.at(message->interfaceName);
+    }
+    catch (const std::out_of_range& e)
+    {
+        message->receiver = nullptr;
+    }
 
     messageQueue->push(message);
 }
@@ -99,8 +98,18 @@ void FcmComponent::sendMessage(const std::shared_ptr<FcmMessage>& message)
 // ---------------------------------------------------------------------------------------------------------------------
 bool FcmComponent::evaluateChoicePoint(const std::string &choicePointName) const
 {
-    checkChoicePoint(choicePointName);
-    return choicePointTable.at(choicePointName)();
+    FcmSttEvaluation choicePointEvaluationFunction;
+
+    try
+    {
+        choicePointEvaluationFunction = choicePointTable.at(choicePointName);
+    }
+    catch (const std::out_of_range& e)
+    {
+        throw std::runtime_error("Choice point " + choicePointName + " for component " + name + " does not exist!");
+    }
+
+    return choicePointEvaluationFunction();
 }
 
 // ---------------------------------------------------------------------------------------------------------------------
@@ -108,8 +117,6 @@ bool FcmComponent::evaluateChoicePoint(const std::string &choicePointName) const
 // ---------------------------------------------------------------------------------------------------------------------
 void FcmComponent::processMessage(const FcmMessage& message)
 {
-    checkMessage(message);
-
     auto interfaceName = message.interfaceName;
     auto messageName = message.name;
 
@@ -137,13 +144,8 @@ void FcmComponent::processMessage(const FcmMessage& message)
                 currentState + " of component " + name + " is not handled!");
     }
 
-    auto action = message_it->second.action;
-    auto nextState = message_it->second.nextState;
-
-    // Execute the action.
-    action(message);
-
-    currentState = nextState;
+    message_it->second.action(message);
+    currentState = message_it->second.nextState;
 }
 
 // ---------------------------------------------------------------------------------------------------------------------
@@ -151,48 +153,7 @@ void FcmComponent::processMessage(const FcmMessage& message)
 // ---------------------------------------------------------------------------------------------------------------------
 void FcmComponent::connectInterface(const std::string &interfaceName, FcmComponent* remoteComponent)
 {
-    checkInterface(interfaceName);
     interfaces[interfaceName] = remoteComponent;
-}
-
-// ---------------------------------------------------------------------------------------------------------------------
-// -- Check functions, that throw a runtime error if they fail --
-// ---------------------------------------------------------------------------------------------------------------------
-
-// ---------------------------------------------------------------------------------------------------------------------
-// Check if the interface exists in the component.
-// ---------------------------------------------------------------------------------------------------------------------
-void FcmComponent::checkInterface(const std::string &interfaceName) const
-{
-    if (interfaces.find(interfaceName) == interfaces.end())
-    {
-        throw std::runtime_error("Interface " + interfaceName + " for component " + name + " does not exist!");
-    }
-}
-
-// ---------------------------------------------------------------------------------------------------------------------
-// Check if the choice-point exists in the component.
-// ---------------------------------------------------------------------------------------------------------------------
-void FcmComponent::checkChoicePoint(const std::string &choicePointName) const
-{
-    if (choicePointTable.find(choicePointName) == choicePointTable.end())
-    {
-        throw std::runtime_error("Choice point " + choicePointName + " for component " + name + " does not exist!");
-    }
-}
-
-// ---------------------------------------------------------------------------------------------------------------------
-// Check message.
-// ---------------------------------------------------------------------------------------------------------------------
-void FcmComponent::checkMessage(const FcmMessage& message) const
-{
-    // Check if the interface was set and throw a runtime error if it wasn't.
-    if (message.interfaceName.empty())
-    {
-        throw std::runtime_error("Interface of message " + message.name + " is not set!");
-    }
-
-    checkInterface(message.interfaceName);
 }
 
 

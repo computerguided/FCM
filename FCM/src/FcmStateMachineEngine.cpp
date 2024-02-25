@@ -2,7 +2,7 @@
 // Created by Fred Dijkstra on 17/02/2024.
 //
 
-#include "../inc/FcmStateMachineEngine.h"
+#include "FcmStateMachineEngine.h"
 
 // ---------------------------------------------------------------------------------------------------------------------
 // Handle message
@@ -11,6 +11,13 @@ void FcmStateMachineEngine::handleMessage(const FcmMessage& message)
 {
     // Get the receiver of the message.
     auto receiver = (FcmComponent*)message.receiver;
+
+    if (receiver == nullptr)
+    {
+
+        // TODO: Log error.
+        return;
+    }
 
     // Process the message.
     receiver->processMessage(message);

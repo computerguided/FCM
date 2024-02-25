@@ -36,7 +36,12 @@ public:
     // ----------------------------------------------------------------------------
     Connector(std::string& name,
               const std::shared_ptr<FcmMessageQueue>& messageQueue,
-              const std::shared_ptr<Connector::Settings>& settingsParam);
+              const std::shared_ptr<Settings>& settingsParam):
+        FcmComponent(name, messageQueue),
+        settings(settingsParam),
+        clientId(settings->clientId),
+        serverId(0),
+        connectionId(0){};
 
     // ----------------------------------------------------------------------------
     // State variables
@@ -51,6 +56,9 @@ public:
 
     void advertise();
     void connectionOk();
+
+    void setTransitions() override;
+    void setChoicePoints() override;
 };
 
 

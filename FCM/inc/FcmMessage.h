@@ -13,8 +13,7 @@
 class FcmMessage
 {
 public:
-    void* sender; // Pointer to the sender of the message.
-    void* receiver; // Pointer to the receiver of the message.
+    void* receiver = nullptr; // Pointer to the receiver of the message.
     uint32_t timestamp; // Timestamp in milliseconds at which the message was sent.
     std::string interfaceName; // Name of the interface through which the message was sent.
     std::string name; // Name of the message.
@@ -28,12 +27,12 @@ using FcmMessageQueue = std::queue<std::shared_ptr<FcmMessage>>;
 // ---------------------------------------------------------------------------------------------------------------------
 // Define a message inside an interface
 // ---------------------------------------------------------------------------------------------------------------------
-#define FCM_DEFINE_MESSAGE( NAME, PARAMETERS ) \
-class NAME : public FcmMessage                  \
-{                                               \
-public:                                         \
-    PARAMETERS                                  \
-    NAME() { name = #NAME; interfaceName = FCM_INTERFACE_NAME; }                    \
+#define FCM_DEFINE_MESSAGE( NAME, PARAMETERS )                      \
+class NAME : public FcmMessage                                      \
+{                                                                   \
+public:                                                             \
+    PARAMETERS                                                      \
+    NAME() { name = #NAME; interfaceName = FCM_INTERFACE_NAME; }    \
 }
 
 #endif //FCM_PROTOTYPING_FCMMESSAGE_H

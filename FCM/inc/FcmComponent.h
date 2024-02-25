@@ -26,10 +26,6 @@ class FcmComponent;
 // FCM Component
 // ----------------------------------------------------------------------------
 
-// ---------------------------------------------------------------------------------------------------------------------
-// Interfaces dictionary administrates the connection to the remote component.
-using FcmInterfaces = std::map<std::string, FcmComponent*>;
-
 class FcmComponent
 {
 public:
@@ -38,9 +34,16 @@ public:
 
     FcmStateTransitionTable stateTransitionTable;
     FcmChoicePointTable choicePointTable;
-    FcmInterfaces interfaces;
+    std::map<std::string, FcmComponent*> interfaces;
 
-    FcmComponent(std::string& nameParam, const std::shared_ptr<FcmMessageQueue>& messageQueueParam);
+    FcmComponent(std::string& nameParam, const std::shared_ptr<FcmMessageQueue>& messageQueueParam):
+        name(nameParam),
+        messageQueue(messageQueueParam){};
+
+    void initialize();
+
+    virtual void setTransitions(){}; // This function is to be overridden by the user.
+    virtual void setChoicePoints(){}; // This function is to be overridden by the user.
 
     void addTransition(const std::string& stateName,
                        const std::string& interfaceName,
@@ -63,11 +66,6 @@ public:
 
 private:
     const std::shared_ptr<FcmMessageQueue> messageQueue;
-
-    void checkInterface(const std::string &interfaceName) const;
-    void checkChoicePoint(const std::string &choicePointName) const;
-    void checkMessage(const FcmMessage& message) const;
-
 };
 
 // ----------------------------------------------------------------------------
@@ -96,8 +94,7 @@ private:
 // Prepare a message with parameters.
 // ---------------------------------------------------------------------------------------------------------------------
 #define FCM_PREPARE_MESSAGE( MESSAGE, INTERFACE, MESSAGE_TYPE ) \
-    auto MESSAGE = std::make_shared<INTERFACE::MESSAGE_TYPE>(); \
-    MESSAGE->interfaceName = #INTERFACE
+    auto MESSAGE = std::make_shared<INTERFACE::MESSAGE_TYPE>()
 
 // ---------------------------------------------------------------------------------------------------------------------
 // Send a message.
