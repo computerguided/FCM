@@ -29,11 +29,11 @@ using FcmMessageQueue = std::list<std::shared_ptr<FcmMessage>>;
 // ---------------------------------------------------------------------------------------------------------------------
 // Define a message inside an interface
 // ---------------------------------------------------------------------------------------------------------------------
-#define FCM_DEFINE_MESSAGE( NAME, ... )                          \
+#define FCM_DEFINE_MESSAGE( NAME, ... )                                 \
     class NAME : public FcmMessage                                      \
     {                                                                   \
     public:                                                             \
-        __VA_ARGS__                                                      \
+        __VA_ARGS__                                                     \
         NAME() { name = #NAME; interfaceName = FCM_INTERFACE_NAME; }    \
     }
 

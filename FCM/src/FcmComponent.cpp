@@ -142,7 +142,8 @@ void FcmComponent::processMessage(const FcmMessage& message)
     auto interface_it = state_it->second.find(interfaceName);
     if (interface_it == state_it->second.end())
     {
-        throw std::runtime_error("Messages on interface " + interfaceName + " in state " + currentState + " of component " +
+        throw std::runtime_error("Messages on interface " + interfaceName +
+            " in state " + currentState + " of component " +
             name + " are not handled!");
     }
 

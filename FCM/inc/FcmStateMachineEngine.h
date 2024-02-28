@@ -18,7 +18,7 @@
 class FcmStateMachineEngine
 {
 public:
-    void handleMessage(const FcmMessage& message);
+    static void handleMessage(const FcmMessage& message);
 };
 
 

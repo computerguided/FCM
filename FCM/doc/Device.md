@@ -94,9 +94,6 @@ void processMessages()
 
 The first step is to copy all the messages from the asynchronous message queues into the main message queue.
 
-
-
-
 ## Copy messages
 
 While copying messages from an asynchronous message queue to the main message queue, the ``copyMessages()`` method was called.
