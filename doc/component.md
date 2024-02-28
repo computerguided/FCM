@@ -50,9 +50,10 @@ const std::shared_ptr<FcmMessageQueue> messageQueue;
 For the default constructor the name and message-queue of the component are set.
 
 ```cpp
-FcmComponent::FcmComponent(std::string& nameParam, const std::shared_ptr<FcmMessageQueue>& messageQueueParam):
-    name(nameParam),
-    messageQueue(messageQueueParam){}
+FcmComponent::FcmComponent(std::string& nameParam,
+                           const std::shared_ptr<FcmMessageQueue>& messageQueueParam,
+                           const std::shared_ptr<FcmTimerHandler>& timerHandlerParam)
+    : name(nameParam), messageQueue(messageQueueParam), timerHandler(timerHandlerParam)
 ```
 
 For a subclass, this constructor must be called and any specific state-variables can be set in addition as shown in the example below.
@@ -60,6 +61,7 @@ For a subclass, this constructor must be called and any specific state-variables
 ```cpp
 Connector(std::string& name,
           const std::shared_ptr<FcmMessageQueue>& messageQueue,
+          const std::shared_ptr<FcmTimerHandler>& timerHandlerParam,
           const std::shared_ptr<Settings>& settingsParam):
     FcmComponent(name, messageQueue),
     settings(settingsParam),
@@ -69,6 +71,12 @@ Connector(std::string& name,
 ```
 
 This will only construct the component, but not initialize the state transition table and choice-points. This will be done by an extra initialization step as described in the next section.
+
+Since a component needs to be able to handle "Timeout" messages on the "Timer" interface, this interface is 'connected' by default.
+
+```cpp
+interfaces["Timer] = this;
+```
 
 ## Component initialization
 This construction does not define the state transition table nor the choice-point evaluation functions. To do this, two virtual methods are defined which are to be overridden in the subclass:

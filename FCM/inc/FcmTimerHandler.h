@@ -27,8 +27,13 @@ public:
     explicit FcmTimerHandler(const std::shared_ptr<FcmMessageQueue>& messageQueueParam);
 
     void setCurrentTime(long long currentTimeParam);
-    int setTimeout(long long timeout, void* component);
-    void clearTimeout(int timerId);
+    [[nodiscard]] int setTimeout(long long timeout, void* component);
+    void cancelTimeout(int timerId);
+
+private:
+
+    static void sendTimeoutMessage(int timerId, void* component);
+    void removeTimeoutMessage(int timerId);
 };
 
 
