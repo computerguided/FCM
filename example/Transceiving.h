@@ -8,6 +8,9 @@
 #include <cstdint>
 #include "FcmMessage.h"
 
+#ifdef FCM_INTERFACE_NAME
+#undef FCM_INTERFACE_NAME
+#endif
 #define FCM_INTERFACE_NAME "Transceiving"
 
 namespace Transceiving

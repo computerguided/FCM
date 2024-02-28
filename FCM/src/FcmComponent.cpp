@@ -5,6 +5,17 @@
 #include "FcmComponent.h"
 
 // ---------------------------------------------------------------------------------------------------------------------
+// Constructor
+// ---------------------------------------------------------------------------------------------------------------------
+FcmComponent::FcmComponent(std::string& nameParam,
+                           const std::shared_ptr<FcmMessageQueue>& messageQueueParam,
+                           const std::shared_ptr<FcmTimerHandler>& timerHandlerParam)
+    : name(nameParam), messageQueue(messageQueueParam), timerHandler(timerHandlerParam)
+{
+    interfaces["Timer"] = this;
+}
+
+// ---------------------------------------------------------------------------------------------------------------------
 // Initialize
 // ---------------------------------------------------------------------------------------------------------------------
 void FcmComponent::initialize()
@@ -90,7 +101,7 @@ void FcmComponent::sendMessage(const std::shared_ptr<FcmMessage>& message)
         message->receiver = nullptr;
     }
 
-    messageQueue->push(message);
+    messageQueue->push_back(message);
 }
 
 // ---------------------------------------------------------------------------------------------------------------------

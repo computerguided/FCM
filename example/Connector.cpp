@@ -20,7 +20,7 @@ void Connector::setTransitions()
 
     FCM_ADD_TRANSITION( "Advertising", Transceiving, ConnectReq, "Correct Server?",
     {
-        // TODO: stop timer
+        timerHandler->clearTimeout(timerId);
         serverId = message.serverId;
         connectionId = message.connectionId;
     });
@@ -31,7 +31,7 @@ void Connector::setTransitions()
         connectAck->connectionId = connectionId;
         FCM_SEND_MESSAGE(connectAck);
 
-        // TODO: Start timer with settings.connectionTimeout.
+        timerId = timerHandler->setTimeout(settings->connectionTimeout, this);
     });
 
     FCM_ADD_TRANSITION( "Correct Server?", Logical, No, "Advertising",
@@ -39,6 +39,7 @@ void Connector::setTransitions()
         FCM_PREPARE_MESSAGE(connectRej, Transceiving, ConnectRej);
         connectRej->connectionId = connectionId;
         FCM_SEND_MESSAGE(connectRej);
+
         advertise();
     });
 
@@ -94,8 +95,7 @@ void Connector::advertise()
     FCM_PREPARE_MESSAGE(advertisementInd, Transceiving, AdvertisementInd);
     advertisementInd->clientId = clientId;
     FCM_SEND_MESSAGE(advertisementInd);
-
-    // TODO: Restart timer with settings.advertisementInterval.
+    timerId = timerHandler->setTimeout(settings->advertisementInterval, this);
 }
 
 // ----------------------------------------------------------------------------
@@ -103,11 +103,11 @@ void Connector::advertise()
 // ----------------------------------------------------------------------------
 void Connector::connectionOk()
 {
-    // Stop timer.
+    timerHandler->clearTimeout(timerId);
 
     FCM_PREPARE_MESSAGE(connectedInd, Transceiving, ConnectedInd);
     connectedInd->connectionId = connectionId;
     FCM_SEND_MESSAGE(connectedInd);
 
-    // TODO: Start timer with settings.connectionTimeout.
+    timerId = timerHandler->setTimeout(settings->connectionTimeout, this);
 }

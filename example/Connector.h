@@ -36,8 +36,9 @@ public:
     // ----------------------------------------------------------------------------
     Connector(std::string& name,
               const std::shared_ptr<FcmMessageQueue>& messageQueue,
-              const std::shared_ptr<Settings>& settingsParam):
-        FcmComponent(name, messageQueue),
+              const std::shared_ptr<Settings>& settingsParam,
+              const std::shared_ptr<FcmTimerHandler>& timerHandlerParam) :
+        FcmComponent(name, messageQueue, timerHandlerParam),
         settings(settingsParam),
         clientId(settings->clientId),
         serverId(0),
@@ -49,6 +50,7 @@ public:
     uint32_t clientId;
     uint32_t serverId;
     uint32_t connectionId;
+    int timerId;
 
     // ----------------------------------------------------------------------------
     // Local functions

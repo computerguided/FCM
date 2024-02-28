@@ -38,7 +38,108 @@ The components in turn can call (non-blocking) functions from the hardware API.
 
 
 
-## Event loop
+## Run loop
+The ``run()`` method is started after all initializations are performed.
+
+```cpp
+[[noreturn]] void run()
+```
+
+It is marked with the ``[[noreturn]]`` attribute, indicating that it is an infinite loop that does not return.  
+
+The method starts by capturing the current time.
+
+```cpp
+auto start = std::chrono::high_resolution_clock::now();
+```
+
+An infinite loop is then entered, which will continue to run until the program is terminated.
+
+Inside the loop, the first operation is to call the ``processMessages()`` method (see "[Process messages](#process-messages)"). This method is responsible for processing all the messages in message queues.
+
+After processing the messages, the thread is put to sleep for a duration specified by ``timeStepMs``.
+
+```cpp
+std::this_thread::sleep_for(std::chrono::milliseconds(timeStepMs));
+```
+
+This pause allows for a controlled rate of execution. Once the thread wakes up, the current time is again captured.
+
+```cpp
+auto end = std::chrono::high_resolution_clock::now();
+```
+ 
+The duration between the start and end timestamps is then calculated.This is done by subtracting start from end and casting the result to milliseconds. The result is a ``std::chrono::milliseconds`` object, which is a type of ``std::chrono::duration``.
+
+```cpp
+auto duration = std::chrono::duration_cast<std::chrono::milliseconds>(end - start);
+```
+
+The ``duration`` is then used to update the current time in the ``timerHandler`` by calling its ``setCurrentTime()`` method (see "[](TimerHandler.md)").
+
+```cpp
+timerHandler.setCurrentTime(duration.count());
+```
+
+Note that setting the time at the ``timerHandler`` can result in "Timeout" messages.
+
+The loop then repeats, processing the next set of messages and updating the current time in the ``timerHandler``.
+
+## Process messages
+Inside the run-loop, the ``processMessages()`` method is called to handle any messages in the message queue.
+
+```cpp
+void processMessages()
+```
+
+The first step is to copy all the messages from the asynchronous message queues into the main message queue.
+
+
+
+
+## Copy messages
+
+While copying messages from an asynchronous message queue to the main message queue, the ``copyMessages()`` method was called.
+
+```cpp
+void copyMessages(const std::shared_ptr<FcmMessageQueue>& messageQueue)
+```
+
+All messages of the asynchronous message queue are now copied by calling the ``insertMessage()`` method (described in the next section) and then removing them.
+
+```cpp
+while (!messageQueue->empty())
+{
+    insertMessage(messageQueue->front());
+    messageQueue->pop_front();
+}
+```
+
+## Insert asynchronous message
+
+To insert an asynchronous message into the main message queue, the ``insertMessage()`` method is called.
+
+```cpp
+void insertMessage(const std::shared_ptr<FcmMessage>& message)
+```
+
+To keep the messages queue ordered in ascending timestamp, the location is searched where the message already in the main message queue has a larger timestamp than the message to be added. This is done using a lambda expression.
+
+```cpp
+auto it = std::find_if(mainMessageQueue.begin(), mainMessageQueue.end(),
+    [&message](const std::shared_ptr<FcmMessage>& m)
+    {
+        return m->timestamp > message->timestamp;
+    });
+```
+
+With the location found, the message can be inserted.
+
+```cpp
+mainMessageQueue.insert(it, message);
+```
+
+
 
 
 

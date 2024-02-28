@@ -16,6 +16,7 @@
 #include "FcmTimerInterface.h"
 #include "FcmLogicalInterface.h"
 #include "FcmStateTransitionTable.h"
+#include "FcmTimerHandler.h"
 
 // ---------------------------------------------------------------------------------------------------------------------
 // Forward declarations
@@ -36,14 +37,19 @@ public:
     FcmChoicePointTable choicePointTable;
     std::map<std::string, FcmComponent*> interfaces;
 
-    FcmComponent(std::string& nameParam, const std::shared_ptr<FcmMessageQueue>& messageQueueParam):
-        name(nameParam),
-        messageQueue(messageQueueParam){};
+    FcmComponent(std::string& nameParam,
+                 const std::shared_ptr<FcmMessageQueue>& messageQueueParam,
+                 const std::shared_ptr<FcmTimerHandler>& timerHandlerParam);
 
     void initialize();
 
     virtual void setTransitions(){}; // This function is to be overridden by the user.
     virtual void setChoicePoints(){}; // This function is to be overridden by the user.
+
+    virtual void setTimerHandler( const std::shared_ptr<FcmTimerHandler>& timerHandlerParam )
+    {
+        timerHandler = timerHandlerParam;
+    }
 
     void addTransition(const std::string& stateName,
                        const std::string& interfaceName,
@@ -64,8 +70,9 @@ public:
 
     void connectInterface(const std::string& interfaceName, FcmComponent* remoteComponent);
 
-private:
     const std::shared_ptr<FcmMessageQueue> messageQueue;
+    std::shared_ptr<FcmTimerHandler> timerHandler;
+
 };
 
 // ----------------------------------------------------------------------------
@@ -77,7 +84,7 @@ private:
     addTransition(STATE, #INTERFACE, #MESSAGE, NEXT_STATE,                  \
     [this](const FcmMessage& msg)                                           \
     {                                                                       \
-        const auto& message = static_cast<const INTERFACE::MESSAGE&>(msg);  \
+        const auto& message = dynamic_cast<const INTERFACE::MESSAGE&>(msg);  \
         ACTION                                                              \
     })
 
