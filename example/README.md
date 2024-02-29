@@ -51,23 +51,19 @@ uint32_t
 The ID of the timer in order for it to be stopped and restarted.
 
 
-States
-State
-Description
-Advertising
-The Client is not connected and is advertising its presence.
-Connecting
-The connection request is accepted and the first "ConnectedInd" is awaited.
-Connected
-The connection has been established. The connection timer is running to monitor whether the connection is not lost.
+## States
 
+| State       | Description                                                                                                         |
+|-------------|---------------------------------------------------------------------------------------------------------------------|
+| Advertising | The Client is not connected and is advertising its presence.                                                        |
+| Connecting  | The connection request is accepted and the first "ConnectedInd" is awaited.                                         |
+| Connected   | The connection has been established. The connection timer is running to monitor whether the connection is not lost. |
 
-Choice-points
-Choice-point
-Evaluation
-Correct Server?
-Whether the serverId is in the serverWhitelist and clientId is correct.
+## Choice-points
 
+| Choice-point    | Evaluation                                                              |
+|-----------------|-------------------------------------------------------------------------|
+| Correct Server? | Whether the serverId is in the serverWhitelist and clientId is correct. |
 
 ## State diagram
 
@@ -77,24 +73,24 @@ Whether the serverId is in the serverWhitelist and clientId is correct.
 ## State transition table
 
 
-| State | Interface | Message | Next state | Action |
-|---| --- | --- | --- | --- |
-| Advertising | Timer | Timeout | Advertising | Call ``advertise()``. |
-|   |Transceiving | ConnectReq | Correct Server? | Stop timer.<br>Set ``serverId``.<br>
- Set connectionId. |
-| Correct Server? | Logical | Yes | Connecting | Send an "ConnectAck" message.<br>Start timer with ``settings.connectionTimeout``. |
-|   | | No | Advertising | Send "ConnectRej" message.<br>Call ``advertise()``. |
-| Connecting | Timer | Timeout | Advertising | Call ``advertise()``. |
-| | Transceiving | ConnectReq | Connecting | - |
-| | Transceiving | ConnectedInd | Connected | Call ``connectionOk()``. |
-| Connected | Timer | Timeout | Advertising | Call ``advertise()``. |
-| | Transceiving | ConnectedInd | Connected | Call ``connectionOk()``. |
+| State             | Interface    | Message      | Next state      | Action                                                                            |
+|-------------------|--------------|--------------|-----------------|-----------------------------------------------------------------------------------|
+| Advertising       | Timer        | Timeout      | Advertising     | Call ``advertise()``.                                                             |
+|                   | Transceiving | ConnectReq   | Correct Server? | Stop timer.<br>Set ``serverId``.<br>                                              |
+| Set connectionId. |              |              |                 |                                                                                   |
+| Correct Server?   | Logical      | Yes          | Connecting      | Send an "ConnectAck" message.<br>Start timer with ``settings.connectionTimeout``. |
+|                   |              | No           | Advertising     | Send "ConnectRej" message.<br>Call ``advertise()``.                               |
+| Connecting        | Timer        | Timeout      | Advertising     | Call ``advertise()``.                                                             |
+|                   | Transceiving | ConnectReq   | Connecting      | -                                                                                 |
+|                   |              | ConnectedInd | Connected       | Call ``connectionOk()``.                                                          |
+| Connected         | Timer        | Timeout      | Advertising     | Call ``advertise()``.                                                             |
+|                   | Transceiving | ConnectedInd | Connected       | Call ``connectionOk()``.                                                          |
 
 ## Local functions
 
-| Function | Actions |
-|---| --- |
-| ``advertise()`` | Send an "AdvertisementInd" message.<br>Restart timer with ``settings.advertisementInterval``. |
-| ``connectionOk()`` | Stop timer.<br>Send "ConnectedInd".<br>Start timer with ``settings.connectionTimeout``. |
+| Function           | Actions                                                                                       |
+|--------------------|-----------------------------------------------------------------------------------------------|
+| ``advertise()``    | Send an "AdvertisementInd" message.<br>Restart timer with ``settings.advertisementInterval``. |
+| ``connectionOk()`` | Stop timer.<br>Send "ConnectedInd".<br>Start timer with ``settings.connectionTimeout``.       |
 
 
