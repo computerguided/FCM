@@ -3,6 +3,16 @@
 _To be able to generate timeouts, the "Timer Handler" is defined which is used by the components to set timeouts._
 
 ---
+
+# Table of contents
+
+1. [Description](#description)
+2. [Set current time](#set-current-time)
+3. [Set timeout](#set-timeout)
+4. [Cancel timeout](#cancel-timeout)
+5. [Send timeout message](#send-timeout-message)
+6. [Remove timeout message](#remove-timeout-message)
+
 ## Description
 
 The basic functionality of the ``FcmTimerHandler`` is to administer a list with the upcoming timeouts.

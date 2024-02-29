@@ -3,6 +3,24 @@
 _A device comprises one or more functional components. The concept of such a component is described in this document._
 
 ---
+
+## Table of contents
+
+1. [Description](#description)
+2. [Component construction](#component-construction)
+3. [Component initialization](#component-initialization)
+4. [Component interfacing](#component-interfacing)
+5. [Component's state-variables](#components-state-variables)
+6. [Component's settings](#components-settings)
+7. [Adding a transition](#adding-a-transition)
+8. [Adding a choice-point](#adding-a-choice-point)
+9. [Prepare a message](#prepare-a-message)
+10. [Send a message](#send-a-message)
+11. [Perform transition](#perform-transition)
+12. [Evaluate choice-point](#evaluate-choice-point)
+13. [Connect interface](#connect-interface)
+14. [Process message](#process-message)
+
 ## Description
 A _component_ is implemented as a subclass of the ```FcmComponent``` class. It implements a specific part of behavioral functionality of the device which is reflected in the name of the component which is set at the initialization of the component.
 
@@ -126,7 +144,7 @@ Note that grouping the messages into interfaces is technically not really necess
 * Message names can be reused.
 * Logging becomes easier when the interface is specified.
 
-However, one of the most important advantages of using interfaces is that the state-machine engine can be more efficient as will be described in more detail in "[State machine engine](StateMachineEngine.md)".
+However, one of the most important advantages of using interfaces is that the state-machine engine can be more efficient.
 
 All the interfaces a component uses are defined in its dictionary ```interfaces``` attribute.
 
@@ -354,7 +372,7 @@ catch (const std::out_of_range& e)
 }
 ```
 
-Note that to allow testing with unconnected interfaces, when the interface was not connected (see "[Connect interface](#connect-interface)"), the ``receiver`` will be the ``nullptr`` which will be handled further in the state machine engine.
+Note that to allow testing with unconnected interfaces, when the interface was not connected (see "[Connect interface](#connect-interface)"), the ``receiver`` will be the ``nullptr`` which will be handled further in message processing loop of the Device (see ["Device - Processing message"](Device.md#process-messages)).
 
 With the ``receiver`` set, the message can be added to the message queue that was supplied when constructing the component (see "[Component construction](#component-construction)").
 
@@ -362,12 +380,12 @@ With the ``receiver`` set, the message can be added to the message queue that wa
 messageQueue->push(message);
 ```
 
-## Process message
+## Perform transition
 
-When a message was sent to one of the connected interfaces of the component, the state machine engine (see "[State machine engine](StateMachineEngine.md)") will call the ``processMessage()`` of the component.
+To perform a transition, the component's ``performTransition()`` method must be called.
 
 ```cpp
-void processMessage(const FcmMessage& message)
+void performTransition(const FcmMessage& message)
 ```
 
 The first step is to get the names of the interface and the message, which were set during creation of the message (see "[Messages](Messages.md)").
@@ -469,3 +487,51 @@ This method is called when the component structure is set-up during the construc
     COMPONENT_2->connectInterface(#INTERFACE, COMPONENT_1)
 ```
 
+## Process message
+
+When a message is received by the component, the component's ``processMessage()`` method must be called.
+
+```cpp
+void executeStateMachine(const FcmMessage& message)
+```
+
+The first step is to process the message by calling the [``performTransition()``](#process-message) method which will execute the state transition and (possibly) change the state of the component.
+
+```cpp
+performTransition(message);
+```
+
+Next, the component must check if the new state is a choice-point.
+
+```cpp
+while (choicePointTable.find(currentState) != choicePointTable.end())
+{
+    ...
+}
+```
+
+If the new state is a choice-point, the evaluation function of the choice-point must be executed.
+
+```cpp
+bool result = evaluateChoicePoint(currentState);
+```
+
+Depending on the result of the evaluation, the corresponding message "Yes" or "No" on the "Logical" interface must be created.
+
+```cpp
+std::shared_ptr<FcmMessage> choicePointMessage;
+if (result)
+{
+    choicePointMessage = std::make_shared<Logical::Yes>();
+}
+else
+{
+    choicePointMessage = std::make_shared<Logical::No>();
+}
+```
+
+The message can be processed immediately, after which the loop will continue until the new state is not a choice-point.
+
+```cpp
+performTransition(*choicePointMessage);
+```

@@ -62,16 +62,11 @@ void FcmTimerHandler::cancelTimeout(int timerId)
     // Find the timeout with the given timer id and remove it.
     for (auto it = timeouts.begin(); it != timeouts.end(); ++it)
     {
-        if (it->second.timerId == timerId)
-        {
-            timeouts.erase(it);
-            return; // Found it, erase it, so we can return.
-        }
-    }
+        if (it->second.timerId != timerId) {continue;}
 
-    // If the timeout was not found, it is possible that the timeout has already
-    // expired and been handled. In that case, the timeout message is in the
-    // message queue. We need to remove it from the message queue.
+        timeouts.erase(it);
+        return; // Found it, erase it, so we can return.
+    }
 
     removeTimeoutMessage(timerId);
 }
@@ -81,7 +76,6 @@ void FcmTimerHandler::cancelTimeout(int timerId)
 // ---------------------------------------------------------------------------------------------------------------------
 void FcmTimerHandler::sendTimeoutMessage(int timerId, void* component)
 {
-    // Create a timeout message and have the component send it to itself.
     FCM_PREPARE_MESSAGE(timeoutMessage, Timer, Timeout);
     timeoutMessage->timerId = timerId;
     auto* castedComponent = static_cast<FcmComponent*>(component);
@@ -97,9 +91,8 @@ void FcmTimerHandler::removeTimeoutMessage(int timerId)
     {
         if ((*it)->interfaceName != "Timer") {continue;}
 
-        // Cast to "Timeout" message to access the timer id.
         auto timeoutMessage = dynamic_cast<Timer::Timeout*>(it->get());
-        if (timeoutMessage->timerId != timerId) { continue;}
+        if (timeoutMessage->timerId != timerId) {continue;}
 
         messageQueue->erase(it);
         return;

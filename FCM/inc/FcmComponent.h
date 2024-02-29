@@ -60,19 +60,18 @@ public:
     void addChoicePoint( const std::string& choicePointName,
                          const FcmSttEvaluation& evaluationFunction);
 
-    [[nodiscard]] bool atChoicePoint() const;
-
     void sendMessage(const std::shared_ptr<FcmMessage>& message);
 
-    void processMessage(const FcmMessage& message);
+    void performTransition(const FcmMessage& message);
 
     [[nodiscard]] bool evaluateChoicePoint(const std::string& choicePointName) const;
 
     void connectInterface(const std::string& interfaceName, FcmComponent* remoteComponent);
 
+    void processMessage(const FcmMessage& message);
+
     const std::shared_ptr<FcmMessageQueue> messageQueue;
     std::shared_ptr<FcmTimerHandler> timerHandler;
-
 };
 
 // ---------------------------------------------------------------------------------------------------------------------

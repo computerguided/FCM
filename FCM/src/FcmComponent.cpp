@@ -77,14 +77,6 @@ void FcmComponent::addChoicePoint(const std::string& choicePointName,
 }
 
 // ---------------------------------------------------------------------------------------------------------------------
-// Determine whether the current state is a choice-point.
-// ---------------------------------------------------------------------------------------------------------------------
-bool FcmComponent::atChoicePoint() const
-{
-    return choicePointTable.find(currentState) != choicePointTable.end();
-}
-
-// ---------------------------------------------------------------------------------------------------------------------
 // Send Message
 // ---------------------------------------------------------------------------------------------------------------------
 void FcmComponent::sendMessage(const std::shared_ptr<FcmMessage>& message)
@@ -126,7 +118,7 @@ bool FcmComponent::evaluateChoicePoint(const std::string &choicePointName) const
 // ---------------------------------------------------------------------------------------------------------------------
 // Process Message
 // ---------------------------------------------------------------------------------------------------------------------
-void FcmComponent::processMessage(const FcmMessage& message)
+void FcmComponent::performTransition(const FcmMessage& message)
 {
     auto interfaceName = message.interfaceName;
     auto messageName = message.name;
@@ -166,6 +158,31 @@ void FcmComponent::processMessage(const FcmMessage& message)
 void FcmComponent::connectInterface(const std::string &interfaceName, FcmComponent* remoteComponent)
 {
     interfaces[interfaceName] = remoteComponent;
+}
+
+// ---------------------------------------------------------------------------------------------------------------------
+// Execute State Machine
+// ---------------------------------------------------------------------------------------------------------------------
+void FcmComponent::processMessage(const FcmMessage& message)
+{
+    performTransition(message);
+
+    // Loop until the new state of the receiver is not a choice-point.
+    while (choicePointTable.find(currentState) != choicePointTable.end())
+    {
+        bool result = evaluateChoicePoint(currentState);
+
+        std::shared_ptr<FcmMessage> choicePointMessage;
+        if (result)
+        {
+            choicePointMessage = std::make_shared<Logical::Yes>();
+        }
+        else
+        {
+            choicePointMessage = std::make_shared<Logical::No>();
+        }
+        performTransition(*choicePointMessage);
+    }
 }
 
 

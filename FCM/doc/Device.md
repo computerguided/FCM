@@ -3,6 +3,17 @@
 _The system can be specified by identifying the actors, the use cases and the scenarios. Some of these actors are devices._
 
 ----
+
+## Table of contents
+
+1. [Definition](#definition)
+2. [Functional decomposition](#functional-decomposition)
+3. [Construction](#construction)
+4. [Run loop](#run-loop)
+5. [Process messages](#process-messages)
+6. [Copy messages](#copy-messages)
+7. [Insert asynchronous message](#insert-asynchronous-message)
+
 ## Definition
 
 Some of the actors of the system can be denoted as _devices_. On an abstract level these devices are characterized as _actors_ that can have a certain _state_ (or combination of states) and demonstrate deterministic _behavior_.
@@ -92,7 +103,33 @@ Inside the run-loop, the ``processMessages()`` method is called to handle any me
 void processMessages()
 ```
 
-The first step is to copy all the messages from the asynchronous message queues into the main message queue.
+The first step is to loop through all the asynchronous message queues and copy all their messages into the main message queue.
+
+```cpp
+for (auto& messageQueue : messageQueues)
+{
+    copyMessages(messageQueue);
+}
+```
+
+After copying all the messages, the main message queue is processed. This is done by looping through all the messages in the queue and calling the ``processMessage()`` method of the receiver of the message. If the receiver is not found, an error is logged and the loop continues.
+
+```cpp
+while (!mainMessageQueue->empty())
+{
+    auto message = mainMessageQueue->front();
+    auto receiver = (FcmComponent*)message->receiver;
+
+    if (receiver == nullptr)
+    {
+        // TODO: Log error.
+        continue;
+    }
+
+    receiver->processMessage(*message);
+    mainMessageQueue->pop_front();
+}
+```
 
 ## Copy messages
 

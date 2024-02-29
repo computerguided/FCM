@@ -4,6 +4,7 @@
 
 #include <thread>
 #include "FcmDevice.h"
+#include "FcmComponent.h"
 
 // ---------------------------------------------------------------------------------------------------------------------
 // Constructor
@@ -53,7 +54,18 @@ void FcmDevice::processMessages()
 
     while (!mainMessageQueue->empty())
     {
-        stateMachineEngine.handleMessage(*mainMessageQueue->front());
+        auto message = mainMessageQueue->front();
+
+        // Get the receiver of the message.
+        auto receiver = (FcmComponent*)message->receiver;
+
+        if (receiver == nullptr)
+        {
+            // TODO: Log error.
+            continue;
+        }
+
+        receiver->processMessage(*message);
         mainMessageQueue->pop_front();
     }
 }
