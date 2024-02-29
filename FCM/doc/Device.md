@@ -48,7 +48,6 @@ The components in turn can call (non-blocking) functions from the hardware API.
 1. Connect all handlers to components
 
 
-
 ## Run loop
 The ``run()`` method is started after all initializations are performed.
 
@@ -66,7 +65,11 @@ auto start = std::chrono::high_resolution_clock::now();
 
 An infinite loop is then entered, which will continue to run until the program is terminated.
 
-Inside the loop, the first operation is to call the ``processMessages()`` method (see "[Process messages](#process-messages)"). This method is responsible for processing all the messages in message queues.
+Inside the loop, the first operation is to call the [``processMessages()``](#process-messages) method which is responsible for processing all the messages in message queues.
+
+```cpp
+processMessages();
+```
 
 After processing the messages, the thread is put to sleep for a duration specified by ``timeStepMs``.
 
@@ -80,21 +83,20 @@ This pause allows for a controlled rate of execution. Once the thread wakes up, 
 auto end = std::chrono::high_resolution_clock::now();
 ```
  
-The duration between the start and end timestamps is then calculated.This is done by subtracting start from end and casting the result to milliseconds. The result is a ``std::chrono::milliseconds`` object, which is a type of ``std::chrono::duration``.
+The duration between the ``start`` and ``end`` timestamps is then calculated.This is done by subtracting ``start`` from ``end`` and casting the result to milliseconds. The result is a ``std::chrono::milliseconds`` object, which is a type of ``std::chrono::duration``.
 
 ```cpp
 auto duration = std::chrono::duration_cast<std::chrono::milliseconds>(end - start);
 ```
 
-The ``duration`` is then used to update the current time in the ``timerHandler`` by calling its ``setCurrentTime()`` method (see "[](TimerHandler.md)").
+The ``duration`` is then used to update the current time in the ``timerHandler`` by calling its [``setCurrentTime()``](TimerHandler.md#set-current-time) method.
 
 ```cpp
 timerHandler.setCurrentTime(duration.count());
 ```
-
 Note that setting the time at the ``timerHandler`` can result in "Timeout" messages.
 
-The loop then repeats, processing the next set of messages and updating the current time in the ``timerHandler``.
+The loop then repeats. 
 
 ## Process messages
 Inside the run-loop, the ``processMessages()`` method is called to handle any messages in the message queue.

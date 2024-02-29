@@ -495,7 +495,7 @@ When a message is received by the component, the component's ``processMessage()`
 void executeStateMachine(const FcmMessage& message)
 ```
 
-The first step is to process the message by calling the [``performTransition()``](#process-message) method which will execute the state transition and (possibly) change the state of the component.
+The first step is to process the message by calling the [``performTransition()``](#perform-transition) method which will execute the state transition and (possibly) change the state of the component.
 
 ```cpp
 performTransition(message);
