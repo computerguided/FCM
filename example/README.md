@@ -61,9 +61,9 @@ The ID of the timer in order for it to be stopped and restarted.
 
 ## Choice-points
 
-| Choice-point    | Evaluation                                                              |
-|-----------------|-------------------------------------------------------------------------|
-| Correct Server? | Whether the serverId is in the serverWhitelist and clientId is correct. |
+| Choice-point    | Evaluation                                                                          |
+|-----------------|-------------------------------------------------------------------------------------|
+| Correct Server? | Whether the ``serverId`` is in the ``serverWhitelist`` and ``clientId`` is correct. |
 
 ## State diagram
 
@@ -93,4 +93,64 @@ The ID of the timer in order for it to be stopped and restarted.
 | ``advertise()``    | Send an "AdvertisementInd" message.<br>Restart timer with ``settings.advertisementInterval``. |
 | ``connectionOk()`` | Stop timer.<br>Send "ConnectedInd".<br>Start timer with ``settings.connectionTimeout``.       |
 
+### Advertise
 
+The ``advertise()`` function sends an "AdvertisementInd" message and restarts the timer with the ``settings.advertisementInterval``.
+
+The first step is to use the [``FCM_PREPARE_MESSAGE``](../FCM/doc/Component.md#prepare-a-message) macro to prepare the ``advertisementInd`` message.
+
+```cpp
+FCM_PREPARE_MESSAGE(advertisementInd, Transceiving, AdvertisementInd);
+```
+
+With the message prepared, the ``clientId`` message parameter is set.
+
+```cpp
+advertisementInd->clientId = clientId;
+```
+
+With the message prepared, it is sent .
+
+```cpp
+FCM_SEND_MESSAGE(advertisementInd);
+```
+
+Finally, the timer is restarted with the ``settings.advertisementInterval`` timeout.
+
+```cpp
+timerId = timerHandler->setTimeout(settings->advertisementInterval, this);
+```
+
+### ConnectionOk
+
+The ``connectionOk()`` function stops the timer, sends a "ConnectedInd" message, and starts the timer with the ``settings.connectionTimeout``.
+
+The first step is to stop the timer.
+
+```cpp
+timerHandler->cancelTimeout(timerId);
+```
+
+The next step is to prepare the "ConnectedInd" message by using the [``FCM_PREPARE_MESSAGE``](../FCM/doc/Component.md#prepare-a-message) macro.
+
+```cpp
+FCM_PREPARE_MESSAGE(connectedInd, Transceiving, ConnectedInd);
+```
+
+With the message prepared, the ``connectionId`` message parameter is set.
+
+```cpp
+connectedInd->connectionId = connectionId;
+```
+
+With the message prepared, it is sent.
+
+```cpp
+FCM_SEND_MESSAGE(connectedInd);
+```
+
+Finally, the timer is restarted with the ``settings.connectionTimeout`` timeout.
+
+```cpp
+timerId = timerHandler->setTimeout(settings->connectionTimeout, this);
+```
