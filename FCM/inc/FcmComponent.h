@@ -17,11 +17,7 @@
 #include "FcmLogicalInterface.h"
 #include "FcmStateTransitionTable.h"
 #include "FcmTimerHandler.h"
-
-// ---------------------------------------------------------------------------------------------------------------------
-// Forward declarations
-// ---------------------------------------------------------------------------------------------------------------------
-class FcmComponent;
+#include "FcmMessageQueue.h"
 
 // ---------------------------------------------------------------------------------------------------------------------
 // FCM Component
@@ -33,23 +29,25 @@ public:
     const std::string name;
     std::string currentState;
 
-    FcmStateTransitionTable stateTransitionTable;
-    FcmChoicePointTable choicePointTable;
-    std::map<std::string, FcmComponent*> interfaces;
-
     FcmComponent(std::string& nameParam,
                  const std::shared_ptr<FcmMessageQueue>& messageQueueParam,
                  const std::shared_ptr<FcmTimerHandler>& timerHandlerParam);
 
     void initialize();
 
+    void connectInterface(const std::string& interfaceName, FcmComponent* remoteComponent);
+
+    void processMessage(const std::shared_ptr<FcmMessage>& message);
+
+protected:
+    std::shared_ptr<FcmTimerHandler> timerHandler;
+    FcmStateTransitionTable stateTransitionTable;
+    FcmChoicePointTable choicePointTable;
+    std::map<std::string, FcmComponent*> interfaces;
+    const std::shared_ptr<FcmMessageQueue> messageQueue;
+
     virtual void setTransitions(){}; // This function is to be overridden by the user.
     virtual void setChoicePoints(){}; // This function is to be overridden by the user.
-
-    virtual void setTimerHandler( const std::shared_ptr<FcmTimerHandler>& timerHandlerParam )
-    {
-        timerHandler = timerHandlerParam;
-    }
 
     void addTransition(const std::string& stateName,
                        const std::string& interfaceName,
@@ -62,16 +60,9 @@ public:
 
     void sendMessage(const std::shared_ptr<FcmMessage>& message);
 
-    void performTransition(const FcmMessage& message);
+    void performTransition(const std::shared_ptr<FcmMessage>& message);
 
     [[nodiscard]] bool evaluateChoicePoint(const std::string& choicePointName) const;
-
-    void connectInterface(const std::string& interfaceName, FcmComponent* remoteComponent);
-
-    void processMessage(const FcmMessage& message);
-
-    const std::shared_ptr<FcmMessageQueue> messageQueue;
-    std::shared_ptr<FcmTimerHandler> timerHandler;
 };
 
 // ---------------------------------------------------------------------------------------------------------------------
@@ -79,21 +70,21 @@ public:
 // ---------------------------------------------------------------------------------------------------------------------
 
 // Convenience macro for adding a transition to the state transition table.
-#define FCM_ADD_TRANSITION(STATE, INTERFACE, MESSAGE, NEXT_STATE, ACTION)   \
-    addTransition(STATE, #INTERFACE, #MESSAGE, NEXT_STATE,                  \
-    [this](const FcmMessage& msg)                                           \
-    {                                                                       \
-        const auto& message = dynamic_cast<const INTERFACE::MESSAGE&>(msg);  \
-        ACTION                                                              \
+#define FCM_ADD_TRANSITION(STATE, INTERFACE, MESSAGE, NEXT_STATE, ACTION)       \
+    addTransition(STATE, #INTERFACE, #MESSAGE, NEXT_STATE,                      \
+    [this](const std::shared_ptr<FcmMessage>& msg)                              \
+    {                                                                           \
+        const auto& message = dynamic_cast<const INTERFACE::MESSAGE&>(*msg);    \
+        ACTION                                                                  \
     })
 
 // Convenience macro for adding a choice point to the choice point table.
-#define FCM_ADD_CHOICE_POINT(CHOICE_POINT, EVALUATION)                      \
-    addChoicePoint(CHOICE_POINT,                                            \
-    [this]()                                                                \
-    {                                                                       \
-        \
-        EVALUATION                                                          \
+#define FCM_ADD_CHOICE_POINT(CHOICE_POINT, EVALUATION)  \
+    addChoicePoint(CHOICE_POINT,                        \
+    [this]()                                            \
+    {                                                   \
+                                                        \
+        EVALUATION                                      \
     })
 
 // ---------------------------------------------------------------------------------------------------------------------

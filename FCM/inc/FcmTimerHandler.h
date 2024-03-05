@@ -7,6 +7,7 @@
 
 #include <map>
 #include <FcmMessage.h>
+#include <FcmMessageQueue.h>
 
 // ---------------------------------------------------------------------------------------------------------------------
 struct FcmTimerInfo
@@ -34,7 +35,7 @@ public:
 
 private:
 
-    static void sendTimeoutMessage(int timerId, void* component);
+    void sendTimeoutMessage(int timerId, void* component);
     void removeTimeoutMessage(int timerId);
 };
 

@@ -1,8 +1,7 @@
 # Device
-----
+****
 _The system can be specified by identifying the actors, the use cases and the scenarios. Some of these actors are devices._
-
-----
+****
 
 ## Table of contents
 
@@ -14,38 +13,136 @@ _The system can be specified by identifying the actors, the use cases and the sc
 6. [Copy messages](#copy-messages)
 7. [Insert asynchronous message](#insert-asynchronous-message)
 
-## Definition
+## Description
 
-Some of the actors of the system can be denoted as _devices_. On an abstract level these devices are characterized as _actors_ that can have a certain _state_ (or combination of states) and demonstrate deterministic _behavior_.
+A system can be specified by identifying the _actors_, the _use cases_ and the _scenarios_.
+
+Some of the actors of the system can be denoted as _devices_. On an abstract level these devices are characterized as having a certain _state_ (or combination of states) and demonstrate deterministic _behavior_.
 
 More practically, a device is defined here as follows:
-* The functionality and behavior of the device is implemented in a modular way by defining a number of functional components.
-* These components are specified to be interconnected in a component diagram.
-* Via these connections the components can transmit messages.
+* The functionality and behavior of the device is implemented in a modular way by defining a number of _functional components_.
+* These components are specified to be interconnected in a _component diagram_.
+* The components are connected via _interfaces_.
+* Via these interfaces components can exchange _messages_.
 * There is one shared message queue.
-* No messages are lost.
 * There is shared memory between these components.
+* The device has a _run-loop_ that processes the messages in the message queue.
 
 ## Functional decomposition
-A device can be in a specific state for one use case but at the same time it could also be in another state in another use case. This could result in complex implementations if not some decomposition is performed. 
+A device can be in a specific _state_ for one use case but at the same time it could also be in another state in another use case. This could result in complex implementations if not some _functional decomposition_ is performed.
 
-This decomposition can be done by deriving functional _components_ from the use cases and scenarios.
+This decomposition can be done by deriving _functional components_ from the use cases and scenarios.
 
-These components have _interfaces_ by which they are connected to one or more other components. Via these interfaces the components can send and receive messages to the connected components. As such the components can be seen as message handlers that implement a number of scenarios.
+These components have _interfaces_ by which they are interconnected. 
+
+Via these interfaces the components can exchange messages. As such the components can be seen as message handlers that implement a number of scenarios.
 
 The implementation of the message handling inside a component is done by defining a _state-machine_.
 
-Some components can be associated with functionality that includes interaction with hardware. These components have interface-ports on which hardware can 'inject' asynchronous messages to the components. This can be done via a polling-loop or via an ISR.
+The messages in the shared message queue are processed one-by-one. This is done by the _run-loop_ of the device. As such, message handling is done _synchronously_ and in a [_run-to-completion_](https://en.wikipedia.org/wiki/Run_to_completion_scheduling) manner.
 
-The components in turn can call (non-blocking) functions from the hardware API.
+Some components can be associated with functionality that includes handling the interaction with _asynchronous_ parts of the device, such as hardware. Such components are called _Asynchronous Interface Handlers_ (AIH), or _handlers_ for short.
+
+It is good practice to use handlers to separate the synchronous and asynchronous parts of the device.
+
+The asynchronous interaction is done by having an _asynchronous message queue_ into which the handler will insert its messages. Several handlers can share an asynchronous message queue as long as it can be guaranteed that the handlers cannot insert messages at the same time (i.e. preempt each other).
+
+Before each new run-loop, the messages in the asynchronous message queues are then moved into the main message queue.
+
+Handlers will have interfaces which can only be used to send messages but not to receive them. As such the handlers will not have a state-machine.
+Handlers also define a set of _non-blocking_ functions that can be called by the components.
+
+## Class definition
+
+The base class for a device is ``FcmDevice`` which has the following properties.
+
+| Property | Type | Description |
+| --- | --- | --- |
+| ``timeStepMs`` | ``int`` | The time step in milliseconds. |
+| ``mainMessageQueue`` | ``std::shared_ptr<FcmMessageQueue>`` | The main message queue. |
+| ``messageQueues`` | ``std::vector<std::shared_ptr<FcmMessageQueue>>`` | A vector of asynchronous message queues. |
+| ``timerHandler`` | ``TimerHandler`` | The timer handler. |
+
 
 ## Construction
 
-1. Initialize the asynchronous message queues.
-1. Construct all handlers.
-1. Create all components.
-1. Connect all interfaces.
-1. Connect all handlers to components
+The constructor of the base class ``FcmDevice`` takes a single parameter, ``timeStepMsParam``, which is the time step in milliseconds. This is the time step that the run-loop will use to control the rate of execution (see "[Run loop](#run-loop)").
+
+```cpp
+FcmDevice(int timeStepMsParam)
+```
+
+Inside the constructor, the main message queue is initialized.
+
+```cpp
+mainMessageQueue = std::make_shared<FcmMessageQueue>();
+```
+
+The Device has one timer handler which is initialized.
+
+```cpp
+timerHandler = TimerHandler();
+```
+
+All the other initializations are done in the derived classes by calling the overridden ``initialize()`` method as described further in the [Initialize](#initialize) section.
+
+As such, the creation of a device in the main program is done by creating an instance of the derived class and calling its ``initialize()`` method and then call the ``run()`` method. This is shown in the following example.
+
+```cpp
+auto device = std::make_shared<SomeDevice>(timeStepMs);
+device->initialize();
+device->run();
+```
+
+## Initialize
+
+The base class ``FcmDevice`` has a virtual method ``initialize()`` which is overridden by the derived classes to perform the following initializations:
+
+1. Create asynchronous message queues.
+1. Create handlers.
+1. Create components.
+1. Connect interfaces.
+1. Connect handlers to components.
+
+These steps are performed in the overridden ``initialize()`` method of the derived class and are described in the following sections.
+
+## Create asynchronous message queues
+When there are handlers in the device, one or more asynchronous message queues need to be created. This is done by calling the ``createMessageQueue()`` method which returns a shared pointer to a new message queue.
+
+```cpp
+std::shared_ptr<FcmMessageQueue> createMessageQueue()
+```
+
+In this method, the first step is to create a new message queue.
+
+```cpp
+auto messageQueue = std::make_shared<FcmMessageQueue>();
+```
+
+The message queue is then added to the vector of asynchronous message queues.
+
+```cpp
+messageQueues.push_back(messageQueue);
+```
+
+The shared pointer to the message queue is then returned.
+
+```cpp
+return messageQueue;
+```
+
+## Create handlers
+
+## Create components
+
+## Connect interfaces
+
+## Connect handlers to components
+
+
+
+
+
 
 
 ## Run loop
@@ -141,13 +238,17 @@ While copying messages from an asynchronous message queue to the main message qu
 void copyMessages(const std::shared_ptr<FcmMessageQueue>& messageQueue)
 ```
 
-All messages of the asynchronous message queue are now copied by calling the ``insertMessage()`` method (described in the next section) and then removing them.
+All messages of the asynchronous message queue are popped from the specified message queue and copied into the main message queue. The timestamp of the message is updated to the current time in milliseconds.
 
 ```cpp
 while (!messageQueue->empty())
 {
-    insertMessage(messageQueue->front());
-    messageQueue->pop_front();
+    auto message = messageQueue->pop();
+
+    message->timestamp =
+        std::chrono::duration_cast<std::chrono::milliseconds>(
+                std::chrono::system_clock::now().time_since_epoch()).count();
+    mainMessageQueue->pop();
 }
 ```
 

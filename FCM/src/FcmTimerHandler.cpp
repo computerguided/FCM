@@ -78,8 +78,13 @@ void FcmTimerHandler::sendTimeoutMessage(int timerId, void* component)
 {
     FCM_PREPARE_MESSAGE(timeoutMessage, Timer, Timeout);
     timeoutMessage->timerId = timerId;
-    auto* castedComponent = static_cast<FcmComponent*>(component);
-    castedComponent->sendMessage(timeoutMessage);
+    timeoutMessage->receiver = component;
+
+    timeoutMessage->timestamp =
+            std::chrono::duration_cast<std::chrono::milliseconds>(
+                    std::chrono::system_clock::now().time_since_epoch()).count();
+
+    messageQueue->push(timeoutMessage);
 }
 
 // ---------------------------------------------------------------------------------------------------------------------

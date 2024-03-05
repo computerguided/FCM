@@ -11,7 +11,7 @@
 // State Transition Table
 // ---------------------------------------------------------------------------------------------------------------------
 
-using FcmSttAction = std::function<void(const FcmMessage&)>;
+using FcmSttAction = std::function<void(const std::shared_ptr<FcmMessage>&)>;
 
 struct FcmSttTransition
 {

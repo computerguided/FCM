@@ -33,9 +33,9 @@ FcmDevice::FcmDevice(int timeStepMsParam) : timeStepMs(timeStepMsParam)
 }
 
 // ---------------------------------------------------------------------------------------------------------------------
-// Create a new message queue
+// Add new asynchronous message queue
 // ---------------------------------------------------------------------------------------------------------------------
-std::shared_ptr<FcmMessageQueue> FcmDevice::createNewMessageQueue()
+std::shared_ptr<FcmMessageQueue> FcmDevice::createMessageQueue()
 {
     auto messageQueue = std::make_shared<FcmMessageQueue>();
     messageQueues.push_back(messageQueue);
@@ -54,7 +54,7 @@ void FcmDevice::processMessages()
 
     while (!mainMessageQueue->empty())
     {
-        auto message = mainMessageQueue->front();
+        auto message = mainMessageQueue->pop();
 
         // Get the receiver of the message.
         auto receiver = (FcmComponent*)message->receiver;
@@ -65,8 +65,7 @@ void FcmDevice::processMessages()
             continue;
         }
 
-        receiver->processMessage(*message);
-        mainMessageQueue->pop_front();
+        receiver->processMessage(message);
     }
 }
 
@@ -77,21 +76,7 @@ void FcmDevice::copyMessages(const std::shared_ptr<FcmMessageQueue>& messageQueu
 {
     while (!messageQueue->empty())
     {
-        insertMessage(messageQueue->front());
-        messageQueue->pop_front();
+        auto message = messageQueue->pop();
+        mainMessageQueue->push(message);
     }
-}
-
-// ---------------------------------------------------------------------------------------------------------------------
-// Insert a message in the main message queue at the proper position depending on the time of the message
-// ---------------------------------------------------------------------------------------------------------------------
-void FcmDevice::insertMessage(const std::shared_ptr<FcmMessage>& message) const
-{
-    auto it = std::find_if(mainMessageQueue->begin(), mainMessageQueue->end(),
-        [&message](const std::shared_ptr<FcmMessage>& m)
-        {
-           return m->timestamp > message->timestamp;
-        });
-
-    mainMessageQueue->insert(it, message);
 }

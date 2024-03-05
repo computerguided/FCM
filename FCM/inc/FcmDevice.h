@@ -9,6 +9,7 @@
 
 #include <FcmMessage.h>
 #include <FcmTimerHandler.h>
+#include <FcmMessageQueue.h>
 
 
 // ---------------------------------------------------------------------------------------------------------------------
@@ -22,19 +23,17 @@ public:
     virtual void initialize() = 0;
     [[noreturn]] void run();
 
-    std::shared_ptr<FcmMessageQueue> createNewMessageQueue();
+    std::shared_ptr<FcmMessageQueue> createMessageQueue();
 
 private:
 
     std::shared_ptr<FcmMessageQueue> mainMessageQueue;
     std::vector<std::shared_ptr<FcmMessageQueue>> messageQueues;
-    FcmStateMachineEngine stateMachineEngine;
     std::shared_ptr<FcmTimerHandler> timerHandler;
     const int timeStepMs;
 
     void processMessages();
     void copyMessages(const std::shared_ptr<FcmMessageQueue>& messageQueue) const;
-    void insertMessage(const std::shared_ptr<FcmMessage>& message) const;
 };
 
 

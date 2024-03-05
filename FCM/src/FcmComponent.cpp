@@ -82,9 +82,6 @@ void FcmComponent::addChoicePoint(const std::string& choicePointName,
 // ---------------------------------------------------------------------------------------------------------------------
 void FcmComponent::sendMessage(const std::shared_ptr<FcmMessage>& message)
 {
-    message->timestamp =
-            std::chrono::duration_cast<std::chrono::milliseconds>(
-                    std::chrono::system_clock::now().time_since_epoch()).count();
     try
     {
         message->receiver = interfaces.at(message->interfaceName);
@@ -94,7 +91,7 @@ void FcmComponent::sendMessage(const std::shared_ptr<FcmMessage>& message)
         message->receiver = nullptr;
     }
 
-    messageQueue->push_back(message);
+    messageQueue->push(message);
 }
 
 // ---------------------------------------------------------------------------------------------------------------------
@@ -119,10 +116,10 @@ bool FcmComponent::evaluateChoicePoint(const std::string &choicePointName) const
 // ---------------------------------------------------------------------------------------------------------------------
 // Process Message
 // ---------------------------------------------------------------------------------------------------------------------
-void FcmComponent::performTransition(const FcmMessage& message)
+void FcmComponent::performTransition(const std::shared_ptr<FcmMessage>& message)
 {
-    auto interfaceName = message.interfaceName;
-    auto messageName = message.name;
+    auto interfaceName = message->interfaceName;
+    auto messageName = message->name;
 
     // Check if the current state exists in the state transition table and throw a runtime error if it doesn't.
     auto state_it = stateTransitionTable.find(currentState);
@@ -158,13 +155,19 @@ void FcmComponent::performTransition(const FcmMessage& message)
 // ---------------------------------------------------------------------------------------------------------------------
 void FcmComponent::connectInterface(const std::string &interfaceName, FcmComponent* remoteComponent)
 {
+    if (interfaces.find(interfaceName) != interfaces.end())
+    {
+        throw std::runtime_error("Interface " + interfaceName +
+            " already connected " + " for component " + name);
+    }
+
     interfaces[interfaceName] = remoteComponent;
 }
 
 // ---------------------------------------------------------------------------------------------------------------------
 // Execute State Machine
 // ---------------------------------------------------------------------------------------------------------------------
-void FcmComponent::processMessage(const FcmMessage& message)
+void FcmComponent::processMessage(const std::shared_ptr<FcmMessage>& message)
 {
     performTransition(message);
 
@@ -182,7 +185,7 @@ void FcmComponent::processMessage(const FcmMessage& message)
         {
             choicePointMessage = std::make_shared<Logical::No>();
         }
-        performTransition(*choicePointMessage);
+        performTransition(choicePointMessage);
     }
 }
 
