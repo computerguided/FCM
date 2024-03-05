@@ -2,8 +2,8 @@
 // Created by Fred Dijkstra on 14/02/2024.
 //
 
-#include "Connector.h"
-#include "Transceiving.h"
+#include "../inc/Connector.h"
+#include "../inc/Transceiving.h"
 
 // ---------------------------------------------------------------------------------------------------------------------
 // Override the setTransitions function to add the transitions.

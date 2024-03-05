@@ -97,7 +97,7 @@ The ID of the timer in order for it to be stopped and restarted.
 
 The ``advertise()`` function sends an "AdvertisementInd" message and restarts the timer with the ``settings.advertisementInterval``.
 
-The first step is to use the [``FCM_PREPARE_MESSAGE``](../FCM/doc/Component.md#prepare-a-message) macro to prepare the ``advertisementInd`` message.
+The first step is to use the [``FCM_PREPARE_MESSAGE``](../../FCM/doc/Component.md#prepare-a-message) macro to prepare the ``advertisementInd`` message.
 
 ```cpp
 FCM_PREPARE_MESSAGE(advertisementInd, Transceiving, AdvertisementInd);
@@ -131,7 +131,7 @@ The first step is to stop the timer.
 timerHandler->cancelTimeout(timerId);
 ```
 
-The next step is to prepare the "ConnectedInd" message by using the [``FCM_PREPARE_MESSAGE``](../FCM/doc/Component.md#prepare-a-message) macro.
+The next step is to prepare the "ConnectedInd" message by using the [``FCM_PREPARE_MESSAGE``](../../FCM/doc/Component.md#prepare-a-message) macro.
 
 ```cpp
 FCM_PREPARE_MESSAGE(connectedInd, Transceiving, ConnectedInd);
