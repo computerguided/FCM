@@ -10,6 +10,7 @@
 #include <FcmMessage.h>
 #include <FcmTimerHandler.h>
 #include <FcmMessageQueue.h>
+#include <FcmAsyncInterfaceHandler.h>
 
 
 // ---------------------------------------------------------------------------------------------------------------------

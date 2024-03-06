@@ -17,10 +17,10 @@ class FcmAsyncInterfaceHandler
 public:
     const std::string name;
 
-    FcmAsyncInterfaceHandler(std::string& nameParam,
-                            const std::shared_ptr<FcmMessageQueue>& messageQueueParam);
+    FcmAsyncInterfaceHandler(const std::string& nameParam,
+                             const std::shared_ptr<FcmMessageQueue>& messageQueueParam);
 
-    void connectInterface(const std::string& interfaceName, FcmComponent* remoteComponent);
+    void connectInterface(const std::string& interfaceName, FcmComponent* receiver);
 
     virtual void initialize() = 0;
 
@@ -28,7 +28,6 @@ protected:
     const std::shared_ptr<FcmMessageQueue> messageQueue;
     std::map<std::string, FcmComponent*> interfaces;
 
-    void initSocket();
     void sendMessage(const std::shared_ptr<FcmMessage>& message);
 };
 

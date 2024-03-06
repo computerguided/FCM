@@ -133,6 +133,14 @@ return messageQueue;
 
 ## Create handlers
 
+With the asynchronous message queues created, the next step is to create each handler. For example, a handler for a UDP interface could be created as follows.
+
+```cpp
+auto udpHandler = std::make_shared<UdpHandler>();
+```
+
+
+
 ## Create components
 
 ## Connect interfaces

@@ -1,8 +1,7 @@
 # FCM Component
-----
+***
 _A device comprises one or more functional components. The concept of such a component is described in this document._
-
----
+***
 
 ## Table of contents
 
@@ -22,15 +21,25 @@ _A device comprises one or more functional components. The concept of such a com
 14. [Process message](#process-message)
 
 ## Description
-A _component_ is implemented as a subclass of the ```FcmComponent``` class. It implements a specific part of behavioral functionality of the device which is reflected in the name of the component which is set at the initialization of the component.
+A _component_ is defined as a subclass of the [``FcmComponent``](../inc/FcmComponent.h) class. It implements a specific part of behavioral functionality of the device which is reflected in the __name__ of the component which is set at the initialization of the component.
 
 ```cpp
 const std::string name;
 ```
 
-A component has a unique _name_ which can be freely chosen. However, it is good practice to have the name reflect the component's functionality in a sense that it answers the question as to what the component does, e.g. "I am a &lt;Component Name&gt;". Doing this makes it much easier to understand the device architecture, ensuring a modular design and preventing errors, mistakes and inefficient architectures.
+Preferably the name is unique within the device but can be freely chosen. However, it is good practice to have the name reflect the component's functionality in a sense that it answers the question as to what the component does, e.g. "I am a &lt;Component Name&gt;". Doing this makes it much easier to understand the device architecture, ensuring a modular design and preventing errors, mistakes and inefficient architectures.
 
 The name is used to identify and display the component in the component diagram. As a guideline, when displaying the component in the documentation, the name of the component is printed in the diagram with each word capitalized and separated by a space or newline (e.g. "Connection Handler").
+
+```puml
+@startuml
+hide empty description
+hide stereotype
+skinparam componentStyle rectangle
+skinparam defaultTextAlignment center
+component COMPONENT as "Connection\nHandler"
+@enduml
+```
 
 For the corresponding class name in the code, the spaces are omitted (e.g. ```ConnectionHandler```).
 

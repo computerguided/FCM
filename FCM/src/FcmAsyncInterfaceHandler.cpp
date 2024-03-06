@@ -5,7 +5,7 @@
 #include "FcmAsyncInterfaceHandler.h"
 
 // ---------------------------------------------------------------------------------------------------------------------
-FcmAsyncInterfaceHandler::FcmAsyncInterfaceHandler(std::string& nameParam,
+FcmAsyncInterfaceHandler::FcmAsyncInterfaceHandler(const std::string& nameParam,
                                                    const std::shared_ptr<FcmMessageQueue>& messageQueueParam)
     : name(nameParam), messageQueue(messageQueueParam)
 {
@@ -27,13 +27,13 @@ void FcmAsyncInterfaceHandler::sendMessage(const std::shared_ptr<FcmMessage>& me
 }
 
 // ---------------------------------------------------------------------------------------------------------------------
-void FcmAsyncInterfaceHandler::connectInterface(const std::string& interfaceName, FcmComponent* remoteComponent)
+void FcmAsyncInterfaceHandler::connectInterface(const std::string& interfaceName, FcmComponent* receiver)
 {
     if (interfaces.find(interfaceName) != interfaces.end())
     {
         throw std::runtime_error("Interface " + interfaceName +
             " already connected " + " for handler " + name);
     }
-    interfaces[interfaceName] = remoteComponent;
+    interfaces[interfaceName] = receiver;
 }
 
