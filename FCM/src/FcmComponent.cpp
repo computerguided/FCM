@@ -10,8 +10,12 @@
 // ---------------------------------------------------------------------------------------------------------------------
 FcmComponent::FcmComponent(std::string& nameParam,
                            const std::shared_ptr<FcmMessageQueue>& messageQueueParam,
-                           const std::shared_ptr<FcmTimerHandler>& timerHandlerParam)
-    : name(nameParam), messageQueue(messageQueueParam), timerHandler(timerHandlerParam)
+                           const std::shared_ptr<FcmTimerHandler>& timerHandlerParam,
+                           const std::map<std::string, std::any>& settingsParam):
+                           name(nameParam),
+                           messageQueue(messageQueueParam),
+                           timerHandler(timerHandlerParam),
+                           settings(settingsParam)
 {
     interfaces["Timer"] = this;
 }

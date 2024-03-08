@@ -6,11 +6,11 @@ _A device comprises one or more functional components. The concept of such a com
 ## Table of contents
 
 1. [Description](#description)
-2. [Component construction](#component-construction)
-3. [Component initialization](#component-initialization)
-4. [Component interfacing](#component-interfacing)
-5. [Component's state-variables](#components-state-variables)
-6. [Component's settings](#components-settings)
+2. [Construction](#construction)
+3. [Initialization](#initialization)
+4. [Interfacing](#interfacing)
+5. [State-variables](#state-variables)
+6. [Settings](#settings)
 7. [Adding a transition](#adding-a-transition)
 8. [Adding a choice-point](#adding-a-choice-point)
 9. [Prepare a message](#prepare-a-message)
@@ -31,56 +31,56 @@ Preferably the name is unique within the device but can be freely chosen. Howeve
 
 The name is used to identify and display the component in the component diagram. As a guideline, when displaying the component in the documentation, the name of the component is printed in the diagram with each word capitalized and separated by a space or newline (e.g. "Connection Handler").
 
-```puml
-@startuml
-hide empty description
-hide stereotype
-skinparam componentStyle rectangle
-skinparam defaultTextAlignment center
-component COMPONENT as "Connection\nHandler"
-@enduml
-```
+![Component](https://www.plantuml.com/plantuml/png/JOt1YiCm30Nl_WgHByaI5lQoIQ4vzYBirzHKbesiGFFtfHHAhyCCCtPdyxr8kEK4Gcb-K4AFbfldgc_S7ORgHqFezwoDZGl5MbfLg9_z490XEkictqh2bNVn5G__aRnfWJf5gCF29wTf-Jyjy--y4dSQfggA-7fVz8yr2Mm88pJjHPu0)
 
-For the corresponding class name in the code, the spaces are omitted (e.g. ```ConnectionHandler```).
+For the corresponding class name in the code, the spaces are omitted (e.g. ``ConnectionHandler``).
 
-The _behavior_ of the component is expressed by a number of scenarios. From these scenarios it can be derived that the component can reside in a specific current state.
+The _behavior_ of the component is expressed by a number of scenarios. From these scenarios it can be derived that the component can reside in a specific _current state_.
 
 ```cpp
 std::string currentState;
 ```
 
-The _transitions_ between the component's states can occur because of the component receiving a specific _message_ on a specific _interface_ (discussed in more detail in "[Component interfacing](#component-interfacing)"). These transitions are defined in the component's _state-transition table_ (STT) which is processed by a state-machine engine (discussed in more detail in "State-machine engine").
+As can be seen, the state is defined as a string, i.e. the _state-name_ which can be freely chosen. However, it is good practice to have the state reflect the component's current activity in a sense that it answers the question as to what the component is currently doing, e.g. "I am &lt;State Name&gt;" (for example "I am Processing").
+
+Doing this makes it much easier to understand the component's behavior.
+
+The _transitions_ between the component's states can occur because of the component receiving a specific _message_ on a specific _interface_ (discussed in more detail in "[Component interfacing](#interfacing)"). These transitions are defined in the component's [_state-transition table_](StateTransitionTable.md) (STT) which is used when a message is processed (see "[Process message](#process-message)").
 
 ```cpp
 FcmStateTransitionTable stateTransitionTable;
 ```
 
-Before ending up in a state, a transition can also route to a _choice-_point_. This is a special kind of state for which an _evaluation function_ is executed when the state is entered. The evaluation function does not take any arguments and the evaluation is done based on one or more of the attributes of the component. The evaluation of a choice-point results in a logical value: ```true``` or ```false```. Based on this result, the corresponding message "Yes" or "No" on the "Logical" interface is created and immediately processed. Note that each component has a "Logical" interface by default (see "Component interfacing" further on).
+Before ending up in a state, a transition can also route to a _choice-point_. This is a special kind of 'state' for which an _evaluation function_ is executed when the state is entered.
+
+The evaluation function of a choice-point does not take any arguments and the evaluation is done based on one or more of the attributes of the component.
+
+The evaluation of a choice-point results in a logical value: ``true`` or ``false``. Based on this result, the corresponding message "Yes" or "No" on the "Logical" interface is created and immediately processed. Note that each component has an implicit "Logical" interface by default.
+
 By definition a choice-point has two transitions associated with the "Yes" and "No" message and that these transitions in turn can also route to another choice-point if so required.
 
-Inside the component, the list of choice-points is explicitly defined in the component's choice-point table.
+Inside the component, the list of choice-points is explicitly defined in the component's _choice-point table_.
 
 ```cpp
 FcmChoicePointTable choicePointTable;
 ```
 
-Although the name of a choice-point can be freely chosen, it would be good practice to formulate the name as a closed question that can be answered with "Yes" or "No" and as such have it end with a question mark.
+Although the name of a choice-point can be freely chosen, it would be good practice to formulate the name as a closed question that can be answered with "Yes" or "No" and as such have it end with a question mark (for example "Max clients reached?").
 
-To be able to send message (see "[Send a message](#send-a-message)"), the component also has a reference to the _message-queue_ that it is supposed to use.
+Inside a transition, a component send messages to other components(see "[Send a message](#send-a-message)"). To be able to do this, the component has a reference to the [_message-queue_](../inc/FcmMessageQueue.h) that it is supposed to use.
 
 ```cpp
 const std::shared_ptr<FcmMessageQueue> messageQueue;
 ```
 
-## Component construction
+## Construction
 
-For the default constructor the name and message-queue of the component are set.
+For the default constructor the name, message-queue and timer-handler (see "[Timer Handler](TimerHandler.md)") of the component are set.
 
 ```cpp
-FcmComponent::FcmComponent(std::string& nameParam,
-                           const std::shared_ptr<FcmMessageQueue>& messageQueueParam,
-                           const std::shared_ptr<FcmTimerHandler>& timerHandlerParam)
-    : name(nameParam), messageQueue(messageQueueParam), timerHandler(timerHandlerParam)
+FcmComponent(std::string& nameParam,
+             const std::shared_ptr<FcmMessageQueue>& messageQueueParam,
+             const std::shared_ptr<FcmTimerHandler>& timerHandlerParam)
 ```
 
 For a subclass, this constructor must be called and any specific state-variables can be set in addition as shown in the example below.
@@ -90,14 +90,14 @@ Connector(std::string& name,
           const std::shared_ptr<FcmMessageQueue>& messageQueue,
           const std::shared_ptr<FcmTimerHandler>& timerHandlerParam,
           const std::shared_ptr<Settings>& settingsParam):
-    FcmComponent(name, messageQueue),
+    FcmComponent(name, messageQueue, timerHandlerParam),
     settings(settingsParam),
     clientId(settings->clientId),
     serverId(0),
     connectionId(0){};
 ```
 
-This will only construct the component, but not initialize the state transition table and choice-points. This will be done by an extra initialization step as described in the next section.
+This will only construct the component, but not _initialize_ the state transition table and choice-points. This will be done by an extra initialization step as described in the next section.
 
 Since a component needs to be able to handle "Timeout" messages on the "Timer" interface, this interface is 'connected' by default.
 
@@ -105,12 +105,12 @@ Since a component needs to be able to handle "Timeout" messages on the "Timer" i
 interfaces["Timer] = this;
 ```
 
-## Component initialization
-This construction does not define the state transition table nor the choice-point evaluation functions. To do this, two virtual methods are defined which are to be overridden in the subclass:
+## Initialization
+The construction does not define the state transition table nor the choice-point evaluation functions. To do this, two virtual methods are defined which are to be overridden in the subclass:
 
 ```cpp
-virtual void setTransitions(){};
-virtual void setChoicePoints(){};
+virtual void setTransitions() = 0;
+virtual void setChoicePoints() = 0;
 ```
 
 These two methods are called in the ``initialize()`` method.
@@ -141,44 +141,57 @@ else
 
 Note that the overridden initialization methods cannot be called inside the constructor of the base class as that would result in a call to the methods of the base class itself. Hence, the additional initialization step.
 
-## Component interfacing
-A component can have one or more interfaces that depend on the design of the component.
+## Interfacing
+A component can have one or more _interfaces_, depending on the design of the component.
 
 It is good engineering practice to define the interfaces beforehand as much as possible. This means; defining the messages and their parameters (see "[Messages](Messages.md)"). Doing this, allows for independently further defining the state-machine of the component.
 
-The interface completely shields the component from the environment in which it is running. A more detailed description is given in "[Interface](Interfaces.md)".
+The interface completely shields the component from the environment in which it is running. A more detailed description is given in "[Interfaces](Interfaces.md)".
 
 Note that grouping the messages into interfaces is technically not really necessary; some state-machine frameworks don't even specify interfaces, and for the method presented here, nothing prevents the developer from using only one interface containing all the messages. However, using interfaces has the following benefits:
 * It creates a more modular design.
-* Message names can be reused.
+* Message names can be reused in different interfaces.
 * Logging becomes easier when the interface is specified.
 
 However, one of the most important advantages of using interfaces is that the state-machine engine can be more efficient.
 
-All the interfaces a component uses are defined in its dictionary ```interfaces``` attribute.
+All the interfaces a component uses are defined in its dictionary ``interfaces`` attribute.
 
 ```cpp
 std::map<std::string, const FcmComponent*> interfaces;
 ```
 
-As can be seen from the definition, an interface holds a reference to ```FcmComponent``` which is set when the interface is connected to the component (see "[Connect interfaces](#connect-interface)").
+As can be seen from the definition, an interface holds a reference to ```FcmComponent``` which is set when the interface is connected to the component (see "[Connect interface](#connect-interface)").
 
-To be able to use an interface (e.g. send the messages defined in the interface), the header file of the interface needs to be included. For example, by default the ```FcmComponent``` adds the "Logical" interface by including the ```FcmLogicalInterface.h```.
+To be able to use an interface (e.g. send the messages defined in the interface), the header file of the interface needs to be included. For example, by default the ``FcmComponent`` adds the "Logical" interface by including the ``FcmLogicalInterface.h``.
 
-## Component's state-variables
+## State-variables
 As was described earlier, some attributes of the component are used inside state transition and evaluation functions. Those specific attributes are called _state-variables_ as these can be technically seen as holding a kind of 'sub-state' of the component and influence the behavior of the component.
 
-## Component's settings
-Apart from state-variables, a component can also have __settings_. These are attributes that are offered to the component when it is instantiated, but cannot be changed by the component itself. This is implemented by storing the settings as constant attributes of the component during initialization.
+## Settings
+Apart from state-variables, a component also has _settings_. This is a dictionary that is offered to the component when it is instantiated, but cannot be changed by the component itself. This is implemented by storing the settings as a constant attribute.
 
 ```cpp
-const std::shared_ptr<Settings> settings;
+const std::map<std::string, std::any> settings;
 ```
 
-Good practice is to define the structure holding the settings as an inner class of the component's class. Creating this ```Settings``` class is useful, especially because different components require different types of settings. Each component can have its own ```Settings``` inner class tailored to its specific needs and the constructor will have the corresponding parameter,
+The settings are used to configure the component and can be used to set the initial state-variables. The settings are set when the component is constructed and are used in the overridden constructor of the subclass.
+
+As an example, suppose a component has a setting ``clientId``, then the settings can be used as follows in which also a runtime error is thrown when the setting is incorrectly casted.
+
+```cpp
+try
+{
+    clientId = std::any_cast<uint32_t>(settings.at("clientId"));
+}
+catch (const std::bad_any_cast& e)
+{
+    throw std::runtime_error("Connector: " + name + " settings error: " + e.what());
+};
+```
 
 ## Adding a transition
-As specified in "[State transition table](StateTransitionTable.md)", a transition is uniquely defined by the combination of the state, interface and message. To add this combination to the state transition table and to specify the next state and the action, the component's ```addTransition()``` method must be called.
+As specified in "[State transition table](StateTransitionTable.md)", a transition is uniquely defined by the combination of the state, interface and message. To add this combination to the state transition table and to specify the next state and the action, the component's ``addTransition()`` method must be called.
 
 ```cpp
 void addTransition(const std::string& stateName,
@@ -188,7 +201,7 @@ void addTransition(const std::string& stateName,
                    const FcmSttAction& action)
 ```
 
-The first step is to check if the state exists. If the state does not exist, the state is added to the dictionary and set to a newly created empty ```FcmSttInterfaces``` dictionary.
+The first step is to check if the state exists. If the state does not exist, the state is added to the dictionary and set to a newly created empty ``FcmSttInterfaces`` dictionary.
 
 ```cpp
 if (stateTransitionTable.find(stateName) == stateTransitionTable.end())
@@ -197,7 +210,7 @@ if (stateTransitionTable.find(stateName) == stateTransitionTable.end())
 }
 ```
 
-Next it must be checked if the interface exists for the state. If this is not the case, the interface is added to the dictionary and set to a newly created empty ```FcmSttMessages``` dictionary.
+Next it must be checked if the interface exists for the state. If this is not the case, the interface is added to the dictionary and set to a newly created empty ``FcmSttMessages`` dictionary.
 
 ```cpp
 if (stateTransitionTable[stateName].find(interfaceName) == stateTransitionTable[state].end())
@@ -217,13 +230,13 @@ if (stateTransitionTable[stateName][interfaceName].find(messageName) != stateTra
 }
 ```
 
-When the message does not exist yet, add the message with the new ``cpp nextState`` and ``action``.
+When the message does not exist yet, add the message with the new ``nextState`` and ``action``.
 
 ```cpp
 stateTransitionTable[stateName][interfaceName][messageName] = FcmSttTransition{action, nextState};
 ```
 
-Using the ```addTransition()``` method of the component, a transition could be added as shown in the following example.
+Using the ``addTransition()`` method of the component, a transition could be added as shown in the following example.
 
 ```cpp
 addTransition("Processing", "ConnectionInterface", "ClientConnected", "Processing", 
@@ -242,12 +255,10 @@ Looking at the example, the amount of code can be simplified by using the ``FCM_
     addTransition(STATE, #INTERFACE, #MESSAGE, NEXT_STATE,              \
     [this](const FcmMessage& msg)                                       \
     {                                                                   \
-        const auto& message = static_cast<INTERFACE::MESSAGE&>(msg);    \
+        const auto& message = dynamic_cast<INTERFACE::MESSAGE&>(msg);    \
         ACTION                                                          \
     })
 ```
-
-Note that ``static_cast`` is used here because it is certain that the message is of the correct type.
 
 Adding the transition in the example can now be done as shown below.
 
@@ -286,19 +297,17 @@ choicePointTable[choicePointName] = evaluationFunction;
 Using the ``addChoicePoint()`` method, a choice-point could be added as shown in the following example.
 
 ```cpp
-addChoicePoint("Max clients?",
-    [this]()
-    {
-        return (numClients >= settings.maxClients);
-    });
+addChoicePoint("Max clients?",[this]()
+{
+    return (numClients >= settings.maxClients);
+});
 ```
 
 Looking at the example, the call can be simplified by using the FCM_ADD_CHOICE_POINT macro as shown below.
 
 ```cpp
 #define FCM_ADD_CHOICE_POINT(CHOICE_POINT, EVALUATION)  \
-    addChoicePoint(CHOICE_POINT,                        \
-    [this]()                                            \
+    addChoicePoint(CHOICE_POINT, [this]                 \
     {                                                   \
         EVALUATION                                      \
     });
@@ -309,7 +318,7 @@ Adding the choice-point in the example can now be done as shown below.
 ```cpp
 FCM_ADD_CHOICE_POINT("Max clients?",
 {
-    return (numClients >= settings.maxClients);
+    return (numClients >= maxClients);
 });
 ```
 
@@ -318,12 +327,12 @@ FCM_ADD_CHOICE_POINT("Max clients?",
 When performing a transition, a component can send a message by performing the following steps:
 1. Create the message by instantiating the proper class as defined in the corresponding interface file.
 1. Set the message parameters.
-1. Call the ``sendMessage()`` method (see "[Send a message](#send-a-message)")) with the created message as the single argument.
+1. Call the ``sendMessage()`` method (see "[Send a message](#send-a-message)") with the created message as the single argument.
 
 To help with the first step, a macro is defined:
 
 ```cpp
-#define FCM_PREPARE_MESSAGE( MESSAGE, INTERFACE, MESSAGE_TYPE ) \
+#define FCM_PREPARE_MESSAGE(MESSAGE, INTERFACE, MESSAGE_TYPE) \
     auto MESSAGE = std::make_shared<INTERFACE::MESSAGE_TYPE>()
 ```
 
@@ -362,12 +371,6 @@ When performing a transition, it must be possible for a component to 'send' a me
 void sendMessage(const std::shared_ptr<FcmMessage>& message)
 ```
 
-Inside this method, the missing default parameters of the message must be set, starting with the ``timestamp`` in milliseconds.
-
-```cpp
-message->timestamp = std::chrono::duration_cast<std::chrono::milliseconds>(std::chrono::system_clock::now().time_since_epoch()).count();
-```
-
 When constructing the message, the ``interfaceName`` property was already set (see "[Messages](Messages.md)") and can now be used to retrieve a connected receiver, but only if the interface was connected.
 
 ```cpp
@@ -383,7 +386,7 @@ catch (const std::out_of_range& e)
 
 Note that to allow testing with unconnected interfaces, when the interface was not connected (see "[Connect interface](#connect-interface)"), the ``receiver`` will be the ``nullptr`` which will be handled further in message processing loop of the Device (see ["Device - Processing message"](Device.md#process-messages)).
 
-With the ``receiver`` set, the message can be added to the message queue that was supplied when constructing the component (see "[Component construction](#component-construction)").
+With the ``receiver`` set, the message can be added to the message queue (see "[Message Queue](MessageQueue.md)") that was supplied when constructing the component (see "[Component construction](#construction)").
 
 ```cpp
 messageQueue->push(message);

@@ -11,6 +11,7 @@
 #include <string>
 #include <map>
 #include <queue>
+#include <any>
 
 #include "FcmMessage.h"
 #include "FcmTimerInterface.h"
@@ -28,10 +29,12 @@ class FcmComponent
 public:
     const std::string name;
     std::string currentState;
+    const std::map<std::string, std::any> settings;
 
     FcmComponent(std::string& nameParam,
                  const std::shared_ptr<FcmMessageQueue>& messageQueueParam,
-                 const std::shared_ptr<FcmTimerHandler>& timerHandlerParam);
+                 const std::shared_ptr<FcmTimerHandler>& timerHandlerParam,
+                 const std::map<std::string, std::any>& settingsParam);
 
     void initialize();
 
@@ -46,8 +49,8 @@ protected:
     std::map<std::string, FcmComponent*> interfaces;
     const std::shared_ptr<FcmMessageQueue> messageQueue;
 
-    virtual void setTransitions(){}; // This function is to be overridden by the user.
-    virtual void setChoicePoints(){}; // This function is to be overridden by the user.
+    virtual void setTransitions() = 0;
+    virtual void setChoicePoints() = 0;
 
     void addTransition(const std::string& stateName,
                        const std::string& interfaceName,
