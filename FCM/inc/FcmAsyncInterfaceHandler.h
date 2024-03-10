@@ -16,9 +16,11 @@ class FcmAsyncInterfaceHandler
 {
 public:
     const std::string name;
+    const std::map<std::string, std::any> settings;
 
     FcmAsyncInterfaceHandler(const std::string& nameParam,
-                             const std::shared_ptr<FcmMessageQueue>& messageQueueParam);
+                             const std::shared_ptr<FcmMessageQueue>& messageQueueParam,
+                             const std::map<std::string, std::any>& settingsParam);
 
     void connectInterface(const std::string& interfaceName, FcmComponent* receiver);
 

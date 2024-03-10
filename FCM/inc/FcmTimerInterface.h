@@ -15,6 +15,7 @@
 
 namespace Timer
 {
+    const char* const currentNamespace = "Timer";
     FCM_DEFINE_MESSAGE( Timeout, int timerId;);
 };
 

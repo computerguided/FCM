@@ -20,6 +20,16 @@ A subclass will also implement one or more so-called _interface functions_ which
 
 Depending on the asynchronous interface, the handler implements methods to handle asynchronous events. In these event-handler methods, the handler can send messages to the interface as will be explained in "[Sending messages](#sending-messages)".
 
+## Construction
+
+The handler is constructed by supplying a name and a reference to a message queue. The name is used to identify the handler in the system. The message queue is used to send messages to the interfaces. Also, it is possible to specify settings.
+
+```cpp
+FcmAsyncInterfaceHandler(const std::string& nameParam,
+                         const std::shared_ptr<FcmMessageQueue>& messageQueueParam,
+                         const std::map<std::string, std::any>& settingsParam);
+```
+
 ## Connecting interfaces
 
 A handler has a map of connected interfaces. The map is a `std::map` with the interface name as the key and a pointer to the receiver as the value. Since the handler can only interface with [components](Component.md), the value is a pointer to a `FcmComponent` object.

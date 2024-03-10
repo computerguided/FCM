@@ -6,8 +6,9 @@
 
 // ---------------------------------------------------------------------------------------------------------------------
 FcmAsyncInterfaceHandler::FcmAsyncInterfaceHandler(const std::string& nameParam,
-                                                   const std::shared_ptr<FcmMessageQueue>& messageQueueParam)
-    : name(nameParam), messageQueue(messageQueueParam)
+                                                   const std::shared_ptr<FcmMessageQueue>& messageQueueParam,
+                                                   const std::map<std::string, std::any>& settingsParam)
+    : name(nameParam), messageQueue(messageQueueParam), settings(settingsParam)
 {
 }
 

@@ -23,12 +23,22 @@ public:
 // ---------------------------------------------------------------------------------------------------------------------
 // Define a message inside an interface
 // ---------------------------------------------------------------------------------------------------------------------
-#define FCM_DEFINE_MESSAGE( NAME, ... )                                 \
+#define FCM_DEFINE_MESSAGE(NAME, ...)                                   \
     class NAME : public FcmMessage                                      \
     {                                                                   \
     public:                                                             \
         __VA_ARGS__                                                     \
-        NAME() { name = #NAME; interfaceName = FCM_INTERFACE_NAME; }    \
+        NAME() { name = #NAME; interfaceName = currentNamespace; }    \
+    }
+
+// ---------------------------------------------------------------------------------------------------------------------
+// Define interface
+// ---------------------------------------------------------------------------------------------------------------------
+#define FCM_SET_INTERFACE(NAME, ...)                \
+    namespace NAME                                  \
+    {                                               \
+        const char* const currentNamespace = #NAME; \
+        __VA_ARGS__                                 \
     }
 
 #endif //FCM_PROTOTYPING_FCMMESSAGE_H

@@ -16,6 +16,7 @@
 
 namespace Logical
 {
+    const char* const currentNamespace = "Logical";
     FCM_DEFINE_MESSAGE( Yes );
     FCM_DEFINE_MESSAGE( No );
 };
