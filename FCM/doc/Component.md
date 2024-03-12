@@ -303,7 +303,7 @@ addChoicePoint("Max clients?",[this]()
 });
 ```
 
-Looking at the example, the call can be simplified by using the FCM_ADD_CHOICE_POINT macro as shown below.
+Looking at the example, the call can be simplified by using the ``FCM_ADD_CHOICE_POINT`` macro as shown below.
 
 ```cpp
 #define FCM_ADD_CHOICE_POINT(CHOICE_POINT, EVALUATION)  \

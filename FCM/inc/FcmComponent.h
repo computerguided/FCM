@@ -13,6 +13,7 @@
 #include <queue>
 #include <any>
 
+#include "FcmBaseComponent.h"
 #include "FcmMessage.h"
 #include "FcmTimerInterface.h"
 #include "FcmLogicalInterface.h"
@@ -24,30 +25,23 @@
 // FCM Component
 // ---------------------------------------------------------------------------------------------------------------------
 
-class FcmComponent
+class FcmComponent: public FcmBaseComponent
 {
 public:
-    const std::string name;
     std::string currentState;
-    const std::map<std::string, std::any> settings;
 
-    FcmComponent(std::string& nameParam,
+    FcmComponent(const std::string& nameParam,
                  const std::shared_ptr<FcmMessageQueue>& messageQueueParam,
                  const std::shared_ptr<FcmTimerHandler>& timerHandlerParam,
                  const std::map<std::string, std::any>& settingsParam);
 
     void initialize();
-
-    void connectInterface(const std::string& interfaceName, FcmComponent* remoteComponent);
-
     void processMessage(const std::shared_ptr<FcmMessage>& message);
 
 protected:
     std::shared_ptr<FcmTimerHandler> timerHandler;
     FcmStateTransitionTable stateTransitionTable;
     FcmChoicePointTable choicePointTable;
-    std::map<std::string, FcmComponent*> interfaces;
-    const std::shared_ptr<FcmMessageQueue> messageQueue;
 
     virtual void setTransitions() = 0;
     virtual void setChoicePoints() = 0;
@@ -60,8 +54,6 @@ protected:
 
     void addChoicePoint( const std::string& choicePointName,
                          const FcmSttEvaluation& evaluationFunction);
-
-    void sendMessage(const std::shared_ptr<FcmMessage>& message);
 
     void performTransition(const std::shared_ptr<FcmMessage>& message);
 
@@ -86,7 +78,6 @@ protected:
     addChoicePoint(CHOICE_POINT,                        \
     [this]()                                            \
     {                                                   \
-                                                        \
         EVALUATION                                      \
     })
 

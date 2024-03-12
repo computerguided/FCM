@@ -43,6 +43,22 @@ std::shared_ptr<FcmMessageQueue> FcmDevice::createMessageQueue()
 }
 
 // ---------------------------------------------------------------------------------------------------------------------
+// Connect two components through an interface
+// ---------------------------------------------------------------------------------------------------------------------
+void FcmDevice::connectInterface(const std::string& interfaceName,
+                                 FcmBaseComponent* firstComponent,
+                                 FcmBaseComponent* secondComponent)
+{
+    firstComponent->connectInterface(interfaceName, secondComponent);
+    secondComponent->connectInterface(interfaceName, firstComponent);
+}
+
+// ---------------------------------------------------------------------------------------------------------------------
+// Create a component
+// ---------------------------------------------------------------------------------------------------------------------
+
+
+// ---------------------------------------------------------------------------------------------------------------------
 // Process messages
 // ---------------------------------------------------------------------------------------------------------------------
 void FcmDevice::processMessages()

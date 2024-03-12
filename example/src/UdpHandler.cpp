@@ -4,6 +4,13 @@
 
 #include "../inc/UdpHandler.h"
 
+// ---------------------------------------------------------------------------------------------------------------------
+UdpHandler::UdpHandler(const std::string& nameParam,
+                       const std::shared_ptr<FcmMessageQueue>& messageQueueParam,
+                       const std::map<std::string, std::any>& settingsParam)
+    : FcmAsyncInterfaceHandler(nameParam, messageQueueParam, settingsParam)
+{
+}
 
 // ---------------------------------------------------------------------------------------------------------------------
 void UdpHandler::initialize()
@@ -31,7 +38,25 @@ void UdpHandler::initSocket()
 }
 
 // ---------------------------------------------------------------------------------------------------------------------
-void UdpHandler::stopListening()
+void UdpHandler::enable()
+{
+    listening = true;
+    initSocket();
+
+    listenThread = std::thread([this]()
+    {
+       while (listening)
+       {
+           receive();
+       }
+    });
+
+    FCM_PREPARE_MESSAGE(udpEnabledInd, UdpEvents, EnabledInd);
+    FCM_SEND_MESSAGE(udpEnabledInd);
+}
+
+// ---------------------------------------------------------------------------------------------------------------------
+void UdpHandler::disable()
 {
     listening = false;
     close(socketHandle);
@@ -40,43 +65,46 @@ void UdpHandler::stopListening()
     {
         listenThread.join();
     }
+
+    FCM_PREPARE_MESSAGE(udpDisabledInd, UdpEvents, DisabledInd);
+    FCM_SEND_MESSAGE(udpDisabledInd);
 }
 
 // ---------------------------------------------------------------------------------------------------------------------
 void UdpHandler::send(const std::string& message)
 {
-    // Send the message
-    if (sendto(socketHandle, message.c_str(), message.size(), 0, (const struct sockaddr *)&serverAddress, sizeof(serverAddress)) < 0)
+    auto result = sendto(socketHandle, message.c_str(), message.size(), 0,
+                         (const struct sockaddr *)&serverAddress,
+                                 sizeof(serverAddress));
+
+    if (result < 0)
     {
         throw std::runtime_error("Failed to send message");
     }
 }
 
 // ---------------------------------------------------------------------------------------------------------------------
-void UdpHandler::receive(std::string& message) const
+void UdpHandler::receive()
 {
     char buffer[1024];
     long n = recvfrom(socketHandle, buffer, 1024, 0, nullptr, nullptr); // Blocking call
     if (n < 0)
     {
-        throw std::runtime_error("Failed to receive message");
+        if (errno == EBADF)
+        {
+            // Socket was closed, handle this as a special case
+            return;
+        }
+        else
+        {
+            throw std::runtime_error("Failed to receive message");
+        }
     }
     buffer[n] = '\0';
-    message = std::string(buffer);
+
+    FCM_PREPARE_MESSAGE(udpMessageInd, UdpEvents, UdpMessageInd);
+    udpMessageInd->message = std::string(buffer);
+    FCM_SEND_MESSAGE(udpMessageInd);
 }
 
-// ---------------------------------------------------------------------------------------------------------------------
-void UdpHandler::startListening()
-{
-    initSocket();
-    listening = true;
-    listenThread = std::thread([this]()
-    {
-        while (listening)
-        {
-            std::string message;
-            receive(message); // Blocking call
-            // TODO: Add message to message queue
-        }
-    });
-}
+

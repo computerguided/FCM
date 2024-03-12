@@ -63,10 +63,5 @@ The `ConnectionInfo` struct is defined as follows:
 ![state_diagram](https://www.plantuml.com/plantuml/png/VPB1JiCm38RlUGfhHwI-G0zbqyG10Hj2N115g6ei5jOwK-DEu-s9ehKEQSJD_VFzlnqtQyVDm6FVgOFH2DYV-0SqkdOm9pQMbF808pmQnqY6lgxVMqk4BIy4r6eIdZydoDB-28s3bGWrxHzkLuBUdPjkzFKEBnpGIG3oIatjx8nTJyr58btmUIccNKq3Dkq1TUpRTWQ9tJnpS5x5sHqiwltc0uegklzSUJbQ0vImqMSSs3ZiaVYUj8fE2u5HGpdLc_RuXwfoqmd-WjzAv2HJwj1Ri2gpgloq4hpu9oMycXxjo6ePbipnXYu7fUlQMPKsyKZoR2Gk1QLZY4fzooj8L0AcEvVGt47nJtAUbXSJGjKQIOzzzmi0)
 
 
-
-
-
-
-
 ****
 

@@ -1,6 +1,6 @@
 # Messages
 ***
-A message is a data structure that is used to send data and events between components and handlers. A message is identified by a _name_ and is sent to a _receiver_ on an _interface_.
+_A message is a data structure that is used to send data and events between components and handlers. A message is identified by a _name_ and is sent to a receiver on an interface_.
 ***
 
 ## Description
@@ -8,7 +8,7 @@ A message is a data structure that is used to send data and events between compo
 All messages are defined as subclasses from the `FcmMessage` class and have the following default fields:
 
 | Field | Type | Description |
-|-------|------|-------------|
+|:-------|:------|:-------------|
 | `receiver` | `void*` | Pointer to the receiver of the message. |
 | `timestamp` | `uint32_t` | Timestamp in milliseconds at which the message was sent. |
 | `interfaceName` | `std::string` | Name of the interface through which the message was sent. |

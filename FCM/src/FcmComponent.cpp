@@ -8,14 +8,12 @@
 // ---------------------------------------------------------------------------------------------------------------------
 // Constructor
 // ---------------------------------------------------------------------------------------------------------------------
-FcmComponent::FcmComponent(std::string& nameParam,
+FcmComponent::FcmComponent(const std::string& nameParam,
                            const std::shared_ptr<FcmMessageQueue>& messageQueueParam,
                            const std::shared_ptr<FcmTimerHandler>& timerHandlerParam,
                            const std::map<std::string, std::any>& settingsParam):
-                           name(nameParam),
-                           messageQueue(messageQueueParam),
-                           timerHandler(timerHandlerParam),
-                           settings(settingsParam)
+                           FcmBaseComponent(nameParam,messageQueueParam,settingsParam),
+                           timerHandler(timerHandlerParam)
 {
     interfaces["Timer"] = this;
 }
@@ -82,23 +80,6 @@ void FcmComponent::addChoicePoint(const std::string& choicePointName,
 }
 
 // ---------------------------------------------------------------------------------------------------------------------
-// Send Message
-// ---------------------------------------------------------------------------------------------------------------------
-void FcmComponent::sendMessage(const std::shared_ptr<FcmMessage>& message)
-{
-    try
-    {
-        message->receiver = interfaces.at(message->interfaceName);
-    }
-    catch (const std::out_of_range& e)
-    {
-        message->receiver = nullptr;
-    }
-
-    messageQueue->push(message);
-}
-
-// ---------------------------------------------------------------------------------------------------------------------
 // Evaluate Choice Point
 // ---------------------------------------------------------------------------------------------------------------------
 bool FcmComponent::evaluateChoicePoint(const std::string &choicePointName) const
@@ -152,20 +133,6 @@ void FcmComponent::performTransition(const std::shared_ptr<FcmMessage>& message)
 
     message_it->second.action(message);
     currentState = message_it->second.nextState;
-}
-
-// ---------------------------------------------------------------------------------------------------------------------
-// Connect Interface
-// ---------------------------------------------------------------------------------------------------------------------
-void FcmComponent::connectInterface(const std::string &interfaceName, FcmComponent* remoteComponent)
-{
-    if (interfaces.find(interfaceName) != interfaces.end())
-    {
-        throw std::runtime_error("Interface " + interfaceName +
-            " already connected " + " for component " + name);
-    }
-
-    interfaces[interfaceName] = remoteComponent;
 }
 
 // ---------------------------------------------------------------------------------------------------------------------

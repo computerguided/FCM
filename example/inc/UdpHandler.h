@@ -12,6 +12,7 @@
 #include <thread>
 
 #include "FcmAsyncInterfaceHandler.h"
+#include "UdpEvents.h"
 
 #define UDP_PORT 9001
 
@@ -19,21 +20,26 @@ class UdpHandler : public FcmAsyncInterfaceHandler
 {
 public:
 
+UdpHandler(const std::string& nameParam,
+           const std::shared_ptr<FcmMessageQueue>& messageQueueParam,
+           const std::map<std::string, std::any>& settingsParam);
+
+
     void initialize() override;
 
     // -- Interface functions --
-    void startListening();
-    void stopListening();
+    void enable();
+    void disable();
     void send(const std::string& message);
 
 private:
-    int socketHandle;
-    struct sockaddr_in serverAddress;
+    int socketHandle = -1;
+    struct sockaddr_in serverAddress = {0};
     std::thread listenThread;
     bool listening = false;
 
     void initSocket();
-    void receive(std::string& message) const;
+    void receive();
 };
 
 

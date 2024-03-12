@@ -3,6 +3,13 @@
 _To be able to exchange data and events, components and handlers have a list of connected 'interfaces' on which messages can be sent. In this section, the concept of interfaces is explained._
 ***
 
+# Table of Contents
+
+1. [Description](#description)
+2. [Connecting interfaces](#connecting-interfaces)
+3. [Sending messages](#sending-messages)
+4. [Specifying an interface](#specifying-an-interface)
+
 ## Description
 An interface is a connection between two components or between a component and a handler. It is a way to send messages to a component. An interface is identified by a _name_ and is 'connected' to a component by a pointer to the receiver. The receiver is stored in a map with the interface name as the key. The map is part of the component or handler that sends the message.
 

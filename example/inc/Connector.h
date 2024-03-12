@@ -4,7 +4,7 @@
 
 // ----------------------------------------------------------------------------
 // Includes
-// ----------------------------------------------------------------------------
+// --------------------------------------------------------------------------------
 #include <string>
 #include "FcmComponent.h"
 
@@ -14,43 +14,30 @@
 class Connector : public FcmComponent
 {
 public:
-    struct Settings
-    {
-        // The ID of the Client itself.
-        uint32_t clientId;
-
-        // The list of servers that the Client is allowed to connect to.
-        std::vector<uint32_t> serverWhitelist;
-
-        // The maximum number of milliseconds allowed between two consecutive "ConnectedInd" messages.
-        uint32_t connectionTimeout; // Maximum number of milliseconds allowed between two consecutive "ConnectedInd" messages.
-
-        // Number of milliseconds between two "AdvertisementInd" messages.
-        uint32_t advertisementInterval;
-    };
-
-    const std::shared_ptr<Settings> settings;
 
     // ----------------------------------------------------------------------------
     // Constructor
     // ----------------------------------------------------------------------------
-    Connector(std::string& name,
+
+    Connector(const std::string& name,
               const std::shared_ptr<FcmMessageQueue>& messageQueue,
-              const std::shared_ptr<Settings>& settingsParam,
-              const std::shared_ptr<FcmTimerHandler>& timerHandlerParam) :
-        FcmComponent(name, messageQueue, timerHandlerParam),
-        settings(settingsParam),
-        clientId(settings->clientId),
-        serverId(0),
-        connectionId(0){};
+              const std::shared_ptr<FcmTimerHandler>& timerHandlerParam,
+              const std::map<std::string, std::any>& settingsParam);
+
+    // ----------------------------------------------------------------------------
+    // Settings
+    // ----------------------------------------------------------------------------
+    uint32_t clientId{};
+    uint32_t connectionTimeout{};
+    uint32_t advertisementInterval{};
+    std::vector<uint32_t> serverWhitelist{};
 
     // ----------------------------------------------------------------------------
     // State variables
     // ----------------------------------------------------------------------------
-    uint32_t clientId;
-    uint32_t serverId;
-    uint32_t connectionId;
-    int timerId;
+    uint32_t connectionId{};
+    uint32_t serverId{};
+    int timerId{};
 
     // ----------------------------------------------------------------------------
     // Local functions

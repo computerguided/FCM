@@ -6,6 +6,29 @@
 #include "../inc/Transceiving.h"
 
 // ---------------------------------------------------------------------------------------------------------------------
+// Constructor
+// ---------------------------------------------------------------------------------------------------------------------
+Connector::Connector(const std::string& name,
+                    const std::shared_ptr<FcmMessageQueue>& messageQueue,
+                    const std::shared_ptr<FcmTimerHandler>& timerHandlerParam,
+                    const std::map<std::string, std::any>& settingsParam) :
+                    FcmComponent(name, messageQueue, timerHandlerParam, settingsParam)
+{
+    try
+    {
+        clientId = std::any_cast<uint32_t>(settings.at("clientId"));
+        serverWhitelist = std::any_cast<std::vector<uint32_t>>(settings.at("serverWhitelist"));
+        connectionTimeout = std::any_cast<uint32_t>(settings.at("connectionTimeout"));
+        advertisementInterval = std::any_cast<uint32_t>(settings.at("advertisementInterval"));
+    }
+    catch (const std::bad_any_cast& e)
+    {
+        throw std::runtime_error("Connector: " + name + " settings error: " + e.what());
+    };
+};
+
+
+// ---------------------------------------------------------------------------------------------------------------------
 // Override the setTransitions function to add the transitions.
 // ---------------------------------------------------------------------------------------------------------------------
 void Connector::setTransitions()
@@ -31,7 +54,7 @@ void Connector::setTransitions()
         connectAck->connectionId = connectionId;
         FCM_SEND_MESSAGE(connectAck);
 
-        timerId = timerHandler->setTimeout(settings->connectionTimeout, this);
+        timerId = timerHandler->setTimeout(connectionTimeout, this);
     });
 
     FCM_ADD_TRANSITION( "Correct Server?", Logical, No, "Advertising",
@@ -80,10 +103,10 @@ void Connector::setChoicePoints()
     FCM_ADD_CHOICE_POINT( "Correct Server?",
     {
         // Determine whether the server is in the whitelist.
-        auto it = std::find(settings->serverWhitelist.begin(),
-                            settings->serverWhitelist.end(), serverId);
+        auto it = std::find(serverWhitelist.begin(),
+                            serverWhitelist.end(), serverId);
 
-        return it != settings->serverWhitelist.end();
+        return it != serverWhitelist.end();
     });
 }
 
@@ -95,7 +118,7 @@ void Connector::advertise()
     FCM_PREPARE_MESSAGE(advertisementInd, Transceiving, AdvertisementInd);
     advertisementInd->clientId = clientId;
     FCM_SEND_MESSAGE(advertisementInd);
-    timerId = timerHandler->setTimeout(settings->advertisementInterval, this);
+    timerId = timerHandler->setTimeout(advertisementInterval, this);
 }
 
 // ---------------------------------------------------------------------------------------------------------------------
@@ -109,5 +132,5 @@ void Connector::connectionOk()
     connectedInd->connectionId = connectionId;
     FCM_SEND_MESSAGE(connectedInd);
 
-    timerId = timerHandler->setTimeout(settings->connectionTimeout, this);
+    timerId = timerHandler->setTimeout(connectionTimeout, this);
 }

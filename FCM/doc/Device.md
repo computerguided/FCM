@@ -57,7 +57,7 @@ Handlers also define a set of _non-blocking_ functions that can be called by the
 The base class for a device is ``FcmDevice`` which has the following properties.
 
 | Property | Type | Description |
-| --- | --- | --- |
+| :--- | :--- | :--- |
 | ``timeStepMs`` | ``int`` | The time step in milliseconds. |
 | ``mainMessageQueue`` | ``std::shared_ptr<FcmMessageQueue>`` | The main message queue. |
 | ``messageQueues`` | ``std::vector<std::shared_ptr<FcmMessageQueue>>`` | A vector of asynchronous message queues. |
@@ -139,11 +139,39 @@ With the asynchronous message queues created, the next step is to create each ha
 auto udpHandler = std::make_shared<UdpHandler>();
 ```
 
-
-
 ## Create components
 
+To be able to create components, the ``createComponent()`` method is called. This method is a template method that takes the type of the component as a template parameter together with the name of the component, a reference to the main message queue and a map of settings.
+
+```cpp
+template <class ComponentType>
+std::shared_ptr<ComponentType> FcmDevice::createComponent(const std::string& name,
+                                                          const std::shared_ptr<FcmMessageQueue>& messageQueue,
+                                                          const std::map<std::string,std::any>& settings)
+```
+
+The method starts by creating a new instance of the component in which the constructor is called with the specified parameters; the name, the message queue, the Device's timer handler and the settings.
+
+```cpp
+auto component = std::make_shared<ComponentType>(name, messageQueue, timerHandler, settings);
+```
+
+The component is then initialized and returned.
+
+```cpp
+component->initialize();
+return component;
+```
+
 ## Connect interfaces
+
+The ``connectInterface()`` method is used to connect an interface to a component. The method takes the name of the interface and a pointer to the receiver as parameters.
+
+```cpp
+void connectInterface(const std::string& interfaceName, FcmComponent* receiver)
+```
+
+
 
 ## Connect handlers to components
 
