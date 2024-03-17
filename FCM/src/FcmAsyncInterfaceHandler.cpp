@@ -1,5 +1,6 @@
 // ---------------------------------------------------------------------------------------------------------------------
 // Created by Fred Dijkstra on 05/03/2024.
+// Documentation: https://github.com/computerguided/FCM/blob/main/FCM/doc/AsyncInterfaceHandler.md
 // ---------------------------------------------------------------------------------------------------------------------
 
 #include "FcmAsyncInterfaceHandler.h"

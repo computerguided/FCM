@@ -14,17 +14,10 @@ Connector::Connector(const std::string& name,
                     const std::map<std::string, std::any>& settingsParam) :
                     FcmComponent(name, messageQueue, timerHandlerParam, settingsParam)
 {
-    try
-    {
-        clientId = std::any_cast<uint32_t>(settings.at("clientId"));
-        serverWhitelist = std::any_cast<std::vector<uint32_t>>(settings.at("serverWhitelist"));
-        connectionTimeout = std::any_cast<uint32_t>(settings.at("connectionTimeout"));
-        advertisementInterval = std::any_cast<uint32_t>(settings.at("advertisementInterval"));
-    }
-    catch (const std::bad_any_cast& e)
-    {
-        throw std::runtime_error("Connector: " + name + " settings error: " + e.what());
-    };
+    setSetting("clientId", clientId);
+    setSetting("serverWhitelist", serverWhitelist);
+    setSetting("connectionTimeout", connectionTimeout);
+    setSetting("advertisementInterval", advertisementInterval);
 };
 
 

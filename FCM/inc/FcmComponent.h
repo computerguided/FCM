@@ -81,23 +81,4 @@ protected:
         EVALUATION                                      \
     })
 
-// ---------------------------------------------------------------------------------------------------------------------
-// Prepare a message with parameters.
-// ---------------------------------------------------------------------------------------------------------------------
-#define FCM_PREPARE_MESSAGE( MESSAGE, INTERFACE, MESSAGE_TYPE ) \
-    auto MESSAGE = std::make_shared<INTERFACE::MESSAGE_TYPE>()
-
-// ---------------------------------------------------------------------------------------------------------------------
-// Send a message.
-// ---------------------------------------------------------------------------------------------------------------------
-#define FCM_SEND_MESSAGE( MESSAGE ) \
-    sendMessage(MESSAGE)
-
-// ---------------------------------------------------------------------------------------------------------------------
-// Connect the interface of two components.
-// ---------------------------------------------------------------------------------------------------------------------
-#define FCM_CONNECT_INTERFACE( INTERFACE, COMPONENT_1, COMPONENT_2 ) \
-    COMPONENT_1->connectInterface(#INTERFACE, COMPONENT_2)           \
-    COMPONENT_2->connectInterface(#INTERFACE, COMPONENT_1)
-
 #endif //FCM_PROTOTYPING_FCMCOMPONENT_H

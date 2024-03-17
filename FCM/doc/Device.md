@@ -17,7 +17,7 @@ _The system can be specified by identifying the actors, the use cases and the sc
 
 A system can be specified by identifying the _actors_, the _use cases_ and the _scenarios_.
 
-Some of the actors of the system can be denoted as _devices_. On an abstract level these devices are characterized as having a certain _state_ (or combination of states) and demonstrate deterministic _behavior_.
+Some of the actors of a system can be denoted as _devices_. On an abstract level these devices are characterized as having a certain _state_ (or combination of states) and demonstrate deterministic _behavior_.
 
 More practically, a device is defined here as follows:
 * The functionality and behavior of the device is implemented in a modular way by defining a number of _functional components_.

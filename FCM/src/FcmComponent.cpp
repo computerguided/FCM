@@ -6,8 +6,6 @@
 #include "FcmComponent.h"
 
 // ---------------------------------------------------------------------------------------------------------------------
-// Constructor
-// ---------------------------------------------------------------------------------------------------------------------
 FcmComponent::FcmComponent(const std::string& nameParam,
                            const std::shared_ptr<FcmMessageQueue>& messageQueueParam,
                            const std::shared_ptr<FcmTimerHandler>& timerHandlerParam,
@@ -18,8 +16,6 @@ FcmComponent::FcmComponent(const std::string& nameParam,
     interfaces["Timer"] = this;
 }
 
-// ---------------------------------------------------------------------------------------------------------------------
-// Initialize
 // ---------------------------------------------------------------------------------------------------------------------
 void FcmComponent::initialize()
 {
@@ -37,8 +33,6 @@ void FcmComponent::initialize()
     }
 }
 
-// ---------------------------------------------------------------------------------------------------------------------
-// Add Transition
 // ---------------------------------------------------------------------------------------------------------------------
 void FcmComponent::addTransition(const std::string& stateName,
                                  const std::string& interfaceName,
@@ -66,8 +60,6 @@ void FcmComponent::addTransition(const std::string& stateName,
 }
 
 // ---------------------------------------------------------------------------------------------------------------------
-// Add Choice Point
-// ---------------------------------------------------------------------------------------------------------------------
 void FcmComponent::addChoicePoint(const std::string& choicePointName,
                                   const FcmSttEvaluation& evaluationFunction)
 {
@@ -79,8 +71,6 @@ void FcmComponent::addChoicePoint(const std::string& choicePointName,
     choicePointTable[choicePointName] = evaluationFunction;
 }
 
-// ---------------------------------------------------------------------------------------------------------------------
-// Evaluate Choice Point
 // ---------------------------------------------------------------------------------------------------------------------
 bool FcmComponent::evaluateChoicePoint(const std::string &choicePointName) const
 {
@@ -98,8 +88,6 @@ bool FcmComponent::evaluateChoicePoint(const std::string &choicePointName) const
     return choicePointEvaluationFunction();
 }
 
-// ---------------------------------------------------------------------------------------------------------------------
-// Process Message
 // ---------------------------------------------------------------------------------------------------------------------
 void FcmComponent::performTransition(const std::shared_ptr<FcmMessage>& message)
 {
@@ -135,8 +123,6 @@ void FcmComponent::performTransition(const std::shared_ptr<FcmMessage>& message)
     currentState = message_it->second.nextState;
 }
 
-// ---------------------------------------------------------------------------------------------------------------------
-// Execute State Machine
 // ---------------------------------------------------------------------------------------------------------------------
 void FcmComponent::processMessage(const std::shared_ptr<FcmMessage>& message)
 {

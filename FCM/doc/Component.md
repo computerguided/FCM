@@ -21,7 +21,7 @@ _A device comprises one or more functional components. The concept of such a com
 14. [Process message](#process-message)
 
 ## Description
-A _component_ is defined as a subclass of the [``FcmComponent``](../inc/FcmComponent.h) class. It implements a specific part of behavioral functionality of the device which is reflected in the __name__ of the component which is set at the initialization of the component.
+A _component_ is defined as a subclass of the [``FcmComponent``](../inc/FcmComponent.h) class. It implements a specific part of behavioral functionality of the [device](Device.md) which is reflected in the _name_ of the component which is set at the initialization of the component.
 
 ```cpp
 const std::string name;
@@ -31,11 +31,9 @@ Preferably the name is unique within the device but can be freely chosen. Howeve
 
 The name is used to identify and display the component in the component diagram. As a guideline, when displaying the component in the documentation, the name of the component is printed in the diagram with each word capitalized and separated by a space or newline (e.g. "Connection Handler").
 
-![Component](https://www.plantuml.com/plantuml/png/JOt1YiCm30Nl_WgHByaI5lQoIQ4vzYBirzHKbesiGFFtfHHAhyCCCtPdyxr8kEK4Gcb-K4AFbfldgc_S7ORgHqFezwoDZGl5MbfLg9_z490XEkictqh2bNVn5G__aRnfWJf5gCF29wTf-Jyjy--y4dSQfggA-7fVz8yr2Mm88pJjHPu0)
-
 For the corresponding class name in the code, the spaces are omitted (e.g. ``ConnectionHandler``).
 
-The _behavior_ of the component is expressed by a number of scenarios. From these scenarios it can be derived that the component can reside in a specific _current state_.
+In the design, the _behavior_ of the component is typically expressed by a number of scenarios. From these scenarios it can be derived that the component can reside in a specific _current state_.
 
 ```cpp
 std::string currentState;
@@ -45,7 +43,7 @@ As can be seen, the state is defined as a string, i.e. the _state-name_ which ca
 
 Doing this makes it much easier to understand the component's behavior.
 
-The _transitions_ between the component's states can occur because of the component receiving a specific _message_ on a specific _interface_ (discussed in more detail in "[Component interfacing](#interfacing)"). These transitions are defined in the component's [_state-transition table_](StateTransitionTable.md) (STT) which is used when a message is processed (see "[Process message](#process-message)").
+The _transitions_ between the component's states can occur because of the component receiving a specific _message_ on a specific _interface_ (discussed in more detail in "[Interfacing](#interfacing)"). These transitions are defined in the component's [_state-transition table_](StateTransitionTable.md) (STT) which is used when a message is processed (see "[Process message](#process-message)").
 
 ```cpp
 FcmStateTransitionTable stateTransitionTable;
@@ -53,7 +51,7 @@ FcmStateTransitionTable stateTransitionTable;
 
 Before ending up in a state, a transition can also route to a _choice-point_. This is a special kind of 'state' for which an _evaluation function_ is executed when the state is entered.
 
-The evaluation function of a choice-point does not take any arguments and the evaluation is done based on one or more of the attributes of the component.
+The evaluation function of a choice-point does not take any arguments and the evaluation is done based on one or more of the [attributes](#state-variables) of the component.
 
 The evaluation of a choice-point results in a logical value: ``true`` or ``false``. Based on this result, the corresponding message "Yes" or "No" on the "Logical" interface is created and immediately processed. Note that each component has an implicit "Logical" interface by default.
 
@@ -67,7 +65,7 @@ FcmChoicePointTable choicePointTable;
 
 Although the name of a choice-point can be freely chosen, it would be good practice to formulate the name as a closed question that can be answered with "Yes" or "No" and as such have it end with a question mark (for example "Max clients reached?").
 
-Inside a transition, a component send messages to other components(see "[Send a message](#send-a-message)"). To be able to do this, the component has a reference to the [_message-queue_](../inc/FcmMessageQueue.h) that it is supposed to use.
+Inside a transition, a component send messages to other components(see "[Send a message](#send-a-message)"). To be able to do this, the component has a reference to the [_message-queue_](../inc/FcmMessageQueue.h) that it is supposed to use and which it typically shares with a number of other components.
 
 ```cpp
 const std::shared_ptr<FcmMessageQueue> messageQueue;
@@ -175,18 +173,23 @@ Apart from state-variables, a component also has _settings_. This is a dictionar
 const std::map<std::string, std::any> settings;
 ```
 
-The settings are used to configure the component and can be used to set the initial state-variables. The settings are set when the component is constructed and are used in the overridden constructor of the subclass.
+The settings are used to configure the component and typically can be used to set the initial value for the state-variables using the template method `setSettings()` which can be called in the constructor of the base class.
 
-As an example, suppose a component has a setting ``clientId``, then the settings can be used as follows in which also a runtime error is thrown when the setting is incorrectly casted.
+```cpp
+template <typename T>
+void setSetting(const std::string& settingName, T& stateVariable);
+```
+
+This method will set the state-variable to the value of the setting if the setting exists and is of the correct type. If the setting does not exist or is of the wrong type, a runtime error is thrown.
 
 ```cpp
 try
 {
-    clientId = std::any_cast<uint32_t>(settings.at("clientId"));
+    stateVariable = std::any_cast<T>(settings.at(settingName));
 }
 catch (const std::bad_any_cast& e)
 {
-    throw std::runtime_error("Connector: " + name + " settings error: " + e.what());
+    throw std::runtime_error("Component: " + name + " settings error: " + e.what());
 };
 ```
 
@@ -201,7 +204,7 @@ void addTransition(const std::string& stateName,
                    const FcmSttAction& action)
 ```
 
-The first step is to check if the state exists. If the state does not exist, the state is added to the dictionary and set to a newly created empty ``FcmSttInterfaces`` dictionary.
+The first step performed in this methog is to check if the state exists. If the state does not exist, the state is added to the dictionary and set to a newly created empty ``FcmSttInterfaces`` dictionary.
 
 ```cpp
 if (stateTransitionTable.find(stateName) == stateTransitionTable.end())
@@ -394,7 +397,7 @@ messageQueue->push(message);
 
 ## Perform transition
 
-To perform a transition, the component's ``performTransition()`` method must be called.
+To perform a transition, the ``performTransition()`` method must be called.
 
 ```cpp
 void performTransition(const FcmMessage& message)
@@ -501,10 +504,10 @@ This method is called when the component structure is set-up during the construc
 
 ## Process message
 
-When a message is received by the component, the component's ``processMessage()`` method must be called.
+When a message is received by the component, the ``processMessage()`` method must be called.
 
 ```cpp
-void executeStateMachine(const FcmMessage& message)
+void processMessage(const FcmMessage& message)
 ```
 
 The first step is to process the message by calling the [``performTransition()``](#perform-transition) method which will execute the state transition and (possibly) change the state of the component.
