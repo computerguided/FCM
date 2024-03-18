@@ -1,9 +1,10 @@
-//
+// ---------------------------------------------------------------------------------------------------------------------
 // Created by Fred Dijkstra on 12/03/2024.
-//
+// ---------------------------------------------------------------------------------------------------------------------
 
 #include "FcmBaseComponent.h"
 
+// ---------------------------------------------------------------------------------------------------------------------
 FcmBaseComponent::FcmBaseComponent(const std::string &nameParam,
                  const std::shared_ptr<FcmMessageQueue> &messageQueueParam,
                  const std::map<std::string, std::any> &settingsParam)
@@ -11,9 +12,6 @@ FcmBaseComponent::FcmBaseComponent(const std::string &nameParam,
 {
 }
 
-
-// ---------------------------------------------------------------------------------------------------------------------
-// Connect Interface
 // ---------------------------------------------------------------------------------------------------------------------
 void FcmBaseComponent::connectInterface(const std::string &interfaceName, FcmBaseComponent *remoteComponent)
 {
@@ -26,8 +24,6 @@ void FcmBaseComponent::connectInterface(const std::string &interfaceName, FcmBas
     interfaces[interfaceName] = remoteComponent;
 }
 
-// ---------------------------------------------------------------------------------------------------------------------
-// Send Message
 // ---------------------------------------------------------------------------------------------------------------------
 void FcmBaseComponent::sendMessage(const std::shared_ptr<FcmMessage>& message)
 {

@@ -14,9 +14,6 @@
 #include <FcmTimerHandler.h>
 #include <FcmMessageQueue.h>
 
-
-// ---------------------------------------------------------------------------------------------------------------------
-// FCM Device
 // ---------------------------------------------------------------------------------------------------------------------
 class FcmDevice
 {
@@ -29,8 +26,8 @@ public:
 
     template <class ComponentType>
     std::shared_ptr<ComponentType> createComponent(const std::string& name,
-                                                              const std::shared_ptr<FcmMessageQueue>& messageQueue,
-                                                              const std::map<std::string,std::any>& settings)
+                                                   const std::shared_ptr<FcmMessageQueue>& messageQueue,
+                                                   const std::map<std::string,std::any>& settings)
     {
         auto component = std::make_shared<ComponentType>(name, messageQueue, timerHandler, settings);
         component->initialize();

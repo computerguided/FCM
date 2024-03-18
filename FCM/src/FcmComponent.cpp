@@ -145,5 +145,3 @@ void FcmComponent::processMessage(const std::shared_ptr<FcmMessage>& message)
         performTransition(choicePointMessage);
     }
 }
-
-

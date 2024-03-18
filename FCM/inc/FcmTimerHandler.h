@@ -1,6 +1,6 @@
-//
+// ---------------------------------------------------------------------------------------------------------------------
 // Created by Fred Dijkstra on 25/02/2024.
-//
+// ---------------------------------------------------------------------------------------------------------------------
 
 #ifndef FCM_FCMTIMERHANDLER_H
 #define FCM_FCMTIMERHANDLER_H
@@ -21,12 +21,11 @@ class FcmTimerHandler
 {
 private:
     std::multimap<long long, FcmTimerInfo> timeouts;
-    long long currentTime;
+    long long currentTime{};
     const std::shared_ptr<FcmMessageQueue> messageQueue;
-    int nextTimerId;
+    int nextTimerId{};
 
 public:
-
     explicit FcmTimerHandler(const std::shared_ptr<FcmMessageQueue>& messageQueueParam);
 
     void setCurrentTime(long long currentTimeParam);
@@ -34,7 +33,6 @@ public:
     void cancelTimeout(int timerId);
 
 private:
-
     void sendTimeoutMessage(int timerId, void* component);
     void removeTimeoutMessage(int timerId);
 };

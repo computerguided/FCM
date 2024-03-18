@@ -76,15 +76,16 @@ const std::shared_ptr<FcmMessageQueue> messageQueue;
 For the default constructor the name, message-queue and timer-handler (see "[Timer Handler](TimerHandler.md)") of the component are set.
 
 ```cpp
-FcmComponent(std::string& nameParam,
+FcmComponent(const std::string& nameParam,
              const std::shared_ptr<FcmMessageQueue>& messageQueueParam,
-             const std::shared_ptr<FcmTimerHandler>& timerHandlerParam)
+             const std::shared_ptr<FcmTimerHandler>& timerHandlerParam,
+             const std::map<std::string, std::any>& settingsParam);
 ```
 
 For a subclass, this constructor must be called and any specific state-variables can be set in addition as shown in the example below.
 
 ```cpp
-Connector(std::string& name,
+Connector(const std::string& name,
           const std::shared_ptr<FcmMessageQueue>& messageQueue,
           const std::shared_ptr<FcmTimerHandler>& timerHandlerParam,
           const std::shared_ptr<Settings>& settingsParam):
@@ -387,7 +388,7 @@ catch (const std::out_of_range& e)
 }
 ```
 
-Note that to allow testing with unconnected interfaces, when the interface was not connected (see "[Connect interface](#connect-interface)"), the ``receiver`` will be the ``nullptr`` which will be handled further in message processing loop of the Device (see ["Device - Processing message"](Device.md#process-messages)).
+When the interface is not connected (see "[Connect interface](#connect-interface)"), the ``receiver`` will be the ``nullptr`` which will be handled further in message processing loop of the Device (see ["Device - Processing message"](Device.md#process-messages)).
 
 With the ``receiver`` set, the message can be added to the message queue (see "[Message Queue](MessageQueue.md)") that was supplied when constructing the component (see "[Component construction](#construction)").
 
@@ -397,7 +398,7 @@ messageQueue->push(message);
 
 ## Perform transition
 
-To perform a transition, the ``performTransition()`` method must be called.
+For a component to perform a transition, its ``performTransition()`` method must be called.
 
 ```cpp
 void performTransition(const FcmMessage& message)
@@ -431,7 +432,7 @@ if (interface_it == state_it->second.end())
 }
 ```
 
-When the interface exists, finally it is checked if the message exists in the state transition table and a runtime error is thrown if it doesn't.
+When the interface exists, finally it is checked if the message exists for the found interface and a runtime error is thrown if it doesn't.
 
 ```cpp
 auto message_it = interface_it->second.find(messageName);

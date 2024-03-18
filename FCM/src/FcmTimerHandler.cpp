@@ -1,23 +1,18 @@
-//
+// ---------------------------------------------------------------------------------------------------------------------
 // Created by Fred Dijkstra on 25/02/2024.
-//
+// Documentation: https://github.com/computerguided/FCM/blob/main/FCM/doc/TimerHandler.md
+// ---------------------------------------------------------------------------------------------------------------------
 
 #include "FcmTimerHandler.h"
 #include "FcmComponent.h"
 #include "FcmTimerInterface.h"
 
 // ---------------------------------------------------------------------------------------------------------------------
-// Constructor
-// ---------------------------------------------------------------------------------------------------------------------
 FcmTimerHandler::FcmTimerHandler(const std::shared_ptr<FcmMessageQueue>& messageQueueParam)
     : messageQueue(messageQueueParam)
 {
-    currentTime = 0;
-    nextTimerId = 0;
 }
 
-// ---------------------------------------------------------------------------------------------------------------------
-// Set the current time
 // ---------------------------------------------------------------------------------------------------------------------
 void FcmTimerHandler::setCurrentTime(long long currentTimeParam)
 {
@@ -36,8 +31,6 @@ void FcmTimerHandler::setCurrentTime(long long currentTimeParam)
 }
 
 // ---------------------------------------------------------------------------------------------------------------------
-// Set a timeout for a component
-// ---------------------------------------------------------------------------------------------------------------------
 int FcmTimerHandler::setTimeout(long long timeout, void* component)
 {
 
@@ -55,8 +48,6 @@ int FcmTimerHandler::setTimeout(long long timeout, void* component)
 }
 
 // ---------------------------------------------------------------------------------------------------------------------
-// Cancel a timeout
-// ---------------------------------------------------------------------------------------------------------------------
 void FcmTimerHandler::cancelTimeout(int timerId)
 {
     // Find the timeout with the given timer id and remove it.
@@ -72,8 +63,6 @@ void FcmTimerHandler::cancelTimeout(int timerId)
 }
 
 // ---------------------------------------------------------------------------------------------------------------------
-// Send a timeout message
-// ---------------------------------------------------------------------------------------------------------------------
 void FcmTimerHandler::sendTimeoutMessage(int timerId, void* component)
 {
     FCM_PREPARE_MESSAGE(timeoutMessage, Timer, Timeout);
@@ -87,8 +76,6 @@ void FcmTimerHandler::sendTimeoutMessage(int timerId, void* component)
     messageQueue->push(timeoutMessage);
 }
 
-// ---------------------------------------------------------------------------------------------------------------------
-// Remove a timeout message from the message queue
 // ---------------------------------------------------------------------------------------------------------------------
 void FcmTimerHandler::removeTimeoutMessage(int timerId)
 {

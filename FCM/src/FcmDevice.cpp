@@ -1,13 +1,12 @@
-//
+// ---------------------------------------------------------------------------------------------------------------------
 // Created by Fred Dijkstra on 25/02/2024.
-//
+// Documentation: https://github.com/computerguided/FCM/blob/main/FCM/doc/Device.md
+// ---------------------------------------------------------------------------------------------------------------------
 
 #include <thread>
 #include "FcmDevice.h"
 #include "FcmComponent.h"
 
-// ---------------------------------------------------------------------------------------------------------------------
-// Constructor
 // ---------------------------------------------------------------------------------------------------------------------
 FcmDevice::FcmDevice(int timeStepMsParam) : timeStepMs(timeStepMsParam)
 {
@@ -15,8 +14,6 @@ FcmDevice::FcmDevice(int timeStepMsParam) : timeStepMs(timeStepMsParam)
     timerHandler = std::make_shared<FcmTimerHandler>(mainMessageQueue);
 }
 
-// ---------------------------------------------------------------------------------------------------------------------
-// Run the device
 // ---------------------------------------------------------------------------------------------------------------------
 [[noreturn]] void FcmDevice::run()
 {
@@ -33,8 +30,6 @@ FcmDevice::FcmDevice(int timeStepMsParam) : timeStepMs(timeStepMsParam)
 }
 
 // ---------------------------------------------------------------------------------------------------------------------
-// Add new asynchronous message queue
-// ---------------------------------------------------------------------------------------------------------------------
 std::shared_ptr<FcmMessageQueue> FcmDevice::createMessageQueue()
 {
     auto messageQueue = std::make_shared<FcmMessageQueue>();
@@ -42,8 +37,6 @@ std::shared_ptr<FcmMessageQueue> FcmDevice::createMessageQueue()
     return messageQueue;
 }
 
-// ---------------------------------------------------------------------------------------------------------------------
-// Connect two components through an interface
 // ---------------------------------------------------------------------------------------------------------------------
 void FcmDevice::connectInterface(const std::string& interfaceName,
                                  FcmBaseComponent* firstComponent,
@@ -53,13 +46,6 @@ void FcmDevice::connectInterface(const std::string& interfaceName,
     secondComponent->connectInterface(interfaceName, firstComponent);
 }
 
-// ---------------------------------------------------------------------------------------------------------------------
-// Create a component
-// ---------------------------------------------------------------------------------------------------------------------
-
-
-// ---------------------------------------------------------------------------------------------------------------------
-// Process messages
 // ---------------------------------------------------------------------------------------------------------------------
 void FcmDevice::processMessages()
 {
@@ -85,8 +71,6 @@ void FcmDevice::processMessages()
     }
 }
 
-// ---------------------------------------------------------------------------------------------------------------------
-// Copy the messages from a message queue to the main message queue
 // ---------------------------------------------------------------------------------------------------------------------
 void FcmDevice::copyMessages(const std::shared_ptr<FcmMessageQueue>& messageQueue) const
 {

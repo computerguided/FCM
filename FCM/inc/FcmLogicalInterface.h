@@ -1,10 +1,9 @@
-//
+// ---------------------------------------------------------------------------------------------------------------------
 // Created by Fred Dijkstra on 22/01/2024.
-//
+// ---------------------------------------------------------------------------------------------------------------------
 
 #ifndef FCM_PROTOTYPING_FCMLOGICALINTERFACE_H
 #define FCM_PROTOTYPING_FCMLOGICALINTERFACE_H
-
 
 #include "FcmMessage.h"
 
@@ -20,6 +19,5 @@ namespace Logical
     FCM_DEFINE_MESSAGE( Yes );
     FCM_DEFINE_MESSAGE( No );
 };
-
 
 #endif //FCM_PROTOTYPING_FCMLOGICALINTERFACE_H
