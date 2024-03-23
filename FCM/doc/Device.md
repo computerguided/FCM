@@ -171,6 +171,13 @@ The ``connectInterface()`` method is used to connect an interface to a component
 void connectInterface(const std::string& interfaceName, FcmComponent* receiver)
 ```
 
+This method is called when the component structure is set-up during the construction of the device (see "[Device](Device.md)"). In there, the ``connectInterface()`` for the components at both ends must be called. To simplify this, the ``FCM_CONNECT_INTERFACE`` is defined.
+
+```cpp
+#define FCM_CONNECT_INTERFACE( INTERFACE, COMPONENT_1, COMPONENT_2 ) \
+    COMPONENT_1->connectInterface(#INTERFACE, COMPONENT_2)           \
+    COMPONENT_2->connectInterface(#INTERFACE, COMPONENT_1)
+```
 
 
 ## Connect handlers to components

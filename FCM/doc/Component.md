@@ -5,20 +5,19 @@ _A device comprises one or more functional components. The concept of such a com
 
 ## Table of contents
 
-1. [Description](#description)
-2. [Construction](#construction)
-3. [Initialization](#initialization)
-4. [Interfacing](#interfacing)
-5. [State-variables](#state-variables)
-6. [Settings](#settings)
-7. [Adding a transition](#adding-a-transition)
-8. [Adding a choice-point](#adding-a-choice-point)
-9. [Prepare a message](#prepare-a-message)
-10. [Send a message](#send-a-message)
-11. [Perform transition](#perform-transition)
-12. [Evaluate choice-point](#evaluate-choice-point)
-13. [Connect interface](#connect-interface)
-14. [Process message](#process-message)
+* [Description](#description)
+* [Construction](#construction)
+* [Initialization](#initialization)
+* [Interfacing](#interfacing)
+* [State-variables](#state-variables)
+* [Settings](#settings)
+* [Adding a transition](#adding-a-transition)
+* [Adding a choice-point](#adding-a-choice-point)
+* [Prepare a message](#prepare-a-message)
+* [Perform transition](#perform-transition)
+* [Evaluate choice-point](#evaluate-choice-point)
+* [Connect interface](#connect-interface)
+* [Process message](#process-message)
 
 ## Description
 A _component_ is defined as a subclass of the [``FcmComponent``](../inc/FcmComponent.h) class. It implements a specific part of behavioral functionality of the [device](Device.md) which is reflected in the _name_ of the component which is set at the initialization of the component.
@@ -174,25 +173,9 @@ Apart from state-variables, a component also has _settings_. This is a dictionar
 const std::map<std::string, std::any> settings;
 ```
 
-The settings are used to configure the component and typically can be used to set the initial value for the state-variables using the template method `setSettings()` which can be called in the constructor of the base class.
-
-```cpp
-template <typename T>
-void setSetting(const std::string& settingName, T& stateVariable);
-```
+The settings are used to configure the component and typically can be used to set the initial value for the state-variables using the template method [`setSettings()`](BaseComponent.md#accessing-settings) which can be called in the constructor.
 
 This method will set the state-variable to the value of the setting if the setting exists and is of the correct type. If the setting does not exist or is of the wrong type, a runtime error is thrown.
-
-```cpp
-try
-{
-    stateVariable = std::any_cast<T>(settings.at(settingName));
-}
-catch (const std::bad_any_cast& e)
-{
-    throw std::runtime_error("Component: " + name + " settings error: " + e.what());
-};
-```
 
 ## Adding a transition
 As specified in "[State transition table](StateTransitionTable.md)", a transition is uniquely defined by the combination of the state, interface and message. To add this combination to the state transition table and to specify the next state and the action, the component's ``addTransition()`` method must be called.
@@ -205,7 +188,7 @@ void addTransition(const std::string& stateName,
                    const FcmSttAction& action)
 ```
 
-The first step performed in this methog is to check if the state exists. If the state does not exist, the state is added to the dictionary and set to a newly created empty ``FcmSttInterfaces`` dictionary.
+The first step performed in this method is to check if the state exists. If the state does not exist, the state is added to the dictionary and set to a newly created empty ``FcmSttInterfaces`` dictionary.
 
 ```cpp
 if (stateTransitionTable.find(stateName) == stateTransitionTable.end())
@@ -331,7 +314,7 @@ FCM_ADD_CHOICE_POINT("Max clients?",
 When performing a transition, a component can send a message by performing the following steps:
 1. Create the message by instantiating the proper class as defined in the corresponding interface file.
 1. Set the message parameters.
-1. Call the ``sendMessage()`` method (see "[Send a message](#send-a-message)") with the created message as the single argument.
+1. Call the ``sendMessage()`` method (see "[Sending messages](BaseComponent.md#sending-messages)") with the created message as the single argument.
 
 To help with the first step, a macro is defined:
 
@@ -365,36 +348,7 @@ This macro is defined as:
     sendMessage(MESSAGE)
 ```
 
-The ``sendMessage()`` method (discussed in the next section) can of course also be called directly, but using the macro gives more symmetrical code with the ``FCM_PREPARE_MESSAGE()``.
-
-
-## Send a message
-When performing a transition, it must be possible for a component to 'send' a message. This is done by calling its ``sendMessage()`` property.
-
-```cpp
-void sendMessage(const std::shared_ptr<FcmMessage>& message)
-```
-
-When constructing the message, the ``interfaceName`` property was already set (see "[Messages](Messages.md)") and can now be used to retrieve a connected receiver, but only if the interface was connected.
-
-```cpp
-try
-{
-    message->receiver = interfaces.at(message->interfaceName);
-}
-catch (const std::out_of_range& e)
-{
-    message->receiver = nullptr;
-}
-```
-
-When the interface is not connected (see "[Connect interface](#connect-interface)"), the ``receiver`` will be the ``nullptr`` which will be handled further in message processing loop of the Device (see ["Device - Processing message"](Device.md#process-messages)).
-
-With the ``receiver`` set, the message can be added to the message queue (see "[Message Queue](MessageQueue.md)") that was supplied when constructing the component (see "[Component construction](#construction)").
-
-```cpp
-messageQueue->push(message);
-```
+The ``sendMessage()`` method can of course also be called directly, but using the macro gives more symmetrical code with the ``FCM_PREPARE_MESSAGE()``.
 
 ## Perform transition
 
@@ -493,14 +447,6 @@ For the component itself, connecting means nothing more than setting the corresp
 
 ```cpp
 interfaces[interfaceName] = remoteComponent;
-```
-
-This method is called when the component structure is set-up during the construction of the device (see "[Device](Device.md)"). In there, the ``connectInterface()`` for the components at both ends must be called. To simplify this, the ``FCM_CONNECT_INTERFACE`` is defined.
-
-```cpp
-#define FCM_CONNECT_INTERFACE( INTERFACE, COMPONENT_1, COMPONENT_2 ) \
-    COMPONENT_1->connectInterface(#INTERFACE, COMPONENT_2)           \
-    COMPONENT_2->connectInterface(#INTERFACE, COMPONENT_1)
 ```
 
 ## Process message
