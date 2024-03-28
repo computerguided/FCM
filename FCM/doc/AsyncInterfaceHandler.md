@@ -1,13 +1,7 @@
 # Asynchronous Interface Handler
-****
+***
 _The Asynchronous Interface Handler is a class that provides a way to handle asynchronous interfaces in a synchronous way._
-****
-
-## Table of Contents
-
-* [Description](#description)
-* [Connecting interfaces](#connecting-interfaces)
-* [Sending messages](#sending-messages)
+***
 
 ## Description
 The default Asynchronous Interface Handler, or _handler_ for short, is defined in the [`FcmAsyncInterfaceHandler`](../inc/FcmAsyncInterfaceHandler.h) class and provides a way to handle asynchronous interfaces in a synchronous way.

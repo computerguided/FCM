@@ -1,15 +1,5 @@
 # Functional Component Method documentation
 ***
-## Table of Contents
-
-* [Component](#component)
-* [Asynchronous Interface Handler](#asynchronous-interface-handler)
-* [Device](#device)
-* [Interfaces](#interfaces)
-* [Messages](#messages)
-* [MessageQueue](#messagequeue)
-* [State Transition Table](#state-transition-table)
-* [Timer Handler](#timer-handler)
 
 ## Overview
 

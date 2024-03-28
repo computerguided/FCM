@@ -1,17 +1,7 @@
 # Device
 ****
-_The system can be specified by identifying the actors, the use cases and the scenarios. Some of these actors are devices._
+_The system can be specified by identifying the actors, the use cases and the scenarios. Some of these actors are devices. The following describes the detailed design of the FcmDevice class_
 ****
-
-## Table of contents
-
-1. [Definition](#definition)
-2. [Functional decomposition](#functional-decomposition)
-3. [Construction](#construction)
-4. [Run loop](#run-loop)
-5. [Process messages](#process-messages)
-6. [Copy messages](#copy-messages)
-7. [Insert asynchronous message](#insert-asynchronous-message)
 
 ## Description
 
@@ -35,13 +25,13 @@ This decomposition can be done by deriving _functional components_ from the use 
 
 These components have _interfaces_ by which they are interconnected. 
 
-Via these interfaces the components can exchange messages. As such the components can be seen as message handlers that implement a number of scenarios.
+Via these interfaces, components can exchange messages. As such, the components can be seen as message handlers that implement a number of scenarios.
 
 The implementation of the message handling inside a component is done by defining a _state-machine_.
 
 The messages in the shared message queue are processed one-by-one. This is done by the _run-loop_ of the device. As such, message handling is done _synchronously_ and in a [_run-to-completion_](https://en.wikipedia.org/wiki/Run_to_completion_scheduling) manner.
 
-Some components can be associated with functionality that includes handling the interaction with _asynchronous_ parts of the device, such as hardware. Such components are called _Asynchronous Interface Handlers_ (AIH), or _handlers_ for short.
+Some components can be associated with functionality that includes handling the interaction with _asynchronous_ parts of the device, such as IO hardware. Such components are called _Asynchronous Interface Handlers_ (AIH), or _handlers_ for short.
 
 It is good practice to use handlers to separate the synchronous and asynchronous parts of the device.
 
@@ -63,7 +53,6 @@ The base class for a device is ``FcmDevice`` which has the following properties.
 | ``messageQueues`` | ``std::vector<std::shared_ptr<FcmMessageQueue>>`` | A vector of asynchronous message queues. |
 | ``timerHandler`` | ``TimerHandler`` | The timer handler. |
 
-
 ## Construction
 
 The constructor of the base class ``FcmDevice`` takes a single parameter, ``timeStepMsParam``, which is the time step in milliseconds. This is the time step that the run-loop will use to control the rate of execution (see "[Run loop](#run-loop)").
@@ -78,7 +67,7 @@ Inside the constructor, the main message queue is initialized.
 mainMessageQueue = std::make_shared<FcmMessageQueue>();
 ```
 
-The Device has one timer handler which is initialized.
+The Device has one [``TimerHandler``](TimerHandler.md) which is initialized.
 
 ```cpp
 timerHandler = TimerHandler();
@@ -150,6 +139,8 @@ std::shared_ptr<ComponentType> FcmDevice::createComponent(const std::string& nam
                                                           const std::map<std::string,std::any>& settings)
 ```
 
+Note that the settings are passed to the constructor of the component and therefore need to be specified first.
+
 The method starts by creating a new instance of the component in which the constructor is called with the specified parameters; the name, the message queue, the Device's timer handler and the settings.
 
 ```cpp
@@ -179,16 +170,12 @@ This method is called when the component structure is set-up during the construc
     COMPONENT_2->connectInterface(#INTERFACE, COMPONENT_1)
 ```
 
-
 ## Connect handlers to components
 
-
-
-
-
-
+Components that use handlers will have a reference to the handler which must be set explicitly.
 
 ## Run loop
+
 The ``run()`` method is started after all initializations are performed.
 
 ```cpp
@@ -239,6 +226,7 @@ Note that setting the time at the ``timerHandler`` can result in "Timeout" messa
 The loop then repeats. 
 
 ## Process messages
+
 Inside the run-loop, the ``processMessages()`` method is called to handle any messages in the message queue.
 
 ```cpp
@@ -318,11 +306,3 @@ With the location found, the message can be inserted.
 ```cpp
 mainMessageQueue.insert(it, message);
 ```
-
-
-
-
-
-
-
-

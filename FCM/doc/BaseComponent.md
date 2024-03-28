@@ -1,14 +1,7 @@
 # FCM Base Component
 ***
-The `FcmBaseComponent` is the base class for the `FcmComponent` and `FcmAsyncInterfaceHandler` classes and implements the basic attributes that are common to both classes, such as the name, settings, list of connected interfaces, and message queue. The base class also provides methods to connect interfaces, send messages, and access settings.
+_The `FcmBaseComponent` is the base class for the `FcmComponent` and `FcmAsyncInterfaceHandler` classes and implements the basic attributes that are common to both classes, such as the name, settings, list of connected interfaces, and message queue. The base class also provides methods to connect interfaces, send messages, and access settings. The following describes the detailed design of the base class._
 ***
-
-## Table of Contents
-
-* [Construction](#construction)
-* [Connecting interfaces](#connecting-interfaces)
-* [Sending messages](#sending-messages)
-* [Accessing settings](#accessing-settings)
 
 ## Construction
 
@@ -20,7 +13,7 @@ FcmBaseComponent(const std::string& nameParam,
                  const std::map<std::string, std::any>& settingsParam);
 ```
 
-The `name`, `messageQueue`, and `settings` attributes are initialized with the supplied parameters.
+The `name`, `messageQueue`, and `settings` attributes that are initialized with the supplied parameters.
 
 ```cpp
 std::string name;
@@ -28,15 +21,31 @@ std::shared_ptr<FcmMessageQueue> messageQueue;
 std::map<std::string, std::any> settings;
 ```
 
-## Connecting interfaces
+## Interfacing
+Depending on the design, a component can have one or more _interfaces_.
 
-A component has a map of connected interfaces. The map is a `std::map` with the interface name as the key and a pointer to the receiver as the value. The value is a pointer to a `FcmComponent` object.
+It is good engineering practice to define the interfaces beforehand as much as possible. This means; defining the messages and their parameters (see "[Messages](Messages.md)").
+
+The interface completely shields the component from the environment in which it is running. A more detailed description is given in "[Interfaces](Interfaces.md)".
+
+Note that grouping the messages into interfaces is technically not really necessary; some state-machine frameworks don't even specify interfaces, and for the method presented here, nothing prevents the developer from using only one interface containing all the messages. However, using interfaces has the following benefits:
+* It creates a more modular design.
+* Message names can be reused in different interfaces.
+* Logging becomes easier when the interface is specified.
+
+However, one of the most important advantages of using interfaces is that the state-machine engine can be more efficient.
+
+All the interfaces a component uses are defined in its dictionary ``interfaces`` attribute.
 
 ```cpp
-std::map<std::string, FcmComponent*> interfaces;
+std::map<std::string, const FcmBaseComponent*> interfaces;
 ```
 
-A convenience method is defined to connect an interface to a component.
+As can be seen from the definition, an interface holds a reference to ```FcmBaseComponent``` which is set when the interface is connected to the component (see "[Connecting interfaces](#connecting-interfaces)").
+
+## Connecting interfaces
+
+To connect an interface to a component, a convenience method is defined.
 
 ```cpp
 void connectInterface(const std::string& interfaceName, FcmComponent* receiver)
@@ -50,7 +59,7 @@ interfaces[interfaceName] = receiver;
 
 ## Sending messages
 
-To be able to send messages to an interface, the `sendMessage()` method can be used.
+To be able to send messages on an interface, the `sendMessage()` method can be used.
 
 ```cpp
 void sendMessage(const std::shared_ptr<FcmMessage>& message)

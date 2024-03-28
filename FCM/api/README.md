@@ -9,7 +9,7 @@ A device represents the top-level entity in the FCM architecture. It is responsi
 - **Creation and Management**: Devices create and manage components and handlers, ensuring proper communication and operation within the system.
 - **Message Queue**: Devices utilize a main message queue for sending messages between components and handlers.
 
-```cpp:src/FcmDevice.cpp
+```cpp
 FcmDevice::FcmDevice(int timeStepMsParam)
 ```
 
@@ -89,11 +89,11 @@ Choice-points are decision points within the state transition table that allow f
 
 To define a choice-point, you use the [`FCM_ADD_CHOICE_POINT`](../doc/Component.md#adding-a-choice-point) macro. Here's an example:
 
-```cpp:src/FcmComponent.cpp
+```cpp
 FCM_ADD_CHOICE_POINT("CheckCondition", 
-    {
-        return checkSomeCondition(); // Should return a boolean value
-    });
+{
+    return checkSomeCondition(); // Should return a boolean value
+});
 ```
 
 In this example, when the component reaches the "CheckCondition" choice-point, it evaluates `checkSomeCondition()`. Based on the returned boolean value, the component transitions to the next state accordingly.
@@ -107,7 +107,7 @@ Asynchronous Interface Handlers (AIH) are specialized components designed to han
 - **Usage**: AIHs are used for operations that do not block the main execution flow, such as I/O operations.
 - **Construction**: AIHs are constructed similarly to functional components but are specifically designed to handle asynchronous interfaces.
 
-```cpp:src/FcmAsyncInterfaceHandler.cpp
+```cpp
 FcmAsyncInterfaceHandler::FcmAsyncInterfaceHandler(const std::string& nameParam, ...)
 ```
 

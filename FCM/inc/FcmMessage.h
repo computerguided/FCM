@@ -21,16 +21,16 @@ public:
 };
 
 // ---------------------------------------------------------------------------------------------------------------------
-#define FCM_DEFINE_MESSAGE(NAME, ...)                                   \
-    class NAME : public FcmMessage                                      \
-    {                                                                   \
-    public:                                                             \
-        __VA_ARGS__                                                     \
-        NAME() { name = #NAME; interfaceName = currentNamespace; }    \
+#define FCM_DEFINE_MESSAGE(NAME, ...)                               \
+    class NAME : public FcmMessage                                  \
+    {                                                               \
+    public:                                                         \
+        __VA_ARGS__                                                 \
+        NAME() { name = #NAME; interfaceName = currentNamespace; }  \
     }
 
 // ---------------------------------------------------------------------------------------------------------------------
-#define FCM_PREPARE_MESSAGE( MESSAGE, INTERFACE, MESSAGE_TYPE ) \
+#define FCM_PREPARE_MESSAGE(MESSAGE, INTERFACE, MESSAGE_TYPE) \
     auto MESSAGE = std::make_shared<INTERFACE::MESSAGE_TYPE>()
 
 // ---------------------------------------------------------------------------------------------------------------------

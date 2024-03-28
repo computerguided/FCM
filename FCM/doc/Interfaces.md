@@ -3,37 +3,15 @@
 _To be able to exchange data and events, components and handlers have a list of connected 'interfaces' on which messages can be sent. In this section, the concept of interfaces is explained._
 ***
 
-# Table of Contents
-
-1. [Description](#description)
-2. [Connecting interfaces](#connecting-interfaces)
-3. [Sending messages](#sending-messages)
-4. [Specifying an interface](#specifying-an-interface)
-
 ## Description
-An interface is a connection between two components or between a component and a handler. It is a way to send messages to a component. An interface is identified by a _name_ and is 'connected' to a component by a pointer to the receiver. The receiver is stored in a map with the interface name as the key. The map is part of the component or handler that sends the message.
 
-```cpp
-std::map<std::string, FcmComponent*> interfaces;
-```
-
-## Connecting interfaces
-
-A component or handler has a method to 'connect' an interface to the component (note that handlers cannot receive messages). The method is called `connectInterface()` and has two parameters: the name of the interface and a pointer to the receiver.
-
-```cpp
-void connectInterface(const std::string& interfaceName, FcmComponent* receiver)
-```
+An interface is a connection between two components or between a component and a handler. It is a way to send messages to a component. An interface is identified by a _name_ and is 'connected' to a component by a pointer to the receiver as described in more detail in ["Connecting interfaces"](BaseComponent.md#connecting-interfaces).
 
 ## Sending messages
 
-A component or handler can send messages to an interface using its [`sendMessage()`](Component.md#send-a-message) method. The method has one parameter: a pointer to the message to be sent.
+A component or handler can send messages to an interface using its [`sendMessage()`](Component.md#send-a-message) method.
 
-```cpp
-void sendMessage(const std::shared_ptr<FcmMessage>& message)
-```
-
-In this method, the message is placed in the message queue that was supplied to the component or handler when it was created. The message queue is a shared resource that is used by all components and handlers in the system. The message queue is used to send messages between components and handlers. The message queue is described in the [Message Queue](MessageQueue.md) section.
+In this method, the message is placed in the message queue that was supplied to the component or handler when it was created. The main message queue is a shared resource that is used by all components and handlers in the system. The message queue is used to send messages between components and handlers. The message queue is described in the [Message Queue](MessageQueue.md) section.
 
 Note that the `sendMessage()` method does not require the specification of the interface name. This is because the interface name is already part of the default field of the message and stored in `interfaceName`. This field is set when the message is created as also described in the next section. The message also has a field `receiver` that specifies the receiver of the message. The receiver is set to `nullptr` if the interface is not connected.
 
@@ -53,12 +31,12 @@ To set the interface and define the messages the ``FCM_SET_INTERFACE`` and ``FCM
 ```
 
 ```cpp
-#define FCM_DEFINE_MESSAGE(NAME, ...)                                   \
-    class NAME : public FcmMessage                                      \
-    {                                                                   \
-    public:                                                             \
-        __VA_ARGS__                                                     \
-        NAME() { name = #NAME; interfaceName = currentNamespace; }    \
+#define FCM_DEFINE_MESSAGE(NAME, ...)                               \
+    class NAME : public FcmMessage                                  \
+    {                                                               \
+    public:                                                         \
+        __VA_ARGS__                                                 \
+        NAME() { name = #NAME; interfaceName = currentNamespace; }  \
     }
 ```
 
@@ -91,9 +69,3 @@ namespace UdpEvents
     };
 }
 ```
-
-
-
-
-
-

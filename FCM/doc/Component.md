@@ -1,26 +1,10 @@
 # FCM Component
 ***
-_A device comprises one or more functional components. The concept of such a component is described in this document._
+_A device comprises one or more functional components. The following describes the design of a component._
 ***
 
-## Table of contents
-
-* [Description](#description)
-* [Construction](#construction)
-* [Initialization](#initialization)
-* [Interfacing](#interfacing)
-* [State-variables](#state-variables)
-* [Settings](#settings)
-* [Adding a transition](#adding-a-transition)
-* [Adding a choice-point](#adding-a-choice-point)
-* [Prepare a message](#prepare-a-message)
-* [Perform transition](#perform-transition)
-* [Evaluate choice-point](#evaluate-choice-point)
-* [Connect interface](#connect-interface)
-* [Process message](#process-message)
-
 ## Description
-A _component_ is defined as a subclass of the [``FcmComponent``](../inc/FcmComponent.h) class. It implements a specific part of behavioral functionality of the [device](Device.md) which is reflected in the _name_ of the component which is set at the initialization of the component.
+A _component_ is defined as a subclass of the [``FcmComponent``](../inc/FcmComponent.h) class which in turn is a subclass of the [``FcmBaseComponent``](BaseComponent.md) class. It implements a specific part of behavioral functionality of the [device](Device.md) which is reflected in the _name_ of the component which is set at the initialization of the component.
 
 ```cpp
 const std::string name;
@@ -54,7 +38,7 @@ The evaluation function of a choice-point does not take any arguments and the ev
 
 The evaluation of a choice-point results in a logical value: ``true`` or ``false``. Based on this result, the corresponding message "Yes" or "No" on the "Logical" interface is created and immediately processed. Note that each component has an implicit "Logical" interface by default.
 
-By definition a choice-point has two transitions associated with the "Yes" and "No" message and that these transitions in turn can also route to another choice-point if so required.
+By definition a choice-point has two transitions associated with the "Yes" and "No" message. These transitions in turn can also route to another choice-point if so required.
 
 Inside the component, the list of choice-points is explicitly defined in the component's _choice-point table_.
 
@@ -64,7 +48,7 @@ FcmChoicePointTable choicePointTable;
 
 Although the name of a choice-point can be freely chosen, it would be good practice to formulate the name as a closed question that can be answered with "Yes" or "No" and as such have it end with a question mark (for example "Max clients reached?").
 
-Inside a transition, a component send messages to other components(see "[Send a message](#send-a-message)"). To be able to do this, the component has a reference to the [_message-queue_](../inc/FcmMessageQueue.h) that it is supposed to use and which it typically shares with a number of other components.
+Inside a transition, a component can send messages to other components(see "[Send a message](#send-a-message)"). To be able to do this, the component has a reference to the [_message-queue_](../inc/FcmMessageQueue.h) that it is supposed to use and which it typically shares with the other components.
 
 ```cpp
 const std::shared_ptr<FcmMessageQueue> messageQueue;
@@ -90,7 +74,7 @@ Connector(const std::string& name,
           const std::shared_ptr<Settings>& settingsParam):
     FcmComponent(name, messageQueue, timerHandlerParam),
     settings(settingsParam),
-    clientId(settings->clientId),
+    clientId(0),
     serverId(0),
     connectionId(0){};
 ```
@@ -139,31 +123,8 @@ else
 
 Note that the overridden initialization methods cannot be called inside the constructor of the base class as that would result in a call to the methods of the base class itself. Hence, the additional initialization step.
 
-## Interfacing
-A component can have one or more _interfaces_, depending on the design of the component.
-
-It is good engineering practice to define the interfaces beforehand as much as possible. This means; defining the messages and their parameters (see "[Messages](Messages.md)"). Doing this, allows for independently further defining the state-machine of the component.
-
-The interface completely shields the component from the environment in which it is running. A more detailed description is given in "[Interfaces](Interfaces.md)".
-
-Note that grouping the messages into interfaces is technically not really necessary; some state-machine frameworks don't even specify interfaces, and for the method presented here, nothing prevents the developer from using only one interface containing all the messages. However, using interfaces has the following benefits:
-* It creates a more modular design.
-* Message names can be reused in different interfaces.
-* Logging becomes easier when the interface is specified.
-
-However, one of the most important advantages of using interfaces is that the state-machine engine can be more efficient.
-
-All the interfaces a component uses are defined in its dictionary ``interfaces`` attribute.
-
-```cpp
-std::map<std::string, const FcmComponent*> interfaces;
-```
-
-As can be seen from the definition, an interface holds a reference to ```FcmComponent``` which is set when the interface is connected to the component (see "[Connect interface](#connect-interface)").
-
-To be able to use an interface (e.g. send the messages defined in the interface), the header file of the interface needs to be included. For example, by default the ``FcmComponent`` adds the "Logical" interface by including the ``FcmLogicalInterface.h``.
-
 ## State-variables
+
 As was described earlier, some attributes of the component are used inside state transition and evaluation functions. Those specific attributes are called _state-variables_ as these can be technically seen as holding a kind of 'sub-state' of the component and influence the behavior of the component.
 
 ## Settings
@@ -178,6 +139,7 @@ The settings are used to configure the component and typically can be used to se
 This method will set the state-variable to the value of the setting if the setting exists and is of the correct type. If the setting does not exist or is of the wrong type, a runtime error is thrown.
 
 ## Adding a transition
+
 As specified in "[State transition table](StateTransitionTable.md)", a transition is uniquely defined by the combination of the state, interface and message. To add this combination to the state transition table and to specify the next state and the action, the component's ``addTransition()`` method must be called.
 
 ```cpp
@@ -242,7 +204,7 @@ Looking at the example, the amount of code can be simplified by using the ``FCM_
     addTransition(STATE, #INTERFACE, #MESSAGE, NEXT_STATE,              \
     [this](const FcmMessage& msg)                                       \
     {                                                                   \
-        const auto& message = dynamic_cast<INTERFACE::MESSAGE&>(msg);    \
+        const auto& message = dynamic_cast<INTERFACE::MESSAGE&>(msg);   \
         ACTION                                                          \
     })
 ```
@@ -258,6 +220,7 @@ FCM_ADD_TRANSITION("Processing", ConnectionEvents, ClientConnected, "Processing"
 ```
 
 ## Adding a choice-point
+
 To add a choice-point to the table, the component's ``addChoicePoint()`` method can be called.
 
 ```cpp
@@ -265,7 +228,7 @@ void addChoicePoint( const std::string& choicePointName,
                      const FcmSttEvaluation& evaluationFunction)
 ```
 
-Before adding the new choice-point, check if it already exists. If the choice point exists, throw a runtime error, printing the choice-point name.
+Before adding the new choice-point, check if it already exists. If the choice point exists, a runtime error is thrown, printing the choice-point name.
 
 ```cpp
 if (choicePointTable.find(choicePointName) != choicePointTable.end())
@@ -433,20 +396,6 @@ If the evaluation function was found, it can be executed and the result be retur
 
 ```cpp
 return choicePointEvaluationFunction();
-```
-
-## Connect interface
-
-To connect and interface to a remote receiver, the ``connectInterface()`` method must be called for the component.
-
-```cpp
-void connectInterface(const std::string& interfaceName, FcmComponent* remoteComponent);
-```
-
-For the component itself, connecting means nothing more than setting the corresponding entry in the dictionary.
-
-```cpp
-interfaces[interfaceName] = remoteComponent;
 ```
 
 ## Process message

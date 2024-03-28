@@ -1,6 +1,6 @@
 # Messages
 ***
-_A message is a data structure that is used to send data and events between components and handlers. A message is identified by a _name_ and is sent to a receiver on an interface_.
+_A message is a data structure that is used to send data and events between components and handlers. A message is identified by a name and is sent to a receiver on an interface_.
 ***
 
 ## Description
