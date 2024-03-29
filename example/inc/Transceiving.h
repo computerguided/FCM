@@ -29,6 +29,6 @@ FCM_SET_INTERFACE(Transceiving,
 
     FCM_DEFINE_MESSAGE( ConnectRej,
                         uint32_t connectionId{}; );
-);
+)
 
 #endif //FCM_PROTOTYPING_TRANSCEIVING_H
