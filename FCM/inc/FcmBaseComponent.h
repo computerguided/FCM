@@ -51,4 +51,8 @@ protected:
 #define FCM_SEND_MESSAGE( MESSAGE ) \
     sendMessage(MESSAGE)
 
+// ---------------------------------------------------------------------------------------------------------------------
+#define FCM_SET_SETTING( SETTING ) \
+    setSetting(#SETTING, SETTING)
+
 #endif //FCM_FCMBASECOMPONENT_H

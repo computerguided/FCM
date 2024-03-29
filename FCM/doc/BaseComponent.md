@@ -106,6 +106,20 @@ catch (const std::bad_any_cast& e)
 }
 ```
 
+As an example, the `setSetting()` method can be used to set the `connectionTimeout` setting.
 
+```cpp
+setSetting("connectionTimeout", connectionTimeout);
+```
+As can be seen in this example, the setting with the key "connectionTimeout" is set to the `connectionTimeout` variable. This means that the key has the same name as the variable. In such cases it is possible to use the `FCM_SET_SETTING` macro which is defined as follows:
 
+```cpp
+#define FCM_SET_SETTING(SETTING) setSetting(#SETTING, SETTING)
+```
+
+The `connectionTimeout` setting can be set using the `FCM_SET_SETTING` macro as follows:
+
+```cpp
+FCM_SET_SETTING(connectionTimeout);
+```
 

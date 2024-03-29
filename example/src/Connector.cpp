@@ -9,17 +9,16 @@
 // Constructor
 // ---------------------------------------------------------------------------------------------------------------------
 Connector::Connector(const std::string& name,
-                    const std::shared_ptr<FcmMessageQueue>& messageQueue,
-                    const std::shared_ptr<FcmTimerHandler>& timerHandlerParam,
-                    const std::map<std::string, std::any>& settingsParam) :
-                    FcmComponent(name, messageQueue, timerHandlerParam, settingsParam)
+                     const std::shared_ptr<FcmMessageQueue>& messageQueue,
+                     const std::shared_ptr<FcmTimerHandler>& timerHandlerParam,
+                     const std::map<std::string, std::any>& settingsParam) :
+                     FcmComponent(name, messageQueue, timerHandlerParam, settingsParam)
 {
-    setSetting("clientId", clientId);
-    setSetting("serverWhitelist", serverWhitelist);
-    setSetting("connectionTimeout", connectionTimeout);
-    setSetting("advertisementInterval", advertisementInterval);
+    FCM_SET_SETTING(clientId);
+    FCM_SET_SETTING(serverWhitelist);
+    FCM_SET_SETTING(connectionTimeout);
+    FCM_SET_SETTING(advertisementInterval);
 };
-
 
 // ---------------------------------------------------------------------------------------------------------------------
 // Override the setTransitions function to add the transitions.
