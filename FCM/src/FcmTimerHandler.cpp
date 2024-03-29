@@ -8,20 +8,17 @@
 #include "FcmTimerInterface.h"
 
 // ---------------------------------------------------------------------------------------------------------------------
-FcmTimerHandler::FcmTimerHandler(const std::shared_ptr<FcmMessageQueue>& messageQueueParam)
-    : messageQueue(messageQueueParam)
+FcmTimerHandler::FcmTimerHandler(const std::shared_ptr<FcmMessageQueue>& messageQueueParam):
+    messageQueue(messageQueueParam)
 {
 }
 
 // ---------------------------------------------------------------------------------------------------------------------
 void FcmTimerHandler::setCurrentTime(long long currentTimeParam)
 {
-    currentTime = currentTimeParam;
-
     if (timeouts.empty()) { return; }
 
-    // Loop through the timeouts and handle the ones that have expired. The list is
-    // sorted, so we need not loop through all of them.
+    currentTime = currentTimeParam;
     auto it = timeouts.begin();
     while (it != timeouts.end() && it->first <= currentTime)
     {
@@ -33,32 +30,21 @@ void FcmTimerHandler::setCurrentTime(long long currentTimeParam)
 // ---------------------------------------------------------------------------------------------------------------------
 int FcmTimerHandler::setTimeout(long long timeout, void* component)
 {
-
-    // Find the time of the timeout
     long long time = currentTime + timeout;
-
-    // Create a timer info object
     FcmTimerInfo timerInfo = {nextTimerId++, component};
-
-    // Add the timeout to the list of timeouts.
     timeouts.insert(std::make_pair(time, timerInfo));
-
-    // Return the timer id
     return timerInfo.timerId;
 }
 
 // ---------------------------------------------------------------------------------------------------------------------
 void FcmTimerHandler::cancelTimeout(int timerId)
 {
-    // Find the timeout with the given timer id and remove it.
     for (auto it = timeouts.begin(); it != timeouts.end(); ++it)
     {
         if (it->second.timerId != timerId) {continue;}
-
         timeouts.erase(it);
-        return; // Found it, erase it, so we can return.
+        return;
     }
-
     removeTimeoutMessage(timerId);
 }
 

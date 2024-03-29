@@ -19,11 +19,11 @@ public:
     const std::string name;
     const std::map<std::string, std::any> settings;
 
-    FcmBaseComponent(const std::string &nameParam,
-                     const std::shared_ptr<FcmMessageQueue> &messageQueueParam,
-                     const std::map<std::string, std::any> &settingsParam);
+    FcmBaseComponent(std::string nameParam,
+                     const std::shared_ptr<FcmMessageQueue>& messageQueueParam,
+                     const std::map<std::string, std::any>& settingsParam);
 
-    void connectInterface(const std::string &interfaceName, FcmBaseComponent *remoteComponent);
+    void connectInterface(const std::string& interfaceName, FcmBaseComponent* remoteComponent);
 
     void sendMessage(const std::shared_ptr<FcmMessage>& message);
 

@@ -4,16 +4,19 @@
 
 #include "FcmBaseComponent.h"
 
+#include <utility>
+
 // ---------------------------------------------------------------------------------------------------------------------
-FcmBaseComponent::FcmBaseComponent(const std::string &nameParam,
-                 const std::shared_ptr<FcmMessageQueue> &messageQueueParam,
-                 const std::map<std::string, std::any> &settingsParam)
-        : name(nameParam), messageQueue(messageQueueParam), settings(settingsParam)
+FcmBaseComponent::FcmBaseComponent(std::string nameParam,
+                                   const std::shared_ptr<FcmMessageQueue> &messageQueueParam,
+                                   const std::map<std::string, std::any> &settingsParam):
+                                   name(std::move(nameParam)), messageQueue(messageQueueParam), settings(settingsParam)
 {
 }
 
 // ---------------------------------------------------------------------------------------------------------------------
-void FcmBaseComponent::connectInterface(const std::string &interfaceName, FcmBaseComponent *remoteComponent)
+void FcmBaseComponent::connectInterface(const std::string& interfaceName,
+                                        FcmBaseComponent *remoteComponent)
 {
     if (interfaces.find(interfaceName) != interfaces.end())
     {
