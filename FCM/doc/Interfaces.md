@@ -1,5 +1,4 @@
 # Interfaces
-***
 _To be able to exchange data and events, components and handlers have a list of connected 'interfaces' on which messages can be sent. In this section, the concept of interfaces is explained._
 ***
 
