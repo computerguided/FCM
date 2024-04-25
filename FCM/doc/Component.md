@@ -1,5 +1,4 @@
 # FCM Component
-***
 _A device comprises one or more functional components. The following describes the design of a component._
 ***
 
