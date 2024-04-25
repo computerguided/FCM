@@ -1,5 +1,4 @@
 # Asynchronous Interface Handler
-***
 _The Asynchronous Interface Handler is a class that provides a way to handle asynchronous interfaces in a synchronous way._
 ***
 
