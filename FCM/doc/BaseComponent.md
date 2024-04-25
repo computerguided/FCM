@@ -1,5 +1,4 @@
 # FCM Base Component
-***
 _The `FcmBaseComponent` is the base class for the `FcmComponent` and `FcmAsyncInterfaceHandler` classes and implements the basic attributes that are common to both classes, such as the name, settings, list of connected interfaces, and message queue. The base class also provides methods to connect interfaces, send messages, and access settings. The following describes the detailed design of the base class._
 ***
 
