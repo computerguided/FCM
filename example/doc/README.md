@@ -18,36 +18,22 @@ Upon receiving the "ConnectAck" message, the Server will start sending regular "
 
 Upon receiving a "ConnectedInd" message from the Server, the Client will restart its connection timer and respond with a "ConnectedInd" message. When the timer expires, the Client will start advertising again.
 
-Settings
-Parameter
-Type
-Description
-clientId
-uint32_t
-The ID of the Client itself.
-serverWhitelist
-[uint32_t]
-The list of servers that the Client is allowed to connect to.
-connectionTimeout
-uint32_t
-Maximum number of milliseconds allowed between two consecutive "ConnectedInd" messages.
-advertisementInterval
-uint32_t
-Number of milliseconds between two "AdvertisementInd" messages.
+## Settings
 
-State variables
-Variable
-Type
-Description
-serverId
-uint32_t
-The ID of the Server that the Client is connected to or about to connect to.
-connectionId
-uint32_t
-The ID of the connection.
-timerId
-uint32_t
-The ID of the timer in order for it to be stopped and restarted.
+| Parameter | Type | Description |
+| -- | -- | -- |
+| clientId | uint32_t | The ID of the Client itself. |
+| serverWhitelist | [uint32_t] | The list of servers that the Client is allowed to connect to. |
+| connectionTimeout | uint32_t | Maximum number of milliseconds allowed between two consecutive "ConnectedInd" messages. |
+| advertisementInterval | uint32_t | Number of milliseconds between two "AdvertisementInd" messages. |
+
+## State variables
+
+| Variable | Type | Description |
+| -- | -- | -- |
+| serverId | uint32_t | The ID of the Server that the Client is connected to or about to connect to. |
+| connectionId | uint32_t | The ID of the connection. |
+| timerId | uint32_t | The ID of the timer in order for it to be stopped and restarted. |
 
 
 ## States
