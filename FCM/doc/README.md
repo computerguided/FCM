@@ -1,5 +1,4 @@
 # Functional Component Method documentation
-***
 
 ## Overview
 

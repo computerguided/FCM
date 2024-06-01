@@ -1,5 +1,4 @@
 # State Transition Table
-***
 _The state transition table is a data structure that is used to define the behavior of a component. It is a table that contains the states and events of the component and the actions that are executed when a state transition occurs._
 ***
 

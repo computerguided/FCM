@@ -1,5 +1,4 @@
 # Functional Components Method Example
----
 This section provides an example of how to use the FCM methods.
 
 ---
@@ -67,7 +66,7 @@ The ID of the timer in order for it to be stopped and restarted.
 
 ## State diagram
 
-![state-diagram](https://www.plantuml.com/plantuml/img/TP712i8m44Jl-nMBHw4_q8DMWWSlAgKNKP7IB1gmIKssWdzlXDQaBRs5dRSpioHpN5fkwoSyb2Iakk4FIdALLGqhem4ym8GR-IRBoYbzxoR2Q4qLJmOa-nrnl8b3dcz5WQN3XJ3MUlsY7Lbljbu0m7bvnIHP3UoZzrZ355dLP5g62HQbfNsNd5u0aV33_hKzTY8taeTXU-FNmqBIDi61PCWXkTCIWZ2jNNIrXyoirI1rt3ewBiRc8ZFIqd_m5m00)
+![state-diagram](https://www.plantuml.com/plantuml/img/TP7DQiCm48Jl-nIBZmM_W0-jY-YXbxOONqeIWl4kYI2M76aToDj7XnZz1D_4pAUP4Mgz34wMwG9dJOmypN97OZywFOks1Y00mlX9DtQYlJQdfwAiCJpAYy04g_1tLBzTzwLw73nMoZeN_Btnx4BOHmK0kxS3rlLx5f-SImyRxFN4TX4eiRIjMRTqV0L8Z835sG7xPr_OUTcF1KWkrCiS4vXY3zEt8OZ6vko2sOpAMilLyN4PjbNPig7mmGy0)
 
 
 ## State transition table

@@ -1,5 +1,4 @@
 # Timer Handler
-***
 _To be able to generate timeouts, the "Timer Handler" is defined which is used by the components to set timeouts._
 ***
 
