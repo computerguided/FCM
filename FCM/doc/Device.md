@@ -1,6 +1,5 @@
 # Device
 _The system can be specified by identifying the actors, the use cases and the scenarios. Some of these actors are devices. The following describes the detailed design of the FcmDevice class_
-****
 
 ## Description
 
