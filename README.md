@@ -12,7 +12,7 @@ The detailed description of the component can be found in “[Functional compone
 
 ## Asynchronous Interface Handler
 
-The FcmAsyncInterfaceHandler is a class that provides a way to handle asynchronous interfaces in a synchronous way. The handler has one or more interfaces on which it can only send messages, but not receive. As such it also has no state-machine.
+The `FcmAsyncInterfaceHandler` is a class that provides a way to handle asynchronous interfaces in a synchronous way. The handler has one or more interfaces on which it can only send messages, but not receive. As such it also has no state-machine.
 
 Typically, Functional Components can have a reference to a handler to call non-blocking interface functions that initiate a certain asynchronous operation. The handler could then for example send a message back to the component when the operation is completed.
 
