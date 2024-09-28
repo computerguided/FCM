@@ -1,4 +1,4 @@
-# Functional Component Method
+# Functional Components Method
 
 ## Overview
 
