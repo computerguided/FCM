@@ -85,7 +85,7 @@ This behavior can be implemented in the state machine shown in the figure below.
 
 ![](https://www.plantuml.com/plantuml/img/TPB1JiCm38RlUGfhHwG-03kCJGEaNT0qJcWW56O34MrI9TxGDl7kk4dAsdLSsjh_vzz_eau3Qy_RgbIV1WcegdaFI67ZJSt6MQN2bx6rzhg2cVVk6uuAuDvPVZG7Wclr8mHh9bXHvNR6VkHoXdWg5bZIEPRh-V9rxhod3KU5G0SOfSzdcnKmU3CQyB8XmlB-ZxoBnscWMytwJGVnZ3s1b5fVlK0nIU5KyuHYMqjZ46aCxVWuTHOMyy3aB507bRBXrC1EXjfR4Fw9mWKavnBzmNKjcXsYfTiTJ4UrF_gtgKXPqvNqJgHntmPDQb7IEvziyewizTnpZixE2xvJiYX_s2y0)
 
-Although the check  of the messages is the same, two choice-points are required because the processing is different. While this is technically not a problem, it does make the state machine more complex, especially when there would be even more messages that need to be handled in a similar way (e.g. `Database:ReadInd`, `Database:ChangeInd`, etc.).
+Although the check  of the messages is the same, two choice-points ("Add Correct Id?" and "Remove Correct Id?") are required because the processing is different. While this is technically not a problem, it does make the state machine more complex, especially when there would be even more messages that need to be handled in a similar way (e.g. `Database:ReadInd`, `Database:ChangeInd`, etc.).
 
 For this purpose, FCM introduces two mechanisms:
 
@@ -102,7 +102,7 @@ The `resendLastReceivedMessage()` uses the `resendMessage()` method of the messa
 messageQueue.resendMessage(lastReceivedMessage);
 ```
 
-This replaces the message at the top of the message queue, whereby it will be received again by the Functional Component.
+This replaces the message at the top of the message queue, whereby it will be _immediately_ received again by the Functional Component before any other incoming messages are processed.
 
 Using these mechanisms, the state machine can be simplified as shown in the figure below.
 
@@ -112,7 +112,7 @@ In this state machine, the “Yes” transition for the “Correct id?” choice
 
 ```cpp
 FCM_ADD_TRANSITION("Correct id?", Logical, Yes, "Processing",
-    resendMessage(lastReceivedMessage);
+    resendLastReceivedMessage();
 );
 ```
 
@@ -284,7 +284,7 @@ FCM_ADD_TRANSITION("Idle", Database, UpdateInd, "Next Client?",
     clientIndex = 0;
 );
 FCM_ADD_TRANSITION("Next Client?", Logical, Yes, "Updating",
-    const auto& databaseUpdatedInd = dynamic_cast<const Database::UpdatedInd&>(*lastReceivedMessage);
+    FCM_CAST_LAST_RECEIVED_MESSAGE(databaseUpdatedInd, Database, UpdatedInd);
     FCM_PREPARE_MESSAGE(clientUpdateReq, Clients, UpdateReq);
     clientUpdateReq = databaseUpdatedInd->data;
     FCM_SEND_MESSAGE(clientUpdateReq, Clients, UpdateReq, nextClient);
