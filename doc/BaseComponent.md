@@ -17,10 +17,16 @@ Preferably the name is unique within the device but can be freely chosen. Howeve
 
 The name is used to identify and display the component in the component diagram. As a guideline, when displaying the component in the documentation, the name of the component is printed in the diagram with each word capitalized and separated by a space or newline (e.g. "Connection Handler"). For the corresponding class name in the code, the spaces are omitted (e.g. `ConnectionHandler`).
 
-A component can also have _settings_. This is a public dictionary that is offered to the component when it is instantiated, but cannot be changed, which is implemented by storing the settings as a constant attribute.
+A component can also have _settings_ which are defined as a dictionary of key-value pairs.
 
 ```cpp
-const std::map<std::string, std::any> settings;
+using FcmSettings std::map<std::string, std::any> settings;
+```
+
+This is a public dictionary that is offered to the component when it is instantiated, but cannot be changed, which is implemented by storing the settings as a constant attribute.
+
+```cpp
+const FcmSettings settings;
 ```
 
 The settings are used to configure the component and typically can be used to set the initial value for the state-variables using the template method `setSettings()` which can be called in the constructor.
@@ -55,7 +61,7 @@ The base component is constructed by supplying a name and the (optional) setting
 
 ```cpp
 FcmBaseComponent::FcmBaseComponent(std::string nameParam,
-                                   const std::map<std::string, std::any> &settingsParam = {}):
+                                   const FcmSettings& settingsParam = {}):
     name(std::move(nameParam)), 
     messageQueue(FcmMessageQueue::getInstance()), 
     settings(settingsParam) {}
@@ -63,10 +69,10 @@ FcmBaseComponent::FcmBaseComponent(std::string nameParam,
 
 ## Initialization
 
-All subclasses of `FcmBaseComponent` must define their own initialization. Therefore, the `initialize()` method is added as a virtual function.
+All subclasses of `FcmBaseComponent` must define their own initialization. Therefore, the `initialize()` method is specified, but is empty for the base class handler.
 
 ```cpp
-virtual void initialize() = 0;
+void initialize() {};
 ```
 
 ## Connect an interface
@@ -113,7 +119,7 @@ A component can send a message by performing the following steps:
 
 To help with the first step, the `FCM_PREPARE_MESSAGE` macro can be used, which exposes a properly typed local parameter with the same name as the message which can be used to set the parameters.
 
-When all message parameters are set, the message can be sent, which can be done using the `FCM_SEND_MESSAGE` macro, with the second argument the optional index.
+When all message parameters are set, the message can be sent, which can be done using the `FCM_SEND_MESSAGE` macro, with the second argument the optional index (hence the use of the ## before VA_ARGS which tells the preprocessor to remove the comma before it if `__VA_ARGS__` is empty.)
 
 ```cpp
 #define FCM_SEND_MESSAGE(MESSAGE, ...) \
@@ -183,18 +189,7 @@ catch (const std::bad_any_cast& e)
 As an example, the `setSetting()` method can be used to set the `connectionTimeout` setting.
 
 ```cpp
-setSetting("connectionTimeout", connectionTimeout);
+setSetting<uint>("connectionTimeout", connectionTimeout);
 ```
 
-As can be seen in this example, the setting with the key "connectionTimeout" is set to the `connectionTimeout` variable. This means that the key has the same name as the variable. In such cases it is possible to use the `FCM_SET_SETTING` macro which is defined as follows:
-
-```cpp
-#define FCM_SET_SETTING(SETTING) setSetting(#SETTING, SETTING)
-```
-
-The `connectionTimeout` setting example will then be as follows:
-
-```cpp
-FCM_SET_SETTING(connectionTimeout);
-```
-
+See "_[Settings](Settings.md)_" for more detailed information.

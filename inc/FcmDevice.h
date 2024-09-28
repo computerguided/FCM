@@ -14,34 +14,37 @@
 class FcmDevice
 {
 public:
-    FcmDevice(int timeStepMsParam);
+    explicit FcmDevice(int timeStepMsParam);
     virtual void initialize() = 0;
     [[noreturn]] void run();
 
     void initializeComponents();
 
-    template <class ComponentType, typename... Args>
+    template <class ComponentType>
     std::shared_ptr<ComponentType> createComponent(const std::string& name,
-                                                   const std::map<std::string, std::any>& settings = {})
+                                                   const FcmSettings& settings = {})
     {
         auto component = std::make_shared<ComponentType>(name, settings);
         components.push_back(component);
         return component;
     }
 
+protected:
+    std::vector<std::shared_ptr<FcmBaseComponent>> components;
+
     static void connectInterface(const std::string& interfaceName,
-                                 FcmBaseComponent* firstComponent,
-                                 FcmBaseComponent* secondComponent);
+                          FcmBaseComponent* firstComponent,
+                          FcmBaseComponent* secondComponent);
 
 private:
     FcmMessageQueue& messageQueue;
     FcmTimerHandler& timerHandler;
     const int timeStepMs;
 
-    std::vector<std::shared_ptr<FcmBaseComponent>> components;
-
     void processMessages();
 };
+// ---------------------------------------------------------------------------------------------------------------------
+#define FCM_CONNECT_INTERFACE(INTERFACE, FIRST_COMPONENT, SECOND_COMPONENT) \
+    connectInterface(#INTERFACE, FIRST_COMPONENT.get(), SECOND_COMPONENT.get())
 
-
-#endif //FCM_FCMDEVICE_H
+#endif //FCM_DEVICE_H

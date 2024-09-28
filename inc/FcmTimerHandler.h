@@ -7,6 +7,9 @@
 #include <FcmMessageQueue.h>
 
 // ---------------------------------------------------------------------------------------------------------------------
+using FcmTime = long long;
+
+// ---------------------------------------------------------------------------------------------------------------------
 struct FcmTimerInfo
 {
     int timerId;
@@ -23,28 +26,28 @@ class FcmTimerHandler
 {
 public:
 
+    FcmTimerHandler() : messageQueue(FcmMessageQueue::getInstance()) {}
+    FcmTimerHandler(const FcmTimerHandler&) = delete;
+    FcmTimerHandler& operator=(const FcmTimerHandler&) = delete;
+
     static FcmTimerHandler& getInstance()
     {
         static FcmTimerHandler instance;
         return instance;
     }
 
-    void setCurrentTime(long long currentTimeParam);
-    [[nodiscard]] int setTimeout(long long timeout, void* component);
-    void cancelTimeout(int timerId);
+    void setCurrentTime(FcmTime currentTimeParam);
+    [[nodiscard]] int setTimeout(FcmTime timeout, void* component);
+    bool cancelTimeout(int timerId);
 
 private:  
-    std::multimap<long long, FcmTimerInfo> timeouts;
-    long long currentTime{};
+    std::multimap<FcmTime, FcmTimerInfo> timeouts;
+    FcmTime currentTime{};
     FcmMessageQueue& messageQueue;
     int nextTimerId{};
 
-    FcmTimerHandler() : messageQueue(FcmMessageQueue::getInstance()) {}
-    FcmTimerHandler(const FcmTimerHandler&) = delete;
-    FcmTimerHandler& operator=(const FcmTimerHandler&) = delete;
-
     void sendTimeoutMessage(int timerId, void* component);
-    void removeTimeoutMessage(int timerId);
+    bool removeTimeoutMessage(int timerId);
 };
 
 #endif //FCM_TIMER_HANDLER_H

@@ -98,7 +98,7 @@ Now, the first step is to _move_ the shared pointer out of the list.
 auto message = std::move(queue.front());
 ```
 
-This is more efficient than copying it and it ensures that the ownership of the message is transferred to the caller without increasing the reference count temporarily.
+This is more efficient than copying it, and it ensures that the ownership of the message is transferred to the caller without increasing the reference count temporarily.
 
 The message is now removed from the list by calling the <code>[std::list::pop_front()](https://cplusplus.com/reference/list/list/pop_front/)</code> method.
 
@@ -147,4 +147,19 @@ if (message->interfaceName == interfaceName && message->messageName == messageNa
     queue.erase(it);
     return;
 }
+```
+
+## Resend message
+
+In some cases a message must be resent by a Functional Component in order to simplify the handling. This can be done by calling the `resendMessage()` method.
+
+```cpp
+void resendMessage( const std::shared_ptr<FcmMessage>& message)
+```
+
+This method simply places the message at the front of the queue which will cause the Functional Component that initiated this, to receive the message again.
+
+```cpp
+std::lock_guard<std::mutex> lock(mutex);
+queue.push_front(message);
 ```

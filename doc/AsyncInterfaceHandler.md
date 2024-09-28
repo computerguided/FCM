@@ -5,7 +5,7 @@ _The Asynchronous Interface Handler is a class that provides a way to handle asy
 
 ## Description
 
-The default Asynchronous Interface Handler, or _handler_ for short, is defined in the `FcmAsyncInterfaceHandler` class which is a subclass of the `FcmBaseComponent` class. It provides a way to handle asynchronous interfaces in a synchronous way.
+The default _Asynchronous Interface Handler_, or _handler_ for short, is defined in the `FcmAsyncInterfaceHandler` class which is a subclass of the `FcmBaseComponent` class. It provides a way to handle asynchronous interfaces in a synchronous way.
 
 A handler has one or more interfaces on which it can only send messages, but not receive. As such it also has no state-machine.
 
@@ -19,7 +19,7 @@ The handler is constructed by supplying a name and optional settings.
 
 ```cpp
 FcmAsyncInterfaceHandler(const std::string& nameParam,
-                         const std::map<std::string, std::any>& settingsParam = {}) :
+                         const FcmSettings& settingsParam = {}) :
     FcmBaseComponent(nameParam, settingsParam) {}
 ```
 

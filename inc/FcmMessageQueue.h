@@ -18,11 +18,10 @@ private:
     std::list<std::shared_ptr<FcmMessage>> queue;
     std::mutex mutex;
 
+public:
     FcmMessageQueue() = default;
     FcmMessageQueue(const FcmMessageQueue&) = delete;
     FcmMessageQueue& operator=(const FcmMessageQueue&) = delete;
-
-public:
 
     static FcmMessageQueue& getInstance()
     {
@@ -32,9 +31,10 @@ public:
     
     void push(const std::shared_ptr<FcmMessage>& message);
     std::optional<std::shared_ptr<FcmMessage>> pop();
-    void removeMessage(const std::string& interfaceName,
+    bool removeMessage(const std::string& interfaceName,
                        const std::string& messageName,
                        const FcmMessageCheckFunction& checkFunction);
+    void resendMessage( const std::shared_ptr<FcmMessage>& message);
 };
 
 

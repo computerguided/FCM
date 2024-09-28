@@ -8,7 +8,13 @@ _To be able to generate timeouts, the "Timer Handler" is defined which is used b
 The basic functionality of the `FcmTimerHandler` is to administer a list with the upcoming timeouts.
 
 ```cpp
-std::multimap<long long, FcmTimerInfo> timeouts;
+std::multimap<FcmTime, FcmTimerInfo> timeouts;
+```
+
+Time in the FCM is represented as a `long long` type. The `FcmTime` type is defined as an alias for this type.
+
+```cpp
+using FcmTime = long long;
 ```
 
 Using the `std::multimap` type ensures that the list is sorted based on the timeout, while permitting multiple entries with the same timeout.
@@ -26,7 +32,7 @@ struct FcmTimerInfo
 The timer also needs to administer the current time which can be set as explained in the next section.
 
 ```cpp
-long long currentTime{};
+FcmTime currentTime{};
 ```
 
 To be able to send timeout messages, a reference to the message queue is stored which is set during construction.
@@ -76,7 +82,7 @@ FCM_SET_INTERFACE(Transceiving, FCM_DEFINE_MESSAGE( Timeout, int timerId{}; )
 When the time progresses to a new value, the `setCurrentTime()` method of the Timer Handler must be called.
 
 ```cpp
-void setCurrentTime(long long currentTimeParam)
+void setCurrentTime(FcmTime currentTimeParam)
 ```
 
 The first step is of course to set the `currentTime` of the Timer Handler.
@@ -108,7 +114,7 @@ while (it != timeouts.end() && it->first <= currentTime)
 To be able to set timeouts, a component gets the reference to the Timer Handler when it is constructed. To set a new timeout, the component calls the `setTimeout()` method of the Timer Handler.
 
 ```cpp
-[[nodiscard]] int setTimeout(long long timeout, void* component);
+[[nodiscard]] int setTimeout(FcmTime timeout, void* component);
 ```
 
 The component is specified as void* to prevent circular dependencies with the `FcmFunctionalComponent` includes the header file of the `FcmTimerHandler`. Also note that for the method it is indicated that the return value should not be discarded as this is the timer ID that is required to cancel the timer as described in the following section.
@@ -116,7 +122,7 @@ The component is specified as void* to prevent circular dependencies with the `F
 Because the current time is set before the new processing loop is started, it can be used to set the time at which the timeout must be generated.
 
 ```cpp
-long long time = currentTime + timeout;
+FcmTime time = currentTime + timeout;
 ```
 
 The timer info object must now be created to hold the `timerId` and the reference to the component in order to send the timeout message when the timer expires. While doing so, the `nextTimerId` can be incremented to have a unique value for the `timerId`.
@@ -152,7 +158,7 @@ As specified, the macro creates the timeoutMessage for which the `timerId` param
 timeoutMessage->timerId = timerId;
 ```
 
-Normally, a component does not have to specify the receiver for a message that it sends on a specific interface as this is already specified for the interface when it was connected (see “_[Connect an interface](#heading=h.6obm1zrex3wp)_”) and set when the message is sent by calling the components `sendMessage()` method. This is different in this case as the receiver was specified when the timeout was set.
+Normally, a component does not have to specify the receiver for a message that it sends on a specific interface as this is already specified for the interface when it was connected and set when the message is sent by calling the components `sendMessage()` method. This is different in this case as the receiver was specified when the timeout was set.
 
 ```cpp
 timeoutMessage->receiver = component;

@@ -11,10 +11,10 @@
 class FcmAsyncInterfaceHandler: public FcmBaseComponent
 {
 public:
-    FcmAsyncInterfaceHandler(const std::string& nameParam,
-                             const std::map<std::string, std::any>& settingsParam = {});
+    explicit FcmAsyncInterfaceHandler(const std::string& nameParam,
+                                      const FcmSettings& settingsParam = {});
 
-    virtual void initialize() = 0;
+    void initialize() override {};
 };
 
 #endif //FCM_ASYNC_INTERFACE_HANDLER_H

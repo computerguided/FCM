@@ -25,7 +25,7 @@ This decomposition can be done by deriving _functional components_ from the use 
 
 The messages in the [shared message queue](./MessageQueue.md) are processed one-by-one. This is done by the _run-loop_ of the device. As such, message handling is done synchronously and in a run-to-completion manner.
 
-Some components can be associated with functionality that includes handling the interaction with asynchronous parts of the device, such as IO hardware. Such components are called [Asynchronous Interface Handlers](./AsynchronousInterfaceHandlers.md) (AIH), or handlers for short.
+Some components can be associated with functionality that includes handling the interaction with asynchronous parts of the device, such as IO hardware. Such components are called "Asynchronous Interface Handlers" (AIH), or handlers for short.
 
 It is good practice to use handlers to separate the synchronous and asynchronous parts of the device. The asynchronous interaction is done by synchronizing the access to the message queue by using a mutex to allow a handler to insert its messages.
 
@@ -91,7 +91,7 @@ As part of the constructor, the message queue and the Timer Handler are initiali
 
 ## Initialize
 
-The base class `FcmDevice` has a virtual method `initialize()` which must overridden by the derived classes to perform the following initializations:
+The base class `FcmDevice` has a virtual method `initialize()` which must be overridden by the derived classes to perform the following initializations:
 
 * Create components.
 * Connect interfaces.
@@ -107,7 +107,7 @@ To be able to create a component, the `createComponent()` method is called. This
 ```cpp
 template <class ComponentType, typename... Args>
 std::shared_ptr<ComponentType> createComponent(const std::string& name,
-                                               const std::map<std::string, std::any>& settings = {})
+                                               const FcmSettings& settings = {})
 ```
 
 The method starts by creating a new instance of the components in which the constructor is called with the specified parameters; the name and the settings.
@@ -125,31 +125,46 @@ return component;
 
 ## Connecting interfaces
 
-To connect a specific interface between two components, the `connectInterface()` method is called.
+To connect a specific interface between two components, the `FCM_CONNECT_INTERFACE()` macro can be used.
 
 ```cpp
-static void connectInterface(const std::string& interfaceName,
-                             FcmBaseComponent* firstComponent,
-                             FcmBaseComponent* secondComponent);
+#define FCM_CONNECT_INTERFACE(INTERFACE, FIRST_COMPONENT, SECOND_COMPONENT) \
+    connectInterface(#INTERFACE, FIRST_COMPONENT.get(), SECOND_COMPONENT.get());
+```
+The macro calls the `connectInterface()` method.
+
+```cpp
+void connectInterface(const std::string& interfaceName, FcmBaseComponent* firstComponent, FcmBaseComponent* secondComponent)
 ```
 
-To actually create the connection, the `connectInterface()` method of each component must be called.
+Because the component to connect to can only be a functional component, the first step is to check whether the first component is a functional component. If so, it can be connected to the second component.
 
 ```cpp
-firstComponent->connectInterface(interfaceName, secondComponent);
-secondComponent->connectInterface(interfaceName, firstComponent);
+if (dynamic_cast<FcmFunctionalComponent*>(secondComponent) != nullptr)
+{
+    firstComponent->connectInterface(interfaceName, secondComponent);
+}
+```
+
+The same is done for the second component to connect it to the first component.
+
+```cpp
+if (dynamic_cast<FcmFunctionalComponent*>(firstComponent) != nullptr)
+{
+    secondComponent->connectInterface(interfaceName, firstComponent);
+}
 ```
 
 ## Connect components to handlers
 
-Handlers cannot receive messages as they don’t possess a state machine. Instead they supply a function interface to initiate asynchronous actions (e.g. start listening). To be able for a component to call these functions, the component must have a reference to the handler which must be set explicitly.
+Handlers cannot receive messages as they don’t possess a state machine. Instead, they supply a function interface to initiate asynchronous actions (e.g. start listening). To be able for a component to call these functions, the component must have a reference to the handler which must be set explicitly.
 
 ## Initialize the created components
 
-The last step of the initialization of the device is to initialize all the created components. This is done by calling the `initializeCreatedComponents()` method.
+The last step of the initialization of the device is to initialize all the created components. This is done by calling the `initializeComponents()` method.
 
 ```cpp
-void initializeCreatedComponents()
+void initializeComponents()
 ```
 
 Since each component has an `initialize()` method, it can be called for each component in the `components` list.
@@ -179,22 +194,24 @@ while ((message = messageQueue->pop()).has_value())
 }
 ```
 
-Every message has a `receiver` property, if not, then this represents an error condition.
+Every message has a `receiver` property, if not, then this represents an error condition which happens when a message is sent to an unconnected interface. In this case, an exception is thrown.
 
 ```cpp
 auto receiver = (FcmComponent*)message->receiver;
+auto sender = (FcmBaseComponent*)message.value()->sender;
 
 if (receiver == nullptr)
 {
-    LOG_ERROR("Receiver not defined");
-    continue;
+    throw std::runtime_error("Component \"" + sender->name +
+                            "\" sent the message \"" + message.value()->name +
+                            "\" to unconnected interface \"" + message.value()->interfaceName + "\"!");
 }
 ```
 
 The `receiver` property of the message is a functional component which has a `processMessage()` method that can be called to process the message.
 
 ```cpp
-receiver->processMessage(*message.value());
+receiver->processMessage(message.value());
 ```
 
 ## Run loop

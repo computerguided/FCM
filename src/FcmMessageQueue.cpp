@@ -1,7 +1,5 @@
 #include <optional>
 #include <memory>
-#include <functional>
-#include <type_traits>
 
 #include "FcmMessage.h"
 #include "FcmMessageQueue.h"
@@ -29,7 +27,7 @@ std::optional<std::shared_ptr<FcmMessage>> FcmMessageQueue::pop()
 }
 
 // ---------------------------------------------------------------------------------------------------------------------
-void FcmMessageQueue::removeMessage(const std::string& interfaceName, 
+bool FcmMessageQueue::removeMessage(const std::string& interfaceName,
                                     const std::string& messageName,
                                     const FcmMessageCheckFunction& checkFunction)
 {
@@ -41,9 +39,17 @@ void FcmMessageQueue::removeMessage(const std::string& interfaceName,
         {
             if (checkFunction && !checkFunction(message)) {continue;}
             queue.erase(it);
-            return;
+            return true;
         }
     }
+    return false;
+}
+
+// ---------------------------------------------------------------------------------------------------------------------
+void FcmMessageQueue::resendMessage(const std::shared_ptr<FcmMessage>& message)
+{
+    std::lock_guard<std::mutex> lock(mutex);
+    queue.push_front(message);
 }
 
 

@@ -16,32 +16,23 @@ Note that the `sendMessage()` method does not require the specification of the i
 
 ## Specifying an interface
 
-It is good practice to define each interface in a separate header file. In the file a namespace is defined with the name of the interface. Inside this namespace the messages are defined that can be sent on the interface.
+It is good practice to define each interface in a separate header file. In the file a class is defined with the name of the interface. Inside this class the messages are defined that can be sent on the interface.
 
 To set the interface the `FCM_SET_INTERFACE` macro is defined.
 
 ```cpp
-#define FCM_SET_INTERFACE(NAME, ...)                \
-    namespace NAME                                  \
-    {                                               \
-        const char* const currentNamespace = #NAME; \
-        __VA_ARGS__                                 \
-    }
+#define FCM_SET_INTERFACE(NAME, ...)                            \
+    class NAME : public FcmInterface                            \
+    {                                                           \
+    public:                                                     \
+        inline static std::string interfaceClassName = #NAME;   \
+        __VA_ARGS__                                             \
+    };
 ```
 
 To define a message for an interface, the `FCM_DEFINE_MESSAGE` macro was defined.
 
-```cpp
-#define FCM_DEFINE_MESSAGE(NAME, ...)                               \
-    class NAME : public FcmMessage                                  \
-    {                                                               \
-    public:                                                         \
-        __VA_ARGS__                                                 \
-        NAME() { name = #NAME; interfaceName = currentNamespace; }  \
-    }
-```
-
-As an example, consider the following definition of the interface is called `UdpEvents` which has a message `UdpMessageInd`.
+As an example, consider the following definition of the interface which is called `UdpEvents` and has a message `UdpMessageInd`.
 
 ```cpp
 FCM_SET_INTERFACE(UdpEvents,
@@ -54,7 +45,7 @@ FCM_SET_INTERFACE(UdpEvents,
 This will then be replaced by:
 
 ```cpp
-namespace UdpEvents
+class UdpEvents : public FcmInterface
 {
     const char* const currentNamespace = "UdpEvents";
 
@@ -62,9 +53,9 @@ namespace UdpEvents
     {
     public:
         std::string message{};
-        UdpMessageInd() { name = "UdpMessageInd"; interfaceName = currentNamespace; }
+        UdpMessageInd() { name = "UdpMessageInd"; interfaceName = interfaceClassName; }
     };
 }
 ```
 
-Note that the uniform initialization syntax (`{}`) is used to ensure all members are initialized without specifying explicit default values. This is to prevent warnings, for example "_Constructor does not initialize these fields: value_" when using Clang-Tidy.
+Note that the uniform initialization syntax (`{}`) is used to ensure all members are initialized without specifying explicit default values. This is to prevent warnings, for example in this case "_Constructor does not initialize these fields: message_" when using Clang-Tidy.

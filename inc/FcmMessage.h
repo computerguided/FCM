@@ -5,11 +5,15 @@
 #include <cstdint>
 
 // ---------------------------------------------------------------------------------------------------------------------
+class FcmInterface{};
+
+// ---------------------------------------------------------------------------------------------------------------------
 class FcmMessage
 {
 public:
     void* receiver = nullptr;
-    int64_t timestamp;
+    void* sender = nullptr;
+    int64_t timestamp{};
     std::string interfaceName;
     std::string name;
 
@@ -17,24 +21,26 @@ public:
 };
 
 // ---------------------------------------------------------------------------------------------------------------------
-#define FCM_PREPARE_MESSAGE(MESSAGE, INTERFACE, MESSAGE_TYPE) \
-    auto MESSAGE = std::make_shared<INTERFACE::MESSAGE_TYPE>()
+#define FCM_PREPARE_MESSAGE(MESSAGE, INTERFACE, MESSAGE_TYPE)   \
+    auto MESSAGE = std::make_shared<INTERFACE::MESSAGE_TYPE>(); \
+    MESSAGE->sender = this
 
 // ---------------------------------------------------------------------------------------------------------------------
-#define FCM_DEFINE_MESSAGE(NAME, ...)                               \
-    class NAME : public FcmMessage                                  \
-    {                                                               \
-    public:                                                         \
-        __VA_ARGS__                                                 \
-        NAME() { name = #NAME; interfaceName = currentNamespace; }  \
+#define FCM_DEFINE_MESSAGE(NAME, ...)                                   \
+    class NAME : public FcmMessage                                      \
+    {                                                                   \
+    public:                                                             \
+        __VA_ARGS__                                                     \
+        NAME() { name = #NAME; interfaceName = interfaceClassName; }    \
     }
 
 // ---------------------------------------------------------------------------------------------------------------------
-#define FCM_SET_INTERFACE(NAME, ...)                \
-    namespace NAME                                  \
-    {                                               \
-        const char* const currentNamespace = #NAME; \
-        __VA_ARGS__                                 \
+#define FCM_SET_INTERFACE(NAME, ...)                            \
+    class NAME : public FcmInterface                            \
+    {                                                           \
+    public:                                                     \
+        inline static std::string interfaceClassName = #NAME;   \
+        __VA_ARGS__                                             \
     }
 
 // ---------------------------------------------------------------------------------------------------------------------

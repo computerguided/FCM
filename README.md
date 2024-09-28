@@ -8,7 +8,7 @@ The Functional Components Method (FCM) is a comprehensive approach designed to f
 
 The `FcmFunctionalComponent` is the base class for all functional components in the system. It provides a way to exchange data and events with other components. The functional component has a list of connected 'interfaces' on which messages can be both received and sent. The functional component also has a finite-state-machine that can be used to implement its behavior.
 
-The detailed description of the component can be found in “[Functional component](./doc/FunctionaComponent.md)”.
+The detailed description of the component can be found in “[Functional component](./doc/FunctionalComponent)”.
 
 ## Asynchronous Interface Handler
 
@@ -52,5 +52,19 @@ The state transition table is a data structure that is used to define the behavi
 The detailed description of the state transition table can be found in “[State Transition Table](./doc/StateTransitionTable.md)”.
 
 ## Timer Handler
-The `FcmTimerHandler` is a class that provides a controlled way to handle timers in the system. The handler has one interface on which it can only send messages, but not receive. As such it also has no state machine.
+The `FcmTimerHandler` is a class that provides a controlled way to handle timers in the system. The handler has one interface on which it can only send messages, but not receive. As such it also has no state machine. In the device there is only one timer handler, implemented as a singleton and instantiated by the `FcmDevice`.
 The detailed description of the handler can be found in “[Timer Handler](./doc/TimerHandler.md)”.
+
+## Examples
+A number of small examples are available and can be found in the “[Examples](./doc/Examples.md)” section. These examples are:
+* [Accessing last received message](./doc/Examples.md#accessing-last-received-message)
+* [Replacing if-statements](./doc/Examples.md#replacing-if-statements)
+* [Resending messages](./doc/Examples.md#resending-messages)
+* [Multiple state transition](./doc/Examples.md#multiple-state-transition)
+* [Creating loops](./doc/Examples.md#creating-loops)
+* [Interface multiplication](./doc/Examples.md#interface-multiplication)
+* [Using the timer](./doc/Examples.md#using-the-timer)
+* [Handling switch statements](./doc/Examples.md#handling-switch-statements)
+
+
+

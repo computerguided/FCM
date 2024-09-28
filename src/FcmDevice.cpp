@@ -1,4 +1,7 @@
 #include <thread>
+#include <chrono>
+#include <iostream>
+
 #include "FcmDevice.h"
 #include "FcmFunctionalComponent.h"
 
@@ -25,13 +28,13 @@ FcmDevice::FcmDevice(int timeStepMsParam) :
     }
 }
 
-// ---------------------------------------------------------------------------------------------------------------------
-void FcmDevice::connectInterface(const std::string& interfaceName,
-                                 FcmBaseComponent* firstComponent,
-                                 FcmBaseComponent* secondComponent)
+//  ---------------------------------------------------------------------------------------------------------------------
+void FcmDevice::initializeComponents()
 {
-    firstComponent->connectInterface(interfaceName, secondComponent);
-    secondComponent->connectInterface(interfaceName, firstComponent);
+    for (const auto& component : components)
+    {
+        component->initialize();
+    }
 }
 
 // ---------------------------------------------------------------------------------------------------------------------
@@ -40,15 +43,32 @@ void FcmDevice::processMessages()
     std::optional<std::shared_ptr<FcmMessage>> message;
     while ((message = messageQueue.pop()).has_value())
     {
-        auto receiver = (FcmFunctionalComponent*)(message->get()->receiver);
+        auto receiver = (FcmFunctionalComponent*)message.value()->receiver;
+        auto sender = (FcmBaseComponent*)message.value()->sender;
 
         if (receiver == nullptr)
         {
-            // TODO: Log error.
-            continue;
+            throw std::runtime_error("Component \"" + sender->name +
+                                    "\" sent the message \"" + message.value()->name +
+                                    "\" to unconnected interface \"" + message.value()->interfaceName + "\"!");
         }
 
         receiver->processMessage(message.value());
     }
+}
 
+// ---------------------------------------------------------------------------------------------------------------------
+void FcmDevice::connectInterface(const std::string& interfaceName,
+                                 FcmBaseComponent* firstComponent,
+                                 FcmBaseComponent* secondComponent)
+{
+    if (dynamic_cast<FcmFunctionalComponent*>(secondComponent) != nullptr)
+    {
+        firstComponent->connectInterface(interfaceName, secondComponent);
+    }
+
+    if (dynamic_cast<FcmFunctionalComponent*>(firstComponent) != nullptr)
+    {
+        secondComponent->connectInterface(interfaceName, firstComponent);
+    }
 }

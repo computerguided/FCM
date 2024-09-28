@@ -4,22 +4,36 @@
 #include <string>
 #include <map>
 #include <any>
+#include <functional>
+#include <memory>
+#include <optional>
 
 #include "FcmMessage.h"
 #include "FcmMessageQueue.h"
+
+using FcmSettings = std::map<std::string, std::any>;
+
+// Optional log function type
+using FcmLogFunction = std::optional<std::function<void(const std::string& message)>>;
 
 // ---------------------------------------------------------------------------------------------------------------------
 class FcmBaseComponent
 {
 public:
     const std::string name;
-    const std::map<std::string, std::any> settings;
+    const FcmSettings& settings;
 
-    FcmBaseComponent(std::string nameParam,
-                     const std::map<std::string, std::any>& settingsParam = {});
+    // Log functions
+    FcmLogFunction logInfoFunction;
+    FcmLogFunction logWarningFunction;
+    FcmLogFunction logErrorFunction;
+    FcmLogFunction logDebugFunction;
+    FcmLogFunction logTransitionFunction;
+
+    explicit FcmBaseComponent(std::string nameParam,
+                             const FcmSettings& settingsParam = {});
 
     void connectInterface(const std::string& interfaceName, FcmBaseComponent* remoteComponent);
-
     void sendMessage(const std::shared_ptr<FcmMessage>& message, size_t index = 0);
 
     template <typename T>
@@ -36,18 +50,23 @@ public:
     }
 
     virtual ~FcmBaseComponent() = default;
+    virtual void initialize() = 0;
 
 protected:
     std::map<std::string, std::vector<FcmBaseComponent*>> interfaces;
     FcmMessageQueue& messageQueue;
+
+    // Logging
+    [[maybe_unused]]  void logError(const std::string& message);
+    [[maybe_unused]] void logWarning(const std::string& message);
+    [[maybe_unused]] void logInfo(const std::string& message);
+    [[maybe_unused]] void logDebug(const std::string& message);
+
+    [[nodiscard]] std::string getLogPrefix(const std::string& logLevel) const;
 };
 
 // ---------------------------------------------------------------------------------------------------------------------
 #define FCM_SEND_MESSAGE(MESSAGE, ...) \
     sendMessage(MESSAGE, ##__VA_ARGS__)
-
-// ---------------------------------------------------------------------------------------------------------------------
-#define FCM_SET_SETTING(SETTING) \
-    setSetting(#SETTING, SETTING)
 
 #endif // FCM_BASE_COMPONENT_H

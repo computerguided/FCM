@@ -83,7 +83,7 @@ This is achieved by using the `FCM_DEFINE_MESSAGE` macro. The macro takes two ar
     }
 ```
 
-In “_[Interfaces](Interfaces.md)_" an example is given on how to use this macro.
+In "[Interfaces](Interfaces.md)" an example is given on how to use this macro.
 
 ## Logical interface
 

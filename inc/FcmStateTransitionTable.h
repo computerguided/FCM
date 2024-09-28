@@ -28,6 +28,5 @@ using FcmStateTransitionTable = std::map<std::string, FcmSttInterfaces>;
 using FcmSttEvaluation = std::function<bool()>;
 using FcmChoicePointTable = std::map<std::string, FcmSttEvaluation>;
 
-
 #endif //FCM_STATE_TRANSITION_TABLE_H
 

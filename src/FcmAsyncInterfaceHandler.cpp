@@ -2,7 +2,7 @@
 
 // ---------------------------------------------------------------------------------------------------------------------
 FcmAsyncInterfaceHandler::FcmAsyncInterfaceHandler(const std::string& nameParam,
-                                                   const std::map<std::string, std::any>& settingsParam):
+                                                   const FcmSettings& settingsParam):
     FcmBaseComponent(nameParam, settingsParam)
 {
 }
