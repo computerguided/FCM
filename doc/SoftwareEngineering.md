@@ -1,6 +1,6 @@
 # Software Engineering using the Functional Components Method
 
-_The Functional Component Method (FCM) supports the six best practices of software engineering by emphasizing modularity, clear definitions, visual modeling, and structured communication._
+_The Functional Components Method (FCM) supports the six best practices of software engineering by emphasizing modularity, clear definitions, visual modeling, and structured communication._
 
 ## Introduction
 
