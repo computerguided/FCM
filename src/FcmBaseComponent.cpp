@@ -5,9 +5,9 @@
 // ---------------------------------------------------------------------------------------------------------------------
 FcmBaseComponent::FcmBaseComponent(std::string nameParam,
                                    const FcmSettings& settingsParam):
-    name(std::move(nameParam)), 
-    messageQueue(FcmMessageQueue::getInstance()), 
-    settings(settingsParam)
+    name(std::move(nameParam)),
+    settings(settingsParam),
+    messageQueue(FcmMessageQueue::getInstance())
 {
 }
 
