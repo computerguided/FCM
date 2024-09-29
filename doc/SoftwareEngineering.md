@@ -13,7 +13,7 @@ The six best practices of software engineering provide a framework for developin
 5. Continuously verify quality
 6. Control changes
 
-The **Functional Component Method (FCM)** is a software development approach that emphasizes modularity, reusability, and clear communication between components. FCM provides a structured framework that aligns closely with these best practices. This guide explores each practice and how FCM assists in implementing them.
+The **Functional Components Method (FCM)** is a software development approach that emphasizes modularity, reusability, and clear communication between components. FCM provides a structured framework that aligns closely with these best practices. This guide explores each practice and how FCM assists in implementing them.
 
 ---
 
