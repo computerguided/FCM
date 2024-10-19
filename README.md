@@ -4,6 +4,8 @@
 
 The Functional Components Method (FCM) is a comprehensive approach designed to facilitate the development, management, and interaction of components within a software system. At its core, FCM emphasizes modularity, reusability, and efficient communication between distinct functional units, known as components. This method leverages a structured framework that includes devices, message queues, state transition tables, and various handlers to streamline the process of creating scalable and maintainable software architectures. By adopting FCM, developers can create systems that are easier to debug, test, and extend, ultimately leading to more robust and flexible applications.
 
+This repository contains an implementation in C++ (for an implementation in C, refer to https://github.com/computerguided/FCM_C).
+
 For an example see the ["Doors Controlling System"](https://github.com/computerguided/FCM-example).
 
 ## Functional Component
