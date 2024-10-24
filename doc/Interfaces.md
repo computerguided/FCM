@@ -16,7 +16,17 @@ Note that the `sendMessage()` method does not require the specification of the i
 
 ## Specifying an interface
 
-It is good practice to define each interface in a separate header file. In the file a class is defined with the name of the interface. Inside this class the messages are defined that can be sent on the interface.
+The base class for all interfaces is `FcmInterface`, which is an abstract class and as such cannot be instantiated (constructor is protected).
+
+```cpp
+class FcmInterface
+{
+protected:
+    FcmInterface() = default; // Protected constructor
+};
+```
+
+It is good practice to define each interface as a subclass of `FcmInterface` and to place it in a separate header file. In the file a class is defined with the name of the interface. Inside this class the messages are defined that can be sent on the interface.
 
 To set the interface the `FCM_SET_INTERFACE` macro is defined.
 
