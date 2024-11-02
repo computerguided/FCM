@@ -3,7 +3,7 @@ _Messages exchanged between components are stored first in the message queue, wh
 
 ## Description
 
-The `FcmMessageQueue` class implements a thread safe message queue. To shield the queue from external manipulation, a `std::list` variable is added as a private property (see the [discussion](MessageQueue.md#discussion---using-list-instead-of-queue)" for the reasons why a `list` is used instead of a `queue`).
+The `FcmMessageQueue` class implements a thread safe message queue. To shield the queue from external manipulation, a `std::list` variable is added as a private property (see the [discussion](MessageQueue.md#discussion---using-list-instead-of-queue) for the reasons why a `list` is used instead of a `queue`).
 
 ```cpp
 std::list<std::shared_ptr<FcmMessage>> queue;
