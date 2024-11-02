@@ -47,8 +47,8 @@ A component-based architecture involves designing software as a collection of re
 
 **How FCM Assists**
 
-* **Core Principle**: FCM is inherently a component-based method. It focuses on creating self-contained components that encapsulate specific functionality.<br>  
-* **Reusability**: Components developed using FCM can be easily reused in different contexts or projects, as they interact through standardized interfaces.<br>  
+* **Core Principle**: FCM is inherently a component-based method. It focuses on creating self-contained components that encapsulate specific functionality.<br><br>
+* **Reusability**: Components developed using FCM can be easily reused in different contexts or projects, as they interact through standardized interfaces.<br><br>
 * **Interoperability**: The use of well-defined interfaces and message protocols in FCM ensures that components can interact seamlessly, promoting interoperability within the system.
 
 ## 4. Model Software Visually
@@ -59,8 +59,8 @@ Visual modeling involves using diagrams and graphical representations to depict 
 
 **How FCM Assists**
 
-* **State Diagrams**: FCM promotes the use of state diagrams to represent component states, transitions, and choice-points, enhancing clarity of component behavior.<br>  
-* **Sequence Diagrams**: Scenarios and interactions between components are illustrated using sequence diagrams, as outlined in FCM documentation. This visual representation helps in understanding system interactions.<br>  
+* **State Diagrams**: FCM promotes the use of state diagrams to represent component states, transitions, and choice-points, enhancing clarity of component behavior.<br><br>
+* **Sequence Diagrams**: Scenarios and interactions between components are illustrated using sequence diagrams, as outlined in FCM documentation. This visual representation helps in understanding system interactions.<br><br>
 * **Component Diagrams**: FCM utilizes component diagrams to show the relationships and interfaces between different components, providing a clear overview of the system architecture.
 
 ## 5. Continuously Verify Quality
