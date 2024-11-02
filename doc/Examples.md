@@ -22,8 +22,7 @@ inline void addTransitionFunction(const std::string& state, const std::string& n
 As an example on how to use this method, consider a component that is waiting for a connection request ("ConnectReq" on the "Transceiving" interface) from a server. When the connection request is received, the component can be transitioned to the next state.
 
 ```cpp
-addTransitionFunction<Transceiving::ConnectReq>(
-    "Advertising", "Correct server?",
+addTransitionFunction<Transceiving::ConnectReq>("Advertising", "Correct server?",
     [this](const auto& message)
     {
         timerHandler->cancelTimeout(timerId);
