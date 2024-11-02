@@ -1,8 +1,6 @@
 # Interfaces
 _To be able to exchange data and events, components and handlers have a list of connected 'interfaces' on which messages can be sent. In this section, the concept of interfaces is explained._
 
----
-
 ## Description
 
 An interface is a connection between two components or between a component and a handler. It is a way to send messages to a component. An interface is identified by a name and is 'connected' to a component by a pointer to the receiver.

@@ -1,8 +1,6 @@
 # Device
 _The system can be specified by identifying the actors, the use cases and the scenarios. Some of these actors are devices. The following describes the detailed design of the FcmDevice class._
 
----
-
 ## Description
 
 A system can be specified by identifying the _actors_, the _use cases_ and the _scenarios_. Some of the actors of a system can be denoted as _devices_. On an abstract level these devices are characterized as having a certain state (or combination of states) and demonstrate deterministic _behavior_.

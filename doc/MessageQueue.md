@@ -1,8 +1,6 @@
 # Message Queue
 _Messages exchanged between components are stored first in the message queue, which is a first-in, first-out (FIFO) data structure._
 
----
-
 ## Description
 
 The `FcmMessageQueue` class implements a thread safe message queue. To shield the queue from external manipulation, a `std::list` variable is added as a private property.

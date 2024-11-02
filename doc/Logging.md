@@ -1,8 +1,6 @@
 # Logging
 _In the <code>FcmBaseComponent</code> class, the logging is implemented which can be individually enabled and configured for each component, for example in the initialization of the device._
 
----
-
 ## Log levels
 
 For the FCM the most important information for debugging and operational monitoring in most cases are the state transitions. Next to that are the other standard logging that can be used during development and operation:

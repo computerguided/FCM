@@ -2,8 +2,6 @@
 
 _Understanding how to translate a component's role and behavior into states, transitions, and choice-points is crucial for designing robust and maintainable systems. This guide walks you through the process step-by-step, leveraging the Functional Components Method (FCM) to structure your component's behavior effectively._
 
----
-
 ## Introduction
 
 A functional component in software encapsulates specific functionality and interacts with other components via well-defined interfaces. Defining the states and transitions of a component helps in:

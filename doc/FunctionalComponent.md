@@ -1,8 +1,6 @@
 # Functional Component
 _A device comprises one or more functional components. The following describes the design of a component._
 
----
-
 ## Description
 
 A functional component is defined as a subclass of the `FcmFunctionalComponent` class which in turn is a subclass of the `FcmBaseComponent` class. It implements a specific part of behavioral functionality of the device which is reflected in the _name_ of the component.

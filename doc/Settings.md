@@ -1,6 +1,6 @@
 # Using settings
 
-The **Functional Components Method (FCM)** framework provides a flexible way to configure components through a `settings` mechanism. This allows developers to pass configuration parameters as key-value pairs, enabling dynamic behavior and customization of components without modifying their source code.
+_The FCM framework provides a flexible way to configure components through a `settings` mechanism. This allows developers to pass configuration parameters as key-value pairs, enabling dynamic behavior and customization of components without modifying their source code._
 
 ## Overview of settings
 
