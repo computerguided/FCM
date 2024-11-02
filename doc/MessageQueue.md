@@ -161,3 +161,24 @@ This method simply places the message at the front of the queue which will cause
 std::lock_guard<std::mutex> lock(mutex);
 queue.push_front(message);
 ```
+
+## Discussion - using `list` instead of `queue`
+
+In the current implementation, `std::list` is used instead of `std::queue`. Let’s look at the implications of this choice. Here’s a comparison of the two containers in this context:
+
+1. **FIFO Behavior**: `std::queue` is specifically designed to operate as a first-in-first-out (FIFO) container. By contrast, `std::list` is a doubly-linked list that does not enforce FIFO but supports it by adding to the back (`push_back`) and removing from the front (`pop_front`). Since `FcmMessageQueue` strictly uses this FIFO pattern, `std::queue` would serve this purpose directly.
+
+2. **Performance**: 
+   - Both `std::queue` and `std::list` provide O(1) time complexity for adding and removing elements from either end, so performance for `push()` and `pop()` operations would be similar.
+   - `std::queue` is implemented on top of a container (typically `std::deque`) that is optimized for sequential access and can outperform `std::list` in some contexts because it avoids the overhead of maintaining pointers for a doubly-linked structure.
+
+3. **Access and Manipulation**:
+   - `std::queue` does not allow direct access to elements other than the front or back. This would limit the flexibility of methods like `removeMessage()`, where the current implementation iterates through the entire list to find a specific message.
+   - `std::list`, on the other hand, allows easy access to any element through iterators, making it more flexible for operations that involve accessing and modifying elements in the middle of the queue.
+
+4. **Thread Safety**: Since `std::queue` lacks certain iterator-based access methods that `std::list` has, it might slightly reduce the risk of unintended modifications, but the current use of `std::mutex` already ensures thread safety, so there’s no additional benefit here.
+
+5. **Use of `resendMessage()`**: The `resendMessage()` method moves a message to the front of the queue, which `std::queue` does not natively support. With `std::queue`, you’d have to either re-implement the front insertion logic or fall back on a `std::deque`.
+
+### Conclusion:
+Since we need more operations that interact with elements throughout the queue, `std::list` is the better choice. If the queue’s functionality could be streamlined to just adding and removing from the ends without other element manipulation, then switching to `std::queue` (with `std::deque` as the underlying container) could be an option. However, since we do access the queue in other ways than just adding and removing from the ends, `std::list` is the better choice.
