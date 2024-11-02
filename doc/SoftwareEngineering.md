@@ -23,10 +23,8 @@ Developing iteratively involves breaking the project into smaller, manageable it
 
 **How FCM Assists**
 
-* **Modular Development**: FCM encourages breaking down the system into discrete functional components. This modularity facilitates iterative development, as components can be developed, tested, and refined individually.
-<br>
-* **Risk Prioritization**: By identifying critical components and their interactions early, teams can focus on high-risk areas first. FCM's clear structure makes it easier to identify and address potential risks within specific components.
-<br>
+* **Modular Development**: FCM encourages breaking down the system into discrete functional components. This modularity facilitates iterative development, as components can be developed, tested, and refined individually.<br><br>
+* **Risk Prioritization**: By identifying critical components and their interactions early, teams can focus on high-risk areas first. FCM's clear structure makes it easier to identify and address potential risks within specific components.<br><br>
 * **Incremental Integration**: Components in FCM communicate through well-defined interfaces. This allows for incremental integration of components, reducing complexity and enabling early discovery of integration issues.
 
 ## 2. Manage Requirements
@@ -37,12 +35,9 @@ Managing requirements involves systematically capturing, analyzing, and tracking
 
 **How FCM Assists**
 
-* **Clear Role Definition**: FCM mandates that each component's role and behavior be clearly defined. This ensures that requirements are directly mapped to specific components.
-<br>  
-* **Traceability**: The detailed documentation of components, interfaces, and messages in FCM provides a traceable link between requirements and implementation.
-<br>  
+* **Clear Role Definition**: FCM mandates that each component's role and behavior be clearly defined. This ensures that requirements are directly mapped to specific components.<br><br>
+* **Traceability**: The detailed documentation of components, interfaces, and messages in FCM provides a traceable link between requirements and implementation.<br><br>
 * **Flexibility**: Changes in requirements can be managed by modifying or extending specific components without affecting the entire system, thanks to FCM's modular architecture.
-<br>  
 
 ## 3. Employ a Component-Based Architecture
 
@@ -52,10 +47,8 @@ A component-based architecture involves designing software as a collection of re
 
 **How FCM Assists**
 
-* **Core Principle**: FCM is inherently a component-based method. It focuses on creating self-contained components that encapsulate specific functionality.
-<br>  
-* **Reusability**: Components developed using FCM can be easily reused in different contexts or projects, as they interact through standardized interfaces.
-<br>  
+* **Core Principle**: FCM is inherently a component-based method. It focuses on creating self-contained components that encapsulate specific functionality.<br>  
+* **Reusability**: Components developed using FCM can be easily reused in different contexts or projects, as they interact through standardized interfaces.<br>  
 * **Interoperability**: The use of well-defined interfaces and message protocols in FCM ensures that components can interact seamlessly, promoting interoperability within the system.
 
 ## 4. Model Software Visually
@@ -66,10 +59,8 @@ Visual modeling involves using diagrams and graphical representations to depict 
 
 **How FCM Assists**
 
-* **State Diagrams**: FCM promotes the use of state diagrams to represent component states, transitions, and choice-points, enhancing clarity of component behavior.
-<br>  
-* **Sequence Diagrams**: Scenarios and interactions between components are illustrated using sequence diagrams, as outlined in FCM documentation. This visual representation helps in understanding system interactions.
-<br>  
+* **State Diagrams**: FCM promotes the use of state diagrams to represent component states, transitions, and choice-points, enhancing clarity of component behavior.<br>  
+* **Sequence Diagrams**: Scenarios and interactions between components are illustrated using sequence diagrams, as outlined in FCM documentation. This visual representation helps in understanding system interactions.<br>  
 * **Component Diagrams**: FCM utilizes component diagrams to show the relationships and interfaces between different components, providing a clear overview of the system architecture.
 
 ## 5. Continuously Verify Quality
@@ -80,10 +71,8 @@ Continuous quality verification involves regularly testing and reviewing the sof
 
 **How FCM Assists**
 
-* **Testable Units**: FCM's modular components are self-contained and have clear interfaces, making them ideal units for testing.
-<br>  
-* **Defined Behavior**: With explicit states and transitions, FCM components have predictable behavior, facilitating the creation of comprehensive test cases.
-<br>  
+* **Testable Units**: FCM's modular components are self-contained and have clear interfaces, making them ideal units for testing.<br><br>
+* **Defined Behavior**: With explicit states and transitions, FCM components have predictable behavior, facilitating the creation of comprehensive test cases.<br><br>
 * **Automated Testing**: The structured nature of FCM components lends itself to automated testing frameworks, enabling continuous integration and delivery practices.
 
 ## 6. Control Changes
@@ -94,10 +83,8 @@ Change control involves managing modifications to the software in an organized m
 
 **How FCM Assists**
 
-* **Encapsulated Changes**: Changes are localized within specific components. Modifying a component typically doesn't affect others unless interfaces change.
-<br>  
-* **Version Control Friendly**: FCM components and their interfaces can be individually tracked in version control systems, facilitating change tracking and rollback if necessary.
-<br>  
+* **Encapsulated Changes**: Changes are localized within specific components. Modifying a component typically doesn't affect others unless interfaces change.<br><br>
+* **Version Control Friendly**: FCM components and their interfaces can be individually tracked in version control systems, facilitating change tracking and rollback if necessary.<br><br>
 * **Clear Documentation**: FCM requires detailed documentation of components, including their interfaces and behaviors, making it easier to assess the impact of changes and communicate them to the team.
 
 ## Conclusion
@@ -106,11 +93,11 @@ The Functional Component Method aligns seamlessly with the six best practices of
 
 Implementing FCM enables teams to:
 
-* **Develop Iteratively**: Tackle high-risk areas first and adapt to changes quickly.
-* **Manage Requirements**: Maintain clear traceability from requirements to implementation.
-* **Employ Component-Based Architecture**: Build reusable and maintainable software components. 
+* **Develop Iteratively**: Tackle high-risk areas first and adapt to changes quickly.<br><br>
+* **Manage Requirements**: Maintain clear traceability from requirements to implementation.<br><br>
+* **Employ Component-Based Architecture**: Build reusable and maintainable software components.<br><br>
 * **Model Visually**: Use diagrams to improve understanding and communication.
-* **Continuously Verify Quality**: Facilitate testing at every stage of development.
+* **Continuously Verify Quality**: Facilitate testing at every stage of development.<br><br>
 * **Control Changes**: Manage and document changes effectively to prevent issues.
 
 Adopting FCM helps software engineers apply these best practices efficiently, leading to reliable, scalable, and high-quality software systems.
