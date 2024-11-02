@@ -28,6 +28,17 @@ public:
     void initialize() override;
     void processMessage(const std::shared_ptr<FcmMessage>& message);
 
+    template<typename MessageType, typename Action>
+    inline void addTransitionFunction(const std::string& state, const std::string& nextState, Action action)
+    {
+        addTransition(state, MessageType::interfaceName, MessageType::name, nextState,
+        [action](const std::shared_ptr<FcmMessage>& msg)
+        {
+            const auto& message = dynamic_cast<const MessageType&>(*msg);
+            action(message);
+        });
+    }
+
 protected:
     FcmTimerHandler& timerHandler;
     FcmStateTransitionTable stateTransitionTable;

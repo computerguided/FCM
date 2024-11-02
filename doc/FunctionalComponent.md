@@ -124,7 +124,7 @@ The choice-points are also added to the states list to be able to use this list 
 setTransitions();
 ```
 
-Inside the `setTransitions()` method the transitions can be added by calling the `FCM_ADD_TRANSITION` macro, for example as shown below.
+Inside the `setTransitions()` method the transitions can be added by calling the `FCM_ADD_TRANSITION` macro, for example as shown below (see [Add a transition](#add-a-transition) for more details).
 
 ```cpp
 FCM_ADD_TRANSITION("Start processing?", Logical, Yes, "Processing",
@@ -226,7 +226,58 @@ When the message does not exist yet, add the message with the new `nextState` an
 stateTransitionTable[stateName][interfaceName][messageName] = FcmSttTransition{action, nextState};
 ```
 
-The `addTransition()` method is not called directly, instead the `FCM_ADD_TRANSITION` macro is used. The macro takes five arguments: the current state, the interface, the message, the next state and the action. The action is a lambda function that is executed when the state transition occurs. Inside the action, the message can be used to extract data and to send messages to other components or handlers. This is possible because the message is automatically cast to the correct type.
+The `addTransition()` method is not called directly, instead there are two methods available to reduce the amount of code:
+
+* Using the `addTransitionFunction()` method
+* Using the `FCM_ADD_TRANSITION` macro
+
+### Using the `addTransitionFunction()` template method
+
+The `addTransitionFunction()` is an inline template method defined as follows:
+
+```cpp
+template<typename MessageType, typename Action>
+inline void addTransitionFunction(const std::string& state, const std::string& nextState, Action action)
+```
+
+Inside the method, the `addTransition()` method is called with the correct arguments. It uses the `MessageType::interfaceName` and `MessageType::name` (which are defined in the `FcmMessage` class) to set the correct interface and message. The action is a lambda function that is executed when the state transition occurs. Inside the action, the message can be used to extract data and to send messages to other components or handlers. This is possible because the message is automatically cast to the correct type.
+
+```cpp
+addTransition(state, MessageType::interfaceName, MessageType::name, nextState,
+    [action](const std::shared_ptr<FcmMessage>& msg)
+    {
+        const auto& message = dynamic_cast<const MessageType&>(*msg);
+        action(message);
+    });
+```
+
+As an example, consider a component that is waiting for a connection request ("ConnectReq" on the "Transceiving" interface) from a server. When the connection request is received, the component can be transitioned to the next state.
+
+```cpp
+addTransitionFunction<Transceiving::ConnectReq>(
+    "Advertising", "Correct server?",
+    [this](const auto& message)
+    {
+        timerHandler->cancelTimeout(timerId);
+        serverId = message.serverId;
+        connectionId = message.connectionId;
+    }
+);
+```
+
+In the example, the `NEXT_STATE` is specified as “Correct server?”. The question mark indicates that the next state is one of the choice-points, which will be described in the section ["Add a choice-point"](#add-a-choice-point).
+
+Note that when no action is needed, the code can be simplified by using a lambda function that does nothing.
+
+```cpp
+addTransitionFunction<Transceiving::ConnectReq>("Advertising", "Correct server?",
+    [](const auto& message){}
+);
+```
+
+### Using the `FCM_ADD_TRANSITION` macro
+
+The second method that is available is using the `FCM_ADD_TRANSITION` macro. The macro takes five arguments: the current state, the interface, the message, the next state and the action. The action is a lambda function that is executed when the state transition occurs. Inside the action, the message can be used to extract data and to send messages to other components or handlers. This is possible because the message is automatically cast to the correct type.
 
 ```cpp
 #define FCM_ADD_TRANSITION(STATE, INTERFACE, MESSAGE, NEXT_STATE, ACTION)       \
@@ -238,10 +289,10 @@ The `addTransition()` method is not called directly, instead the `FCM_ADD_TRANSI
     })
 ```
 
-By specifying the `ACTION` as the last argument, the macro can be conveniently used. Consider for example a situation of a regularly advertising client that is waiting for a connection request from a server:
+By specifying the `ACTION` as the last argument, the macro can be conveniently used. Consider the earlier example of a regularly advertising client that is waiting for a connection request from a server:
 
 ```cpp
-FCM_ADD_TRANSITION( "Advertising", Transceiving, ConnectReq, "Correct server",
+FCM_ADD_TRANSITION( "Advertising", Transceiving, ConnectReq, "Correct server?",
 {
     timerHandler->cancelTimeout(timerId);
     serverId = message.serverId;
@@ -249,7 +300,13 @@ FCM_ADD_TRANSITION( "Advertising", Transceiving, ConnectReq, "Correct server",
 });
 ```
 
-In the example, the `NEXT_STATE` is specified as “Correct server?”. The question mark indicates that the next state is one of the choice-points, which will be described in the next section.
+Note that the `message` is defined and available inside the macro and is automatically cast to the correct type.
+
+### Which method to use?
+
+The `FCM_ADD_TRANSITION` macro is more compact and convenient to use while coding, especially when the action is a simple and only contains a few lines of code. However, when the action becomes more complex, the method suffers from the standard problem with macros as it becomes difficult to debug using breakpoints because the macro is not expanded inline and the program will halt on the wrong line. A possible practice is to define the action as a separate method and then call this method inside the macro.
+
+Another option is to use the `addTransitionFunction()` method, which is recommended when the action becomes more complex. In that case, breakpoints can be used in the action to debug the code.
 
 ## Add multiple-states transition
 

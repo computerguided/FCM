@@ -18,8 +18,8 @@ public:
     void* receiver = nullptr;
     void* sender = nullptr;
     int64_t timestamp{};
-    std::string interfaceName;
-    std::string name;
+    std::string _interfaceName;
+    std::string _name;
 
     virtual ~FcmMessage() = default;
 };
@@ -30,21 +30,23 @@ public:
     MESSAGE->sender = this
 
 // ---------------------------------------------------------------------------------------------------------------------
-#define FCM_DEFINE_MESSAGE(NAME, ...)                                   \
-    class NAME : public FcmMessage                                      \
-    {                                                                   \
-    public:                                                             \
-        __VA_ARGS__                                                     \
-        NAME() { name = #NAME; interfaceName = interfaceClassName; }    \
+#define FCM_DEFINE_MESSAGE(NAME, ...)                                    \
+    class NAME : public FcmMessage                                       \
+    {                                                                    \
+    public:                                                              \
+        __VA_ARGS__                                                      \
+        static constexpr const char* interfaceName = interfaceClassName; \
+        static constexpr const char* name = #NAME;                       \
+        NAME() { _interfaceName = interfaceName; _name = name; }         \
     }
 
 // ---------------------------------------------------------------------------------------------------------------------
-#define FCM_SET_INTERFACE(NAME, ...)                            \
-    class NAME : public FcmInterface                            \
-    {                                                           \
-    public:                                                     \
-        inline static std::string interfaceClassName = #NAME;   \
-        __VA_ARGS__                                             \
+#define FCM_SET_INTERFACE(NAME, ...)                             \
+    class NAME : public FcmInterface                             \
+    {                                                            \
+    public:                                                      \
+        static constexpr const char* interfaceClassName = #NAME; \
+        __VA_ARGS__                                              \
     }
 
 // ---------------------------------------------------------------------------------------------------------------------

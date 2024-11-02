@@ -32,11 +32,11 @@ void FcmBaseComponent::sendMessage(const std::shared_ptr<FcmMessage>& message, s
 {
     try
     {
-        auto& componentList = interfaces.at(message->interfaceName);
+        auto& componentList = interfaces.at(message->_interfaceName);
         if (index >= componentList.size())
         {
-            throw std::out_of_range("Component \"" + name + "\" tries to send message \"" + message->name +
-                                    "\" to interface \"" + message->interfaceName + "\" on index " +
+            throw std::out_of_range("Component \"" + name + "\" tries to send message \"" + message->_name +
+                                    "\" to interface \"" + message->_interfaceName + "\" on index " +
                                     std::to_string(index) + " but there are only " +
                                     std::to_string(componentList.size()) + " components connected!");
         }

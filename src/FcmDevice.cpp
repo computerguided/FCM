@@ -49,8 +49,8 @@ void FcmDevice::processMessages()
         if (receiver == nullptr)
         {
             throw std::runtime_error("Component \"" + sender->name +
-                                    "\" sent the message \"" + message.value()->name +
-                                    "\" to unconnected interface \"" + message.value()->interfaceName + "\"!");
+                                    "\" sent the message \"" + message.value()->_name +
+                                    "\" to unconnected interface \"" + message.value()->_interfaceName + "\"!");
         }
 
         receiver->processMessage(message.value());
