@@ -65,6 +65,7 @@ The detailed description of the handler can be found in “[Timer Handler](./doc
 
 ## Examples
 A number of small examples are available and can be found in the “[Examples](./doc/Examples.md)” section. These examples are:
+* [Add a state transition](./doc/Examples.md#add-a-state-transition)
 * [Accessing last received message](./doc/Examples.md#accessing-last-received-message)
 * [Replacing if-statements](./doc/Examples.md#replacing-if-statements)
 * [Resending messages](./doc/Examples.md#resending-messages)

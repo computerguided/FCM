@@ -1,6 +1,86 @@
 # FCM Best Practices and Examples
 _This is a living document containing a selection of the best practices and examples for the Functional Components Method._
 
+## Add a state transition
+
+There are two methods available to add a state transition:
+
+* Using the `addTransitionFunction()` method
+* Using the `FCM_ADD_TRANSITION` macro
+
+In the following sections, the two methods are described in detail.
+
+### Using the `addTransitionFunction()` template method
+
+The `addTransitionFunction()` is an inline template method defined as follows:
+
+```cpp
+template<typename MessageType, typename Action>
+inline void addTransitionFunction(const std::string& state, const std::string& nextState, Action action)
+```
+
+As an example on how to use this method, consider a component that is waiting for a connection request ("ConnectReq" on the "Transceiving" interface) from a server. When the connection request is received, the component can be transitioned to the next state.
+
+```cpp
+addTransitionFunction<Transceiving::ConnectReq>(
+    "Advertising", "Correct server?",
+    [this](const auto& message)
+    {
+        timerHandler->cancelTimeout(timerId);
+        serverId = message.serverId;
+        connectionId = message.connectionId;
+    }
+);
+```
+
+In the example, the `NEXT_STATE` is specified as “Correct server?”. The question mark indicates that the next state is one of the choice-points, which will be described in the section ["Add a choice-point"](#add-a-choice-point).
+
+Note that when no action is needed, the code can be simplified by using a lambda function that does nothing.
+
+```cpp
+addTransitionFunction<Transceiving::ConnectReq>("Advertising", "Correct server?",
+    [](const auto& message){}
+);
+```
+
+### Using the `FCM_ADD_TRANSITION` macro
+
+The second method that is available is using the `FCM_ADD_TRANSITION` macro.
+
+```cpp
+#define FCM_ADD_TRANSITION(STATE, INTERFACE, MESSAGE, NEXT_STATE, ACTION)
+```
+
+The macro takes five arguments: the current state, the interface, the message, the next state and the action. The action is a lambda function that is executed when the state transition occurs. Inside the action, the message can be used to extract data and to send messages to other components or handlers. This is possible because the message is automatically cast to the correct type.
+
+By specifying the `ACTION` as the last argument, the macro can be conveniently used. Consider the earlier example of a regularly advertising client that is waiting for a connection request from a server:
+
+```cpp
+FCM_ADD_TRANSITION( "Advertising", Transceiving, ConnectReq, "Correct server?",
+{
+    timerHandler->cancelTimeout(timerId);
+    serverId = message.serverId;
+    connectionId = message.connectionId;
+});
+```
+
+Note that the `message` is defined and available inside the macro and is automatically cast to the correct type.
+
+When no action is needed, the code can be simplified.
+
+```cpp
+FCM_ADD_TRANSITION( "Advertising", Transceiving, ConnectReq, "Correct server?",
+{
+    // NOP
+});
+```
+
+### Which method to use?
+
+The `FCM_ADD_TRANSITION` macro is more compact and convenient to use while coding, especially when the action is a simple and only contains a few lines of code. However, when the action becomes more complex, the method suffers from the standard problem with macros as it becomes difficult to debug using breakpoints because the macro is not expanded inline and the program will halt on the wrong line. A possible practice is to define the action as a separate method and then call this method inside the macro.
+
+Another option is to use the `addTransitionFunction()` method, which is recommended when the action becomes more complex. In that case, breakpoints can be used in the action to debug the code.
+
 ## Accessing the last received message
 
 In several circumstances it might be useful to store or access the parameters of the last received message. For example to use the value of one or more of its parameters in the evaluation of a choice-point.
