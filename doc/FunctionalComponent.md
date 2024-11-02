@@ -283,10 +283,12 @@ The second method that is available is using the `FCM_ADD_TRANSITION` macro. The
     [this](const std::shared_ptr<FcmMessage>& msg)                              \
     {                                                                           \
         const auto& message = dynamic_cast<const INTERFACE::MESSAGE&>(*msg);    \
+        (void)message;                                                          \
+        (void)this;                                                             \
         ACTION                                                                  \
     })
 ```
-
+The statement `(void)message;` and `(void)this;` are used to suppress compiler warnings about unused variables and `this` pointer.
 By specifying the `ACTION` as the last argument, the macro can be conveniently used. Consider the earlier example of a regularly advertising client that is waiting for a connection request from a server:
 
 ```cpp
@@ -299,6 +301,15 @@ FCM_ADD_TRANSITION( "Advertising", Transceiving, ConnectReq, "Correct server?",
 ```
 
 Note that the `message` is defined and available inside the macro and is automatically cast to the correct type.
+
+When no action is needed, the code can be simplified.
+
+```cpp
+FCM_ADD_TRANSITION( "Advertising", Transceiving, ConnectReq, "Correct server?",
+{
+    // NOP
+});
+```
 
 ### Which method to use?
 

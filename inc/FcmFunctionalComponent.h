@@ -77,7 +77,7 @@ protected:
     [this](const std::shared_ptr<FcmMessage>& msg)                              \
     {                                                                           \
         const auto& message = dynamic_cast<const INTERFACE::MESSAGE&>(*msg);    \
-        (void)message;                                                             \
+        (void)message;                                                          \
         (void)this;                                                             \
         ACTION                                                                  \
     })
