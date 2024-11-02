@@ -3,7 +3,7 @@ _Messages exchanged between components are stored first in the message queue, wh
 
 ## Description
 
-The `FcmMessageQueue` class implements a thread safe message queue. To shield the queue from external manipulation, a `std::list` variable is added as a private property.
+The `FcmMessageQueue` class implements a thread safe message queue. To shield the queue from external manipulation, a `std::list` variable is added as a private property (see "[Discussion - using `list` instead of `queue`](MessageQueue.md#discussion-using-list-instead-of-queue)" for the reasons why a `list` is used instead of a `queue`).
 
 ```cpp
 std::list<std::shared_ptr<FcmMessage>> queue;
@@ -180,5 +180,5 @@ In the current implementation, `std::list` is used instead of `std::queue`. Let�
 
 5. **Use of `resendMessage()`**: The `resendMessage()` method moves a message to the front of the queue, which `std::queue` does not natively support. With `std::queue`, you’d have to either re-implement the front insertion logic or fall back on a `std::deque`.
 
-### Conclusion:
+### Conclusion
 Since we need more operations that interact with elements throughout the queue, `std::list` is the better choice. If the queue’s functionality could be streamlined to just adding and removing from the ends without other element manipulation, then switching to `std::queue` (with `std::deque` as the underlying container) could be an option. However, since we do access the queue in other ways than just adding and removing from the ends, `std::list` is the better choice.
