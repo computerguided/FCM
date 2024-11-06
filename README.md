@@ -6,11 +6,15 @@ The Functional Components Method (FCM) is a comprehensive approach designed to f
 
 The FCM supports the six best practices of software engineering by emphasizing modularity, clear definitions, visual modeling, and structured communication. This is described in the ["Software Engineering using FCM"](./doc/SoftwareEngineering.md) document.
 
-The FCM can be used to specify the software of a device. This is described in the ["FCM Specification Guide"](./doc/FcmSpecificationGuide.md). In the FCM the concept of functional components is introduced. How a functional component is derived from a Functional Component's role and behavior is described in the ["Designing Components"](./doc/DesigningComponents.md) document.
+The FCM can be used to specify the software of a device. This is described in the ["FCM Specification Guide"](./doc/FcmSpecificationGuide.md). In the FCM the concept of _functional components_ is introduced. How a functional component is derived from it's role and behavior is described in the ["Designing Components"](./doc/DesigningComponents.md) document.
 
 For an example see the ["Doors Controlling System"](https://github.com/computerguided/FCM-example).
 
 This repository contains an implementation in C++ (for an implementation in C, refer to https://github.com/computerguided/FCM_C). In the following sections the FCM classes are described.
+
+Since the FCM is a structured method, it is possible to generate parts of the documentation and code. The repository [FCM Tools](https://github.com/computerguided/fcm-tools) contains a set of tools to do just that.
+
+The following sections give a short description of the FCM classes. For more detailed information, please refer to the documentation in the [doc](./doc) folder.
 
 ## Functional Component
 
