@@ -16,6 +16,8 @@ Since the FCM is a structured method, it is possible to generate parts of the do
 
 The following sections give a short description of the FCM classes. For more detailed information, please refer to the documentation in the [doc](./doc) folder.
 
+For a discussion on the FCM from both critics and proponents see the ["Discussion"](#discussion) section.
+
 ## Functional Component
 
 The `FcmFunctionalComponent` is the base class for all functional components in the system. It provides a way to exchange data and events with other components. The functional component has a list of connected 'interfaces' on which messages can be both received and sent. The functional component also has a finite-state-machine that can be used to implement its behavior.
@@ -79,5 +81,31 @@ A number of small examples are available and can be found in the “[Examples](.
 * [Using the timer](./doc/Examples.md#using-the-timer)
 * [Handling switch statements](./doc/Examples.md#handling-switch-statements)
 
+## Discussion
 
+**Critic:** The Functional Component Method (FCM) framework introduces additional layers of abstraction, which can complicate the development process. Developers might find it challenging to navigate through these abstractions, leading to increased complexity and potential inefficiencies.
+
+**Proponent:** While FCM does introduce abstractions, they are designed to enhance modularity and reusability. By encapsulating functionality within well-defined components, FCM promotes a clear separation of concerns, making the system more maintainable and scalable. This structured approach can ultimately reduce complexity by providing a consistent framework for component interaction.
+
+**Critic:** The reliance on message queues and state transition tables in FCM could introduce performance bottlenecks, especially in systems requiring real-time processing. The overhead associated with message handling and state management might not be suitable for high-performance applications.
+
+**Proponent:** FCM's design aims to balance flexibility and performance. While message queues and state transition tables add some overhead, they also provide robust mechanisms for asynchronous communication and state management. For performance-critical applications, FCM allows for optimization by fine-tuning these components or integrating more efficient communication protocols as needed.
+
+**Critic:** The learning curve associated with FCM can be steep for developers unfamiliar with its concepts. This could lead to longer development times and potential misimplementation of the framework's principles.
+
+**Proponent:** Adopting any new framework requires an initial investment in learning. FCM provides comprehensive documentation and examples to assist developers in understanding its concepts. Once familiar with FCM, developers can leverage its structured approach to streamline development processes, potentially reducing time-to-market for future projects.
+
+**Critic:** FCM's emphasis on modularity might lead to fragmented codebases, where the interconnections between components become difficult to manage and trace. This fragmentation could hinder debugging and system comprehension.
+
+**Proponent:** FCM encourages clear interface definitions and standardized communication patterns between components, which can mitigate fragmentation. By adhering to these standards, developers can maintain a cohesive codebase where component interactions are transparent and traceable, facilitating easier debugging and system understanding.
+
+**Critic:** Incorporating FCM into existing projects may require significant refactoring, which could be resource-intensive and disrupt ongoing development.
+
+**Proponent:** Integrating FCM into existing projects should be approached incrementally. By gradually refactoring parts of the system to align with FCM principles, teams can manage the transition without major disruptions. The long-term benefits of improved modularity and maintainability can outweigh the initial refactoring efforts.
+
+**Critic:** The generality of FCM might not align with the specific needs of certain projects, leading to a mismatch between the framework's capabilities and the project's requirements.
+
+**Proponent:** FCM is designed to be adaptable, allowing developers to customize components and communication mechanisms to fit specific project needs. Its flexibility enables it to be tailored to various application domains, ensuring that the framework supports, rather than constrains, project-specific requirements.
+
+In summary, while the Functional Component Method framework introduces certain complexities and requires an initial learning investment, its emphasis on modularity, reusability, and structured communication offers significant advantages in developing scalable and maintainable software systems. By carefully considering the trade-offs and implementing FCM thoughtfully, development teams can leverage its benefits to enhance their software engineering practices. 
 
