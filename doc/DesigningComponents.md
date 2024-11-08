@@ -65,7 +65,7 @@ For the `DatabaseManager`:
 States for the `DatabaseManager`:
 
 | State | Description |
-| --- | --- |
+|:--- |:--- |
 | Idle | Waiting for requests. |
 | Processing | Forwarding a valid request to the database. |
 

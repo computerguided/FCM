@@ -5,7 +5,7 @@
 The following table lists the FCM classes and gives a brief description of each class.
 
 | Class | Reference | Description |
-|-------|-----------|-------------|
+|:-------|:-----------|:-------------|
 | `FcmMessage` | [`.h`](../inc/FcmMessage.h), [`.md`](../doc/Messages.md) | Base class for all messages. |
 | `FcmInterface` | [`.h`](../inc/FcmMessage.h), [`.md`](../doc/Interfaces.md) | Base class for all interfaces. |
 | `FcmDevice` | [`.h`](../inc/FcmDevice.h), [`.md`](../doc/Devices.md) | Base class for all devices. |
