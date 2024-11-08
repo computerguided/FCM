@@ -6,14 +6,14 @@ The following table lists the FCM classes and gives a brief description of each 
 
 | Class | Reference | Description |
 |:-------|:-----------|:-------------|
-| `FcmMessage` | [`.h`](../inc/FcmMessage.h), [`.md`](../doc/Messages.md) | Base class for all messages. |
-| `FcmInterface` | [`.h`](../inc/FcmMessage.h), [`.md`](../doc/Interfaces.md) | Base class for all interfaces. |
-| `FcmDevice` | [`.h`](../inc/FcmDevice.h), [`.md`](../doc/Devices.md) | Base class for all devices. |
-| `FcmAsyncInterfaceHandler` | [`.h`](../inc/FcmAsyncInterfaceHandler.h), [`.md`](../doc/AsyncInterfaceHandlers.md) | Base class for all asynchronous interface handlers. |
-| `FcmBaseComponent` | [`.h`](../inc/FcmBaseComponent.h), [`.md`](../doc/Components.md) | Base class for all components. |
-| `FcmFunctionalComponent` | [`.h`](../inc/FcmFunctionalComponent.h), [`.md`](../doc/FunctionalComponent.md) | Base class for all functional components. |
-| `FcmMessageQueue` | [`.h`](../inc/FcmMessageQueue.h), [`.md`](../doc/MessageQueue.md) | Message queue (singleton). |
-| `FcmTimerHandler` | [`.h`](../inc/FcmTimerHandler.h), [`.md`](../doc/TimerHandler.md) | Timer handler (singleton). |
+| `FcmMessage` | [`.h`](../inc/FcmMessage.h), [`.md`](../doc/classes/Messages.md) | Base class for all messages. |
+| `FcmInterface` | [`.h`](../inc/FcmMessage.h), [`.md`](../doc/classes/Interfaces.md) | Base class for all interfaces. |
+| `FcmDevice` | [`.h`](../inc/FcmDevice.h), [`.md`](../doc/classes/Devices.md) | Base class for all devices. |
+| `FcmAsyncInterfaceHandler` | [`.h`](../inc/FcmAsyncInterfaceHandler.h), [`.md`](../doc/classes/AsyncInterfaceHandlers.md) | Base class for all asynchronous interface handlers. |
+| `FcmBaseComponent` | [`.h`](../inc/FcmBaseComponent.h), [`.md`](../doc/classes/Components.md) | Base class for all components. |
+| `FcmFunctionalComponent` | [`.h`](../inc/FcmFunctionalComponent.h), [`.md`](../doc/classes/FunctionalComponent.md) | Base class for all functional components. |
+| `FcmMessageQueue` | [`.h`](../inc/FcmMessageQueue.h), [`.md`](../doc/classes/MessageQueue.md) | Message queue (singleton). |
+| `FcmTimerHandler` | [`.h`](../inc/FcmTimerHandler.h), [`.md`](../doc/classes/TimerHandler.md) | Timer handler (singleton). |
 
 ## Class diagram
 
