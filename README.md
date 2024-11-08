@@ -1,5 +1,4 @@
 # Functional Components Method
-![fcm](https://github.com/user-attachments/assets/9423a489-e37d-4b2d-8377-784145bcbcc8)
 
 ## Overview
 
