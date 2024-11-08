@@ -82,6 +82,7 @@ A number of small examples are available and can be found in the “[Examples](.
 * [Handling switch statements](./doc/Examples.md#handling-switch-statements)
 
 ## Discussion
+![critic-proponent](https://github.com/user-attachments/assets/74907f9a-bf7e-4009-a3e2-d40d6f3d80c0)
 
 **Critic:** The Functional Component Method (FCM) framework introduces additional layers of abstraction, which can complicate the development process. Developers might find it challenging to navigate through these abstractions, leading to increased complexity and potential inefficiencies.
 
