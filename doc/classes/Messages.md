@@ -69,17 +69,21 @@ FCM_PREPARE_MESSAGE(connectAckMessage, Transceiving, ConnectAck);
 
 Messages are defined within the namespace of the interface. A message is defined as a class that is derived from the `FcmMessage` class. The class has a constructor that sets the `name` and `interfaceName` fields of the message. The `name` field is set to the name of the message class and the `interfaceName` field is set to the name of the interface.
 
-This is achieved by using the `FCM_DEFINE_MESSAGE` macro. The macro takes two arguments: the name of the message and the parameters of the message. The macro takes care of setting the `name` and `interfaceName` attributes of the message.
+This is achieved by using the `FCM_DEFINE_MESSAGE` macro. The macro takes two arguments: the name of the message and the parameters of the message. The macro takes care of setting the `name` and `interfaceName` attributes, both for the message instantiation and the class itself.
 
 ```cpp
-#define FCM_DEFINE_MESSAGE(NAME, ...)                               \
-    class NAME : public FcmMessage                                  \
-    {                                                               \
-    public:                                                         \
-        __VA_ARGS__                                                 \
-        NAME() { name = #NAME; interfaceName = currentNamespace; }  \
+#define FCM_DEFINE_MESSAGE(NAME, ...)                                    \
+    class NAME : public FcmMessage                                       \
+    {                                                                    \
+    public:                                                              \
+        __VA_ARGS__                                                      \
+        static constexpr const char* interfaceName = interfaceClassName; \
+        static constexpr const char* name = #NAME;                       \
+        NAME() { _interfaceName = interfaceClassName; _name = #NAME; }   \
     }
 ```
+
+Note that the class properties `interfaceName` and `name` are static class members and are used to identify the message when all we have is the message class in the `addTransition` template method (see "[Functional Components](./FunctionalComponent.md#using-the-addtransitionfunction-template-method)").
 
 In "[Interfaces](Interfaces.md)" an example is given on how to use this macro.
 

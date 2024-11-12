@@ -37,7 +37,7 @@ public:
         __VA_ARGS__                                                      \
         static constexpr const char* interfaceName = interfaceClassName; \
         static constexpr const char* name = #NAME;                       \
-        NAME() { _interfaceName = interfaceName; _name = name; }         \
+        NAME() { _interfaceName = interfaceClassName; _name = #NAME; }   \
     }
 
 // ---------------------------------------------------------------------------------------------------------------------
