@@ -1,6 +1,6 @@
 # Guide to Deriving States, Transitions, and Choice-Points from a Component's Role and Behavior
 
-_Understanding how to translate a component's role and behavior into states, transitions, and choice-points is crucial for designing robust and maintainable systems. This guide walks you through the process step-by-step, leveraging the Functional Components Method (FCM) to structure your component's behavior effectively._
+_Understanding how to translate a component's role and behavior into states, transitions, and choice-points is crucial for designing robust and maintainable systems. This guide walks you through the process step-by-step, leveraging the Functional Components Method (FCM) to effectively structure your component's behavior._
 
 ## Introduction
 
@@ -64,10 +64,10 @@ For the `DatabaseManager`:
 
 States for the `DatabaseManager`:
 
-| State | Description |
-|:--- |:--- |
-| Idle | Waiting for requests. |
-| Processing | Forwarding a valid request to the database. |
+| State       | Description                |
+|:-------------|:---------------|
+| Idle        | Waiting for requests.      |
+| Processing  | Forwarding a valid request to the database. |
 
 ---
 
@@ -149,82 +149,17 @@ In the `DatabaseManager` component:
 
 ### State Transition Table for `DatabaseManager`
 
-<table>
-  <thead>
-    <tr>
-      <th>Current State</th>
-      <th>Interface</th>
-      <th>Message</th>
-      <th>Action</th>
-      <th>Next State</th>
-    </tr>
-  </thead>
-  <tbody>
-    <tr>
-      <td rowspan="2">Idle</td>
-      <td rowspan="2">Database</td>
-      <td>AddInd</td>
-      <td>
-        - Set `clientIndex = 0`<br>
-        - Set `operationType = Add`
-      </td>
-      <td>Is Id Valid?</td>
-    </tr>
-    <tr>
-      <td>RemoveInd</td>
-      <td>
-        - Set `clientIndex = 0`<br>
-        - Set `operationType = Remove`
-      </td>
-      <td>Is Id Valid?</td>
-    </tr>
-    <tr>
-      <td rowspan="2">Is Id Valid?</td>
-      <td rowspan="2">Logical</td>
-      <td>Yes</td>
-      <td>Resend last received message</td>
-      <td>Processing</td>
-    </tr>
-    <tr>
-      <td>No</td>
-      <td>Ignore and log invalid id</td>
-      <td>Idle</td>
-    </tr>
-    <tr>
-      <td>Processing</td>
-      <td>Database</td>
-      <td>ReadyInd</td>
-      <td>
-        - Update `databaseEntries` from `ReadyInd`<br>
-      </td>
-      <td>Was Operation Remove?</td>
-    </tr>
-    <tr>
-      <td rowspan="2">Was Operation Remove?</td>
-      <td rowspan="2">Logical</td>
-      <td>Yes</td>
-      <td>No action needed</td>
-      <td>Is Database Empty?</td>
-    </tr>
-    <tr>
-      <td>No</td>
-      <td>No action needed</td>
-      <td>Idle</td>
-    </tr>
-    <tr>
-      <td rowspan="2">Is Database Empty?</td>
-      <td rowspan="2">Logical</td>
-      <td>Yes</td>
-      <td>Perform actions when database is empty</td>
-      <td>Idle</td>
-    </tr>
-    <tr>
-      <td>No</td>
-      <td>No action needed</td>
-      <td>Idle</td>
-    </tr>
-  </tbody>
-</table>
+| Current State       | Interface  | Message     | Action                               | Next State         |
+|:-----|:----|:-------------|:-------|:--------------------|
+| Idle                | Database   | AddInd      | Set `clientIndex = 0`, `operationType = Add` | Is Id Valid?       |
+| Idle                | Database   | RemoveInd   | Set `clientIndex = 0`, `operationType = Remove` | Is Id Valid?       |
+| Is Id Valid?        | Logical    | Yes         | Resend last received message         | Processing         |
+| Is Id Valid?        | Logical    | No          | Ignore and log invalid id            | Idle               |
+| Processing          | Database   | ReadyInd    | Update `databaseEntries` from `ReadyInd` | Was Operation Remove? |
+| Was Operation Remove? | Logical  | Yes         | No action needed                     | Is Database Empty? |
+| Was Operation Remove? | Logical  | No          | No action needed                     | Idle               |
+| Is Database Empty?  | Logical    | Yes         | Perform actions when database is empty | Idle             |
+| Is Database Empty?  | Logical    | No          | No action needed                     | Idle               |
 
 ---
 
@@ -234,12 +169,6 @@ In the `DatabaseManager` component:
 
 - **Include Choice-Points**: Represent choice-points as decision nodes ending with a question mark.
 - **Show Conditional Paths**: Indicate the outcomes of choice-point evaluations ("Yes", "No" branches).
-
-**Example**:
-
-![](https://www.plantuml.com/plantuml/img/XP31Ikn044NtzHMNMJx81xmiT0PKo4P5GH5nKKwLsfXqXwuUPHJ_NRk7cM0JS1C8TVlSKxMqn35jXfvUd2Xq6DCMehQERamkU29xTNxao0DMCOPtV19m5dowTX-A__H5TF_l0KslJwavGYUz4kKlclnhdTnmxmGjJZZn8vksAv7Eon-XAnt2c-QS9KwAHMVe12Ltl03Rz8ne8cJUPGnhDNF-6ItkrAfnwMrn7cWAbi4jsyMeaVFUk_hVGYpRxBCN-edZaCVkGJ6R0H7DmClgU_vfkNpndSbMujDD3dueWD9VKudgcebM-kfnLRPKBvkX_mO0)
-
-*Note: The diagram illustrates transitions between `Idle`, `Is Id Valid?`, `Processing`, `Was Operation Remove?`, and `Is Database Empty?` states, including handling of valid and invalid `id`s.*
 
 ---
 
@@ -252,7 +181,7 @@ In the `DatabaseManager` component:
 ```cpp
 void setStates() override
 {
-    states = 
+    states =
     {
         "Idle",
         "Processing",
@@ -264,7 +193,7 @@ void setStates() override
 ### Define Choice-Points:
 
 ```cpp
-void setChoicePoints() override 
+void setChoicePoints() override
 {
     // Choice-Point: Is Id Valid?
     FCM_ADD_CHOICE_POINT("Is Id Valid?",
@@ -284,11 +213,6 @@ void setChoicePoints() override
 }
 ```
 
-- **Explanation**:
-  - **"Is Id Valid?"**: Checks if the `id` in the last received message matches `myId`.
-  - **"Was Operation Remove?"**: Determines if the last operation was a removal.
-  - **"Is Database Empty?"**: Evaluates whether the `databaseEntries` count is zero.
-
 ### Define Transitions:
 
 ```cpp
@@ -297,13 +221,13 @@ void setTransitions() override
     // From Idle to Is Id Valid? on AddInd
     FCM_ADD_TRANSITION("Idle", Database, AddInd, "Is Id Valid?",
         clientIndex = 0;
-        operationType = Operation::Add; // Track operation type
+        operationType = Operation::Add;
     );
 
     // From Idle to Is Id Valid? on RemoveInd
     FCM_ADD_TRANSITION("Idle", Database, RemoveInd, "Is Id Valid?",
         clientIndex = 0;
-        operationType = Operation::Remove; // Track operation type
+        operationType = Operation::Remove;
     );
 
     // From Is Id Valid? to Processing on Logical:Yes
@@ -319,7 +243,7 @@ void setTransitions() override
     // From Processing to Was Operation Remove? on ReadyInd
     FCM_ADD_TRANSITION("Processing", Database, ReadyInd, "Was Operation Remove?",
         auto readyInd = FCM_CAST_MESSAGE(message, ReadyIndMessage);
-        databaseEntries = readyInd->entriesCount; // Update entries count
+        databaseEntries = readyInd->entriesCount;
     );
 
     // From Was Operation Remove? to Is Database Empty? on Logical:Yes
@@ -344,32 +268,11 @@ void setTransitions() override
 }
 ```
 
-- **Explanation**:
-  - **Tracking Operation Type**:
-    - The state variable `operationType` tracks whether the current operation is an `Add` or `Remove`.
-  - **From `Processing` State**:
-    - After receiving `ReadyInd`, move to the choice-point "Was Operation Remove?" to decide the next state based on the operation type.
-  - **Using Choice-Points**:
-    - Avoid using if-statements in actions; utilize choice-points to make decisions about state transitions.
-
-### Implement State Variables:
-
-```cpp
-// State variables
-enum class Operation { None, Add, Remove };
-Operation operationType = Operation::None;
-int databaseEntries = 0;
-```
-
-- **Explanation**:
-  - `operationType`: Tracks the type of operation being processed.
-  - `databaseEntries`: Stores the current number of entries in the database.
-
 ---
 
 ## Conclusion
 
-By systematically translating a component's role and behavior into defined states, transitions, and choice-points—as closed questions ending with a question mark—you create a clear and maintainable structure for your component. This process ensures all scenarios are accounted for and the component behaves predictably in response to various messages and events.
+By systematically translating a component's role and behavior into defined states, transitions, and choice-points, you create a clear and maintainable structure for your component. This process ensures all scenarios are accounted for and the component behaves predictably in response to various messages and events.
 
 Adopting this method provides several benefits:
 
@@ -401,7 +304,7 @@ Adopting this method provides several benefits:
 
 ## Summary
 
-This guide provided a comprehensive approach to derive states, transitions, and choice-points from a component's role and behavior. By following the steps outlined:
+This guide provides a comprehensive approach to derive states, transitions, and choice-points from a component's role and behavior. By following the steps outlined:
 
 1. **Define the Role and Behavior**: Understand what the component does.
 2. **Identify Use Cases and Scenarios**: Break down functionality into specific situations.
@@ -412,8 +315,4 @@ This guide provided a comprehensive approach to derive states, transitions, and 
 7. **Construct the State Diagram**: Visualize the states and transitions.
 8. **Implement in Code**: Translate everything into code using the FCM framework, ensuring proper use of choice-points.
 
-By meticulously applying these steps, you design components that are robust, maintainable, and perfectly aligned with their intended roles within the system.
-
----
-
-By following this guide, developers can create well-structured components that enhance the overall quality and maintainability of the software system.
+By meticulously applying these steps, you design components that are robust, maintainable, and perfectly aligned with their intended roles within the system, ultimately enhancing the overall quality and maintainability of the software system.
