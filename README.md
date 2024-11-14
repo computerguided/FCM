@@ -2,139 +2,147 @@
 
 ## Overview
 
-The Functional Components Method (FCM) is a comprehensive approach designed to facilitate the development, management, and interaction of components within a software system. At its core, FCM emphasizes modularity, reusability, and efficient communication between distinct functional units, known as components. This method leverages a structured framework that includes devices, message queues, state transition tables, and various handlers to streamline the process of creating scalable and maintainable software architectures. By adopting FCM, developers can create systems that are easier to debug, test, and extend, ultimately leading to more robust and flexible applications.
+The Functional Components Method (FCM) is a comprehensive approach for developing, managing, and interacting with software components. FCM emphasizes modularity, reusability, and efficient communication between distinct functional units, called components. It uses a structured framework that includes devices, message queues, state transition tables, and handlers, aiming to create scalable and maintainable software architectures. By adopting FCM, developers can build systems that are easier to debug, test, and extend, ultimately resulting in more robust and flexible applications.
 
-The FCM supports the six best practices of software engineering by emphasizing modularity, clear definitions, visual modeling, and structured communication. This is described in the ["Software Engineering using FCM"](./doc/SoftwareEngineering.md) document.
+FCM supports the six best practices of software engineering by promoting modularity, clear definitions, visual modeling, and structured communication. These best practices are described in the ["Software Engineering using FCM"](./doc/SoftwareEngineering.md) document.
 
-The FCM can be used to specify the software of a device. This is described in the ["FCM Specification Guide"](./doc/FcmSpecificationGuide.md). In the FCM the concept of _functional components_ is introduced. How a functional component is derived from it's role and behavior is described in the ["Designing Components"](./doc/DesigningComponents.md) document.
+FCM can be used to specify the software for a device, as explained in the ["FCM Specification Guide"](./doc/FcmSpecificationGuide.md). The concept of _functional components_ is introduced in FCM, with details on deriving a functional component from its role and behavior covered in the ["Designing Components"](./doc/DesigningComponents.md) document.
 
-For an example see the ["Doors Controlling System"](https://github.com/computerguided/FCM-example).
+For an example, see the ["Doors Controlling System"](https://github.com/computerguided/FCM-example).
 
-This repository contains an implementation in C++ (for an implementation in C, refer to https://github.com/computerguided/FCM_C). In the following sections the FCM classes are described.
+This repository contains a C++ implementation (a C implementation can be found [here](https://github.com/computerguided/FCM_C)).
 
-Since the FCM is a structured method, it is possible to generate parts of the documentation and code. The repository [FCM Tools](https://github.com/computerguided/fcm-tools) contains a set of tools to do just that.
+As a structured method, FCM allows for generating parts of the documentation and code. The [FCM Tools](https://github.com/computerguided/fcm-tools) repository provides tools for this purpose.
 
-The following sections give a short description of the FCM classes. For more detailed information, please refer to the documentation in the [doc](./doc) folder.
+The following sections provide a brief overview of FCM classes. For detailed information, refer to the documentation in the [doc](./doc) folder.
 
-For a discussion on the FCM from both critics and proponents see the ["Discussion"](#discussion) section.
+For a discussion of FCM from both critics and proponents, see the ["Discussion"](#discussion) section.
 
 ## Functional Component
 
-The `FcmFunctionalComponent` is the base class for all functional components in the system. It provides a way to exchange data and events with other components. The functional component has a list of connected 'interfaces' on which messages can be both received and sent. The functional component also has a finite-state-machine that can be used to implement its behavior.
+The `FcmFunctionalComponent` is the base class for all functional components in the system. It facilitates data and event exchange between components using connected interfaces, which can receive and send messages. It also features a finite-state machine to define component behavior.
 
-The detailed description of the component can be found in “[Functional component](./doc/classes/FunctionalComponent.md)”.
+More details can be found in ["Functional Component"](./doc/classes/FunctionalComponent.md).
 
 ## Asynchronous Interface Handler
 
-The `FcmAsyncInterfaceHandler` is a class that provides a way to handle asynchronous interfaces in a synchronous way. The handler has one or more interfaces on which it can only send messages, but not receive. As such it also has no state-machine.
+The `FcmAsyncInterfaceHandler` provides a way to handle asynchronous interfaces synchronously. It has one or more interfaces that can send messages, but not receive them, and it does not include a state machine.
 
-Typically, Functional Components can have a reference to a handler to call non-blocking interface functions that initiate a certain asynchronous operation. The handler could then for example send a message back to the component when the operation is completed.
+Functional Components often reference this handler to initiate non-blocking asynchronous operations. The handler can send a message back when the operation is completed.
 
-The detailed description of the handler can be found in “[Asynchronous Interface Handler](./doc/classes/AsyncInterfaceHandler.md)”.
+Details are available in ["Asynchronous Interface Handler"](./doc/classes/AsyncInterfaceHandler.md).
 
 ## Worker Handler
 
-The `FcmWorkerHandler` is a class that provides a way to handle worker threads. The handler has one or more interfaces on which it can only send messages, but not receive. As such it also has no state-machine.
+The `FcmWorkerHandler` handles worker threads, with one or more interfaces for sending messages. It does not receive messages or include a state machine.
 
-The Worker Handler is typically used to implement a long-running task that is executed in a separate thread. The task is implemented in the `run()` method which is called when the worker is started. The worker can be cancelled by calling the `cancel()` method.
+This handler is used to implement long-running tasks in separate threads. The task is implemented in the `run()` method and can be canceled using the `cancel()` method.
 
-The detailed description of the handler can be found in “[Worker Handler](./doc/classes/WorkerHandler.md)”.
+More details are in ["Worker Handler"](./doc/classes/WorkerHandler.md).
 
 ## Base Component
 
-The `FcmBaseComponent` is the base class for the `FcmFunctionalComponent` and `FcmAsyncInterfaceHandler` classes and implements the basic attributes that are common to both classes, such as the name, settings, list of connected interfaces, and message queue. The base class also provides methods to connect interfaces, send messages, and access settings.
-The detailed description of the base component can be found in “[Base Component](./doc/classes/BaseComponent.md)”.
+The `FcmBaseComponent` is the base class for `FcmFunctionalComponent` and `FcmAsyncInterfaceHandler`. It includes basic attributes common to both classes, such as name, settings, connected interfaces, and a message queue. The base class also provides methods for interface connection, message sending, and accessing settings.
+
+More details are in ["Base Component"](./doc/classes/BaseComponent.md).
 
 ## Device
 
-A device is a collection of components and handlers that work together to perform a specific function. The device is the top-level entity in the system and is responsible for creating and managing all components and handlers. The device also has a message queue that is used to send messages between components.
-Note that a “device” is an abstraction; it can be a real physical device like a network node just as well as a separate software entity – like an application, service or task – that communicates with other software entities on a larger OS.
-The `FcmDevice` is the base class for all devices in the system. It provides a way to create, connect and manage components and handlers. The device has a list of components and handlers that are part of the device.
-The detailed description of the device can be found in “[Device](./doc/classes/Device.md)”.
+A device is a collection of components and handlers working together to perform a specific function. It serves as the top-level entity, responsible for creating and managing components and handlers. A device can be a physical entity (e.g., a network node) or a software entity (e.g., an application or service).
+
+The `FcmDevice` class provides methods to create, connect, and manage components and handlers. It also has a message queue for communication between components.
+
+More details are in ["Device"](./doc/classes/Device.md).
 
 ## Interfaces
 
-To be able to exchange data and events, components and handlers have a list of connected 'interfaces' on which messages can be sent.
-An interface is defined as a set of messages and typically defined in its own header file.
-The detailed description of the interfaces can be found in “[Interfaces](./doc/classes/Interfaces.md)”.
+Components and handlers use interfaces to exchange data and events. An interface is defined by a set of messages, typically in its own header file.
+
+More details are in ["Interfaces"](./doc/classes/Interfaces.md).
 
 ## Messages
 
-A message is a data structure that is used to send data and events between components and handlers. A message is identified by a name and is sent to a receiver on an interface.
-The detailed description of the messages can be found in the “[Messages](./doc/classes/Messages.md)”.
+Messages are data structures used to send data and events between components and handlers. Each message is identified by a name and sent to a receiver via an interface.
+
+More details are in ["Messages"](./doc/classes/Messages.md).
 
 ## Message Queue
 
-When a device is created, a message queue is created, which is a thread safe shared resource that is used by all components in the system. The message queue is used to send messages between components and handlers.
-The detailed description of the message queue can be found in the “[Message queue](./doc/classes/MessageQueue.md)”.
+The message queue is a thread-safe resource created when a device is instantiated. It is used by all components and handlers for message exchange.
+
+More details are in ["Message Queue"](./doc/classes/MessageQueue.md).
 
 ## State Transition Table
 
-The state transition table is a data structure that is used to define the behavior of a component. It is a table that contains the states and events of the component and the actions that are executed when a state transition occurs.
-The detailed description of the state transition table can be found in “[State Transition Table](./doc/classes/StateTransitionTable.md)”.
+The state transition table defines component behavior by listing states, events, and the corresponding actions for state transitions.
+
+More details are in ["State Transition Table"](./doc/classes/StateTransitionTable.md).
 
 ## Timer Handler
-The `FcmTimerHandler` is a class that provides a controlled way to handle timers in the system. The handler has one interface on which it can only send messages, but not receive. As such it also has no state machine. In the device there is only one timer handler, implemented as a singleton and instantiated by the `FcmDevice`.
-The detailed description of the handler can be found in “[Timer Handler](./doc/classes/TimerHandler.md)”.
+
+The `FcmTimerHandler` provides a controlled way to manage timers. It has an interface to send messages, but not receive them, and does not include a state machine. The timer handler is implemented as a singleton in the `FcmDevice`.
+
+More details are in ["Timer Handler"](./doc/classes/TimerHandler.md).
 
 ## Examples
-A number of small examples are available and can be found in the “[Examples](./doc/Examples.md)” section. These examples are:
-* [Add a state transition](./doc/Examples.md#add-a-state-transition)
-* [Accessing last received message](./doc/Examples.md#accessing-last-received-message)
-* [Replacing if-statements](./doc/Examples.md#replacing-if-statements)
-* [Resending messages](./doc/Examples.md#resending-messages)
-* [Multiple state transition](./doc/Examples.md#multiple-state-transition)
-* [Creating loops](./doc/Examples.md#creating-loops)
-* [Interface multiplication](./doc/Examples.md#interface-multiplication)
-* [Using the timer](./doc/Examples.md#using-the-timer)
-* [Handling switch statements](./doc/Examples.md#handling-switch-statements)
+
+Several examples are available in the ["Examples"](./doc/Examples.md) section:
+
+- [Add a state transition](./doc/Examples.md#add-a-state-transition)
+- [Accessing last received message](./doc/Examples.md#accessing-last-received-message)
+- [Replacing if-statements](./doc/Examples.md#replacing-if-statements)
+- [Resending messages](./doc/Examples.md#resending-messages)
+- [Multiple state transition](./doc/Examples.md#multiple-state-transition)
+- [Creating loops](./doc/Examples.md#creating-loops)
+- [Interface multiplication](./doc/Examples.md#interface-multiplication)
+- [Using the timer](./doc/Examples.md#using-the-timer)
+- [Handling switch statements](./doc/Examples.md#handling-switch-statements)
 
 ## Discussion
+
 ![critic-proponent](https://github.com/user-attachments/assets/c65e12c9-5a13-4c22-802a-fff8229412c3)
 
-**Critic:** The Functional Component Method (FCM) framework introduces additional layers of abstraction, which can complicate the development process. Developers might find it challenging to navigate through these abstractions, leading to increased complexity and potential inefficiencies.
+**Critic:** The FCM framework introduces additional abstraction layers, complicating the development process. Developers may struggle with these abstractions, leading to increased complexity and inefficiencies.
 
-**Proponent:** While FCM does introduce abstractions, they are designed to enhance modularity and reusability. By encapsulating functionality within well-defined components, FCM promotes a clear separation of concerns, making the system more maintainable and scalable. This structured approach can ultimately reduce complexity by providing a consistent framework for component interaction.
+**Proponent:** While FCM adds abstractions, they enhance modularity and reusability. Encapsulating functionality within well-defined components promotes separation of concerns, resulting in a more maintainable and scalable system. This structured approach reduces complexity by providing consistent component interactions.
 
-**Critic:** The reliance on message queues and state transition tables in FCM could introduce performance bottlenecks, especially in systems requiring real-time processing. The overhead associated with message handling and state management might not be suitable for high-performance applications.
+**Critic:** The reliance on message queues and state transition tables can introduce performance bottlenecks, especially for real-time systems. The overhead from message handling and state management may not suit high-performance applications.
 
-**Proponent:** FCM's design aims to balance flexibility and performance. While message queues and state transition tables add some overhead, they also provide robust mechanisms for asynchronous communication and state management. For performance-critical applications, FCM allows for optimization by fine-tuning these components or integrating more efficient communication protocols as needed.
+**Proponent:** FCM balances flexibility and performance. Though there is some overhead, it offers robust mechanisms for asynchronous communication and state management. Performance-critical applications can be optimized by fine-tuning components or integrating efficient communication protocols.
 
-**Critic:** The learning curve associated with FCM can be steep for developers unfamiliar with its concepts. This could lead to longer development times and potential misimplementation of the framework's principles.
+**Critic:** FCM has a steep learning curve for developers unfamiliar with its concepts, potentially extending development timelines and leading to misimplementations.
 
-**Proponent:** Adopting any new framework requires an initial investment in learning. FCM provides comprehensive documentation and examples to assist developers in understanding its concepts. Once familiar with FCM, developers can leverage its structured approach to streamline development processes, potentially reducing time-to-market for future projects.
+**Proponent:** Any new framework requires initial learning. FCM offers comprehensive documentation and examples to ease understanding. Once familiar, developers can leverage FCM's structured approach to streamline development and reduce time-to-market for future projects.
 
-**Critic:** FCM's emphasis on modularity might lead to fragmented codebases, where the interconnections between components become difficult to manage and trace. This fragmentation could hinder debugging and system comprehension.
+**Critic:** FCM's emphasis on modularity can lead to fragmented codebases, making component interconnections difficult to manage and trace.
 
-**Proponent:** FCM encourages clear interface definitions and standardized communication patterns between components, which can mitigate fragmentation. By adhering to these standards, developers can maintain a cohesive codebase where component interactions are transparent and traceable, facilitating easier debugging and system understanding.
+**Proponent:** Clear interface definitions and standardized communication patterns mitigate fragmentation. By following these standards, developers maintain a cohesive codebase with transparent and traceable interactions, simplifying debugging and system comprehension.
 
-**Critic:** Incorporating FCM into existing projects may require significant refactoring, which could be resource-intensive and disrupt ongoing development.
+**Critic:** Integrating FCM into existing projects may require significant refactoring, which could be resource-intensive and disrupt ongoing development.
 
-**Proponent:** Integrating FCM into existing projects should be approached incrementally. By gradually refactoring parts of the system to align with FCM principles, teams can manage the transition without major disruptions. The long-term benefits of improved modularity and maintainability can outweigh the initial refactoring efforts.
+**Proponent:** Integration should be approached incrementally, refactoring parts of the system to align with FCM principles. The long-term benefits of improved modularity and maintainability outweigh the initial effort.
 
-**Critic:** The generality of FCM might not align with the specific needs of certain projects, leading to a mismatch between the framework's capabilities and the project's requirements.
+**Critic:** FCM's generality might not align well with specific project needs, leading to a mismatch between the framework's capabilities and project requirements.
 
-**Proponent:** FCM is designed to be adaptable, allowing developers to customize components and communication mechanisms to fit specific project needs. Its flexibility enables it to be tailored to various application domains, ensuring that the framework supports, rather than constrains, project-specific requirements.
+**Proponent:** FCM is adaptable, allowing developers to customize components and communication to fit specific needs. Its flexibility ensures it supports, rather than constrains, project-specific requirements.
 
-**Critic:** Implementing state machines can sometimes appear redundant, especially when the system's behavior is straightforward. In such cases, the added complexity of defining states and transitions may not be justified.
+**Critic:** Implementing state machines can seem redundant for straightforward system behaviors, adding unnecessary complexity.
 
-**Proponent:** While it's true that for simple behaviors, state machines might seem unnecessary, they provide a structured approach that can scale with system complexity. Even in simple cases, using state machines can enhance clarity and maintainability, ensuring that as the system evolves, its behavior remains well-defined and manageable.
+**Proponent:** While state machines may seem excessive for simple behavior, they offer a scalable, structured approach. They improve clarity and maintainability, ensuring the system's behavior is well-defined and manageable as it evolves.
 
-**Critic:** However, as state machines grow, they can accumulate numerous transitions, which can obfuscate the system's functionality. A complex state machine with many transitions can become difficult to understand and maintain.
+**Critic:** State machines can accumulate numerous transitions, making functionality difficult to comprehend and maintain.
 
-**Proponent:** An increase in the number of transitions often indicates that a component is handling too much functionality. This is akin to a function becoming too long or a class encompassing too many responsibilities. In such scenarios, it's advisable to decompose the component into smaller, more focused units. This modular approach aligns with the Single Responsibility Principle, enhancing both clarity and maintainability.
+**Proponent:** A large number of transitions often suggests a component is handling too much. In such cases, decomposing the component into smaller, focused units enhances clarity and maintainability, aligning with the Single Responsibility Principle.
 
-**Critic:** But isn't decomposing components into smaller units a complex task in itself? It requires careful analysis to ensure that the new components interact correctly and that the system's overall behavior remains consistent.
+**Critic:** Decomposing components is itself complex, requiring careful analysis to ensure consistent behavior.
 
-**Proponent:** Decomposing components does require thoughtful design, but the benefits outweigh the initial effort. By breaking down a complex state machine into smaller, more manageable components, each with its own state machine, we can reduce complexity and improve the system's modularity. This approach facilitates easier testing, debugging, and future enhancements. Moreover, it aligns with best practices in software engineering, such as modular design and separation of concerns.
+**Proponent:** Thoughtful decomposition reduces complexity and improves modularity. Breaking down components facilitates easier testing, debugging, and enhancements, aligning with best software engineering practices.
 
-**Critic:** Still, managing multiple state machines and ensuring their correct interaction can introduce its own set of challenges. Coordinating between different components and their respective states requires careful synchronization and communication.
+**Critic:** Managing multiple state machines requires careful synchronization, which adds challenges.
 
-**Proponent:** Indeed, coordinating multiple state machines necessitates a well-defined communication strategy. However, frameworks like the Functional Component Method (FCM) are designed to handle such scenarios. FCM provides mechanisms for efficient communication and synchronization between components, ensuring that their interactions are seamless and that the system's overall behavior is coherent. By leveraging such frameworks, we can manage the complexity associated with multiple state machines effectively.
+**Proponent:** Proper synchronization is essential, and FCM is designed to manage such scenarios with efficient communication and coordination between components.
 
-**Critic:** In summary, while state machines offer a structured approach to modeling system behavior, they can become complex and unwieldy if not managed properly. It's crucial to balance the benefits of using state machines with the potential for increased complexity, ensuring that they are applied judiciously and that components are appropriately decomposed to maintain clarity and maintainability.
+**Critic:** Balancing the benefits of state machines with their potential for increased complexity is crucial.
 
-**Proponent:** Absolutely. The key lies in thoughtful design and adherence to best practices. By carefully considering the system's requirements and structuring components appropriately, we can harness the power of state machines to create robust, maintainable, and scalable systems. It's about finding the right balance and ensuring that the tools and methodologies we use serve to simplify and clarify the system, rather than adding unnecessary complexity.
-
-
+**Proponent:** Thoughtful design and adherence to best practices are key. Properly structuring components allows state machines to be effective in creating robust, maintainable, and scalable systems.
 
