@@ -32,6 +32,14 @@ Typically, Functional Components can have a reference to a handler to call non-b
 
 The detailed description of the handler can be found in “[Asynchronous Interface Handler](./doc/classes/AsyncInterfaceHandler.md)”.
 
+## Worker Handler
+
+The `FcmWorkerHandler` is a class that provides a way to handle worker threads. The handler has one or more interfaces on which it can only send messages, but not receive. As such it also has no state-machine.
+
+The Worker Handler is typically used to implement a long-running task that is executed in a separate thread. The task is implemented in the `run()` method which is called when the worker is started. The worker can be cancelled by calling the `cancel()` method.
+
+The detailed description of the handler can be found in “[Worker Handler](./doc/classes/WorkerHandler.md)”.
+
 ## Base Component
 
 The `FcmBaseComponent` is the base class for the `FcmFunctionalComponent` and `FcmAsyncInterfaceHandler` classes and implements the basic attributes that are common to both classes, such as the name, settings, list of connected interfaces, and message queue. The base class also provides methods to connect interfaces, send messages, and access settings.
