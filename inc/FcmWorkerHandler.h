@@ -14,7 +14,7 @@ public:
     explicit FcmWorkerHandler(const std::string& nameParam,
                        const FcmSettings& settingsParam = {});
 
-    void initialize() override;
+    void initialize() override {};
 
     // Starts the worker thread
     bool start();
@@ -22,13 +22,13 @@ public:
     // Cancels the worker thread
     void cancel();
 
-    ~FcmWorkerHandler();
+    virtual ~FcmWorkerHandler() override;
 
 protected:
-    // Method to be overridden by subclass to perform the long-running task
+    // // Method to be overridden by subclass to perform the long-running task
     virtual void run() = 0;
 
-    // Method to be overridden by subclass to handle task completion
+    // // Method to be overridden by subclass to handle task completion
     virtual std::shared_ptr<FcmMessage> prepareFinishedMessage() = 0;
     virtual void finished() = 0;
 
