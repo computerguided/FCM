@@ -25,10 +25,10 @@ public:
     virtual ~FcmWorkerHandler() override;
 
 protected:
-    // // Method to be overridden by subclass to perform the long-running task
+    // Method to be overridden by subclass to perform the long-running task
     virtual void run() = 0;
 
-    // // Method to be overridden by subclass to handle task completion
+    // Methods to be overridden by subclass to handle task completion
     virtual std::shared_ptr<FcmMessage> prepareFinishedMessage() = 0;
     virtual void finished() = 0;
 
@@ -41,7 +41,6 @@ private:
 
     // Placeholder for the finished message
     std::shared_ptr<FcmMessage> finishedMessage;
-
 };
 
 #endif //FCM_WORKER_H
