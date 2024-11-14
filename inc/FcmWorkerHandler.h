@@ -22,7 +22,7 @@ public:
     // Cancels the worker thread
     void cancel();
 
-    ~FcmWorkerHandler() = default;
+    ~FcmWorkerHandler();
 
 protected:
     // Method to be overridden by subclass to perform the long-running task
