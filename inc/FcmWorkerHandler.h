@@ -5,16 +5,14 @@
 #include <atomic>
 #include <thread>
 
-#include "FcmBaseComponent.h"
+#include "FcmAsyncInterfaceHandler.h"
 
 // ---------------------------------------------------------------------------------------------------------------------
-class FcmWorkerHandler: public FcmBaseComponent
+class FcmWorkerHandler: public FcmAsyncInterfaceHandler
 {
 public:
     explicit FcmWorkerHandler(const std::string& nameParam,
-                       const FcmSettings& settingsParam = {});
-
-    void initialize() override {};
+                              const FcmSettings& settingsParam = {});
 
     // Starts the worker thread
     bool start();

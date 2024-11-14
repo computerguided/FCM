@@ -4,8 +4,8 @@
 
 // ---------------------------------------------------------------------------------------------------------------------
 FcmWorkerHandler::FcmWorkerHandler(const std::string& nameParam,
-                                   const FcmSettings& settingsParam):
-    FcmBaseComponent(nameParam, settingsParam)
+                                  const FcmSettings& settingsParam):
+    FcmAsyncInterfaceHandler(nameParam, settingsParam)
 {
 }
 
