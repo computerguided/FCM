@@ -1,0 +1,12 @@
+@startuml
+"Actor A" -> "Actor B": Connect request
+activate "Actor B"
+"Actor B" -> "Actor C": Security check
+rnote over "Actor C"
+ Check if
+ whitelisted
+end note
+"Actor C" -> "Actor B":Failed security check
+"Actor B" -> "Actor A": Connect reject
+deactivate "Actor B"
+@enduml

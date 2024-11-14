@@ -1,0 +1,5 @@
+@startuml
+participant "Actor A"
+participant "Actor B"
+"Actor A" -->> "Actor B" : Connect request
+@enduml

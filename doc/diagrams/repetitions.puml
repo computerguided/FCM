@@ -1,0 +1,9 @@
+@startuml
+participant "Actor A"
+participant "Actor B"
+loop
+"Actor A" -> "Actor B" : Ping
+"Actor B" -> "Actor A" : Pong
+... 5 seconds ...
+end
+@enduml

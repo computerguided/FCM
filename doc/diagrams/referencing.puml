@@ -1,0 +1,8 @@
+@startuml
+participant "Actor A"
+participant "Actor B"
+ref over "Actor A" : Initialization
+ref over "Actor A", "Actor B" : Connection established
+"Actor A" -> "Actor B":Data indication
+"Actor B" -> "Actor A":Data acknowledge
+@enduml
