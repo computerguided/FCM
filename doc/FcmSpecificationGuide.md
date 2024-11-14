@@ -108,6 +108,10 @@ _Interfaces_ define how components communicate, including the messages and param
 
 Multiple interfaces may be used between two components to separate different purposes.
 
+Interfaces are defined in the component diagram as shown in the figure below.
+
+![](https://www.plantuml.com/plantuml/png/NP0n3i8m34LtdyBA10C7O41gamg9cHEuZa4LRLgbOG34tN4xb2YJyz_xKYnNSwAOdaCFywCB4qKQaCTX6eE4T4slNZ0A9mhtNhBA1n0l8Kcy4Sjvr6ht5ZpX4Ru0kprIYpIZsIfOMxDoBhbREVk2kyO0R8jWlMhtpoQJjf0sbwwGBfTD8PTFQppe-a2jJhiaZGp4oyE1KyeUsEjie9BWzNO_)
+
 ## State Machine
 
 The behavior of each component can be defined using a state machine. The _state machine_ specifies the possible states, transitions, and actions for each component. This approach provides a clear, formalized understanding of component behavior.
