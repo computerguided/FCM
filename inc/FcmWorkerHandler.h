@@ -11,8 +11,9 @@
 class FcmWorkerHandler: public FcmAsyncInterfaceHandler
 {
 public:
-    explicit FcmWorkerHandler(const std::string& nameParam,
-                              const FcmSettings& settingsParam = {});
+    using FcmAsyncInterfaceHandler::FcmAsyncInterfaceHandler;
+
+    void initialize() override {}; // Override in derived classes if needed.
 
     // Starts the worker thread
     bool start();

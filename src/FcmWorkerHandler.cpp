@@ -3,13 +3,6 @@
 #include "FcmWorkerHandler.h"
 
 // ---------------------------------------------------------------------------------------------------------------------
-FcmWorkerHandler::FcmWorkerHandler(const std::string& nameParam,
-                                  const FcmSettings& settingsParam):
-    FcmAsyncInterfaceHandler(nameParam, settingsParam)
-{
-}
-
-// ---------------------------------------------------------------------------------------------------------------------
 FcmWorkerHandler::~FcmWorkerHandler()
 {
     cancel();
