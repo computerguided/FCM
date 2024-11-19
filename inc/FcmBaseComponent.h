@@ -43,9 +43,14 @@ public:
         {
             stateVariable = std::any_cast<T>(settings.at(settingName));
         }
+
         catch (const std::bad_any_cast& e)
         {
-            throw std::runtime_error("Component: " + name + " settings error: " + e.what());
+            logError("Settings error for '" + settingName + "' : cast error");
+        }
+        catch (const std::out_of_range& e)
+        {
+            logError("Settings error for '" + settingName + "' : key not found");
         }
     }
 
