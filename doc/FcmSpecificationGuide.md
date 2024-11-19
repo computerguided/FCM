@@ -52,7 +52,7 @@ If an actor can respond immediately and no history or state change occurs, a sim
 
 When an actor needs to take action in response to an event, this can be represented with a comment box in the sequence diagram, as shown below.
 
-![](https://www.plantuml.com/plantuml/img/RSz12W8n343HVKyHkjOBp4AcwiPZn3HgiAP39wFWwQqeP3EhG7Xyad4sRBOyIfZw5989rI0cijeWnRNjFeR65wXFRWvXW9EA2HPveqdL5RFnGkU7gihqfS3zY7EH-SOvU76xSpySqH14iz2lxYLdwS-GxbfVXVELmyYQ-tSV)
+![](http://www.plantuml.com/plantuml/img/JOv12e0m30JlUSNIkn_m85PV8cqGiIPOetxV2g8UbvqTjjrioBOlYPmFfXdUeMhmXCxLw5M4Wo7pklDc96eCFJX_4C7725EagG0i4JT4R_yp-fzn2BFecJYEJ6rPbHSN)
 
 ### Referencing
 
@@ -78,8 +78,6 @@ An example is given in the figure below.
 When an event's receipt is uncertain, such as in wireless transmission, a dotted open arrow is used. If an event is sent but not received, it is represented with an 'x' instead of an arrowhead, as illustrated in the figures below.
 
 ![](https://www.plantuml.com/plantuml/img/SoWkIImgAStDuIe0qfd9cGM9UIKAIex99Vb52evAs4ITbBZWyWgwkdPs20a5AmNd_BoyrEGIXQBKmjBKuX8kXzIy5A3n0000)
-
-![](https://www.plantuml.com/plantuml/img/SoWkIImgAStDuIe0qfd9cGM9UIKAIex99Vb52evAs4ITbBZWyWgwkdOL20a5AmNd_BoyrEGIXQBKmjBKuX8kXzIy5A3n0000)
 
 ### Repetitions
 
@@ -109,6 +107,10 @@ _Interfaces_ define how components communicate, including the messages and param
 - Be specific to a functionality or responsibility
 
 Multiple interfaces may be used between two components to separate different purposes.
+
+Interfaces are defined in the component diagram as shown in the figure below.
+
+![](https://www.plantuml.com/plantuml/png/NP0n3i8m34LtdyBA10C7O41gamg9cHEuZa4LRLgbOG34tN4xb2YJyz_xKYnNSwAOdaCFywCB4qKQaCTX6eE4T4slNZ0A9mhtNhBA1n0l8Kcy4Sjvr6ht5ZpX4Ru0kprIYpIZsIfOMxDoBhbREVk2kyO0R8jWlMhtpoQJjf0sbwwGBfTD8PTFQppe-a2jJhiaZGp4oyE1KyeUsEjie9BWzNO_)
 
 ## State Machine
 

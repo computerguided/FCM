@@ -1,0 +1,15 @@
+@startuml
+skinparam componentStyle rectangle
+skinparam {
+  InterfaceFontSize = 9
+}
+
+component A as "Component A"
+component B as "Component B"
+component C as "Component C"
+component D as "Component D"
+
+A - B
+A -- C
+C - D
+@enduml

@@ -96,7 +96,7 @@ Implementing FCM enables teams to:
 * **Develop Iteratively**: Tackle high-risk areas first and adapt to changes quickly.<br><br>
 * **Manage Requirements**: Maintain clear traceability from requirements to implementation.<br><br>
 * **Employ Component-Based Architecture**: Build reusable and maintainable software components.<br><br>
-* **Model Visually**: Use diagrams to improve understanding and communication.
+* **Model Visually**: Use diagrams to improve understanding and communication.<br><br>
 * **Continuously Verify Quality**: Facilitate testing at every stage of development.<br><br>
 * **Control Changes**: Manage and document changes effectively to prevent issues.
 

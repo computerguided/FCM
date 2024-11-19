@@ -1,0 +1,22 @@
+@startuml
+skinparam componentStyle rectangle
+skinparam {
+  InterfaceFontSize = 9
+}
+
+() ab as "Interface AB"
+() ac as "Interface AC"
+() cd as "Interface CD"
+
+component A as "Component A"
+component B as "Component B"
+component C as "Component C"
+component D as "Component D"
+
+A - ab
+ab - B
+A -- ac
+ac -- C
+C - cd
+cd - D
+@enduml

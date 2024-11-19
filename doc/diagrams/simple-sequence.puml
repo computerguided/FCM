@@ -1,0 +1,4 @@
+@startuml
+"Actor A" -> "Actor B": Ping
+"Actor B" -> "Actor A": Pong
+@enduml
