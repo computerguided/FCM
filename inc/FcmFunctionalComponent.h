@@ -25,7 +25,7 @@ public:
     explicit FcmFunctionalComponent(const std::string& nameParam,
                                     const FcmSettings& settingsParam = {});
 
-    void initialize() override;
+    void initialize() override {}; // Override in derived classes if needed.
     void processMessage(const std::shared_ptr<FcmMessage>& message);
 
     template<typename MessageType, typename Action>
@@ -38,6 +38,8 @@ public:
             action(message);
         });
     }
+
+    virtual void _initialize() override;
 
 protected:
     FcmTimerHandler& timerHandler;
@@ -60,7 +62,7 @@ protected:
     void addChoicePoint( const std::string& choicePointName,
                          const FcmSttEvaluation& evaluationFunction);
 
-    void performTransition(const std::shared_ptr<FcmMessage>& message);
+    bool performTransition(const std::shared_ptr<FcmMessage>& message);
 
     [[nodiscard]] bool evaluateChoicePoint(const std::string& choicePointName) const;
     void resendLastReceivedMessage();

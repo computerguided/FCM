@@ -2,6 +2,7 @@
 #define FCM_DEVICE_H
 
 #include <map>
+#include <optional>
 
 #include <FcmBaseComponent.h>
 #include <FcmFunctionalComponent.h>
@@ -18,17 +19,6 @@ public:
     virtual void initialize() = 0;
     [[noreturn]] void run();
 
-    void initializeComponents();
-
-    template <class ComponentType>
-    std::shared_ptr<ComponentType> createComponent(const std::string& name,
-                                                   const FcmSettings& settings = {})
-    {
-        auto component = std::make_shared<ComponentType>(name, settings);
-        components.push_back(component);
-        return component;
-    }
-
 protected:
     std::vector<std::shared_ptr<FcmBaseComponent>> components;
 
@@ -36,11 +26,21 @@ protected:
                           FcmBaseComponent* firstComponent,
                           FcmBaseComponent* secondComponent);
 
+    void initializeComponents();
+
+    template <class ComponentType>
+    std::shared_ptr<ComponentType> createComponent(const std::string& name,
+                                                   const FcmSettings& settings)
+    {
+        auto component = std::make_shared<ComponentType>(name, settings);
+        components.push_back(component);
+        return component;
+    }
+
 private:
     FcmMessageQueue& messageQueue;
     FcmTimerHandler& timerHandler;
     const int timeStepMs;
-
     void processMessages();
 };
 // ---------------------------------------------------------------------------------------------------------------------

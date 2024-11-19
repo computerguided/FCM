@@ -10,7 +10,7 @@ FcmFunctionalComponent::FcmFunctionalComponent(const std::string& nameParam,
 }
 
 // ---------------------------------------------------------------------------------------------------------------------
-void FcmFunctionalComponent::initialize()
+void FcmFunctionalComponent::_initialize()
 {
     setStates();
     if (states.empty())
@@ -26,6 +26,8 @@ void FcmFunctionalComponent::initialize()
     {
         throw std::runtime_error("State transition table is empty for component \"" + name + "\"!");
     }
+
+    initialize();
 }
 
 // ---------------------------------------------------------------------------------------------------------------------
@@ -90,7 +92,7 @@ bool FcmFunctionalComponent::evaluateChoicePoint(const std::string &choicePointN
 }
 
 // ---------------------------------------------------------------------------------------------------------------------
-void FcmFunctionalComponent::performTransition(const std::shared_ptr<FcmMessage>& message)
+bool FcmFunctionalComponent::performTransition(const std::shared_ptr<FcmMessage>& message)
 {
     auto interfaceName = message->_interfaceName;
     auto messageName = message->_name;
@@ -107,7 +109,8 @@ void FcmFunctionalComponent::performTransition(const std::shared_ptr<FcmMessage>
 
     if (!transition.has_value())
     {
-        throw std::runtime_error(notFoundReason);
+        logError(notFoundReason);
+        return false;
     }
 
     std::string nextState = transition->nextState;
@@ -128,6 +131,7 @@ void FcmFunctionalComponent::performTransition(const std::shared_ptr<FcmMessage>
 
     transition->action(message);
     currentState = nextState;
+    return true;
 }
 
 // ---------------------------------------------------------------------------------------------------------------------
@@ -136,7 +140,10 @@ void FcmFunctionalComponent::processMessage(const std::shared_ptr<FcmMessage>& m
     lastReceivedMessage = message;
     historyState = currentState;
 
-    performTransition(message);
+    if (!performTransition(message))
+    {
+        return;
+    }
 
     while (choicePointTable.find(currentState) != choicePointTable.end())
     {
@@ -151,7 +158,10 @@ void FcmFunctionalComponent::processMessage(const std::shared_ptr<FcmMessage>& m
         {
             choicePointMessage = std::make_shared<Logical::No>();
         }
-        performTransition(choicePointMessage);
+        if (!performTransition(choicePointMessage))
+        {
+            return;
+        }
     }
 }
 

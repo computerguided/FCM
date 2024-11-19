@@ -14,7 +14,7 @@ FcmDevice::FcmDevice(int timeStepMsParam) :
 }
 
 // ---------------------------------------------------------------------------------------------------------------------
-[[noreturn]] void FcmDevice::run()
+void FcmDevice::run()
 {
     auto start = std::chrono::high_resolution_clock::now();
 
@@ -24,7 +24,7 @@ FcmDevice::FcmDevice(int timeStepMsParam) :
         std::this_thread::sleep_for(std::chrono::milliseconds(timeStepMs));
         auto end = std::chrono::high_resolution_clock::now();
         auto duration = std::chrono::duration_cast<std::chrono::milliseconds>(end - start);
-        timerHandler.setCurrentTime(duration.count());
+        timerHandler.setCurrentTime(duration.count());        
     }
 }
 
@@ -33,7 +33,7 @@ void FcmDevice::initializeComponents()
 {
     for (const auto& component : components)
     {
-        component->initialize();
+        component->_initialize();
     }
 }
 
@@ -48,11 +48,11 @@ void FcmDevice::processMessages()
 
         if (receiver == nullptr)
         {
-            throw std::runtime_error("Component \"" + sender->name +
-                                    "\" sent the message \"" + message.value()->_name +
-                                    "\" to unconnected interface \"" + message.value()->_interfaceName + "\"!");
+            auto errorMessage = "Sent the message \"" + message.value()->_name +
+                                "\" to unconnected interface \"" + message.value()->_interfaceName + "\"!";
+            sender->logError(errorMessage);
+            return;
         }
-
         receiver->processMessage(message.value());
     }
 }

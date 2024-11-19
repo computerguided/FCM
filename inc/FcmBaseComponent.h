@@ -51,16 +51,20 @@ public:
 
     virtual ~FcmBaseComponent() = default;
     virtual void initialize() = 0;
+    virtual void _initialize()
+    {
+        initialize();
+    }
+
+    // Logging
+    [[maybe_unused]] void logError(const std::string& message);
+    [[maybe_unused]] void logWarning(const std::string& message);
+    [[maybe_unused]] void logInfo(const std::string& message);
+    [[maybe_unused]] void logDebug(const std::string& message);
 
 protected:
     std::map<std::string, std::vector<FcmBaseComponent*>> interfaces;
     FcmMessageQueue& messageQueue;
-
-    // Logging
-    [[maybe_unused]]  void logError(const std::string& message);
-    [[maybe_unused]] void logWarning(const std::string& message);
-    [[maybe_unused]] void logInfo(const std::string& message);
-    [[maybe_unused]] void logDebug(const std::string& message);
 
     [[nodiscard]] std::string getLogPrefix(const std::string& logLevel) const;
 };
