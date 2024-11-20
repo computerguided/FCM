@@ -15,6 +15,12 @@ To handle the access to the queue in order to allow asynchronous interfaces (see
 mutable std::mutex mutex;
 ```
 
+To be able to wait for a message to arrive, a `std::condition_variable` is defined.
+
+```cpp
+std::condition_variable conditionVariable;
+```
+
 This can now be used in the queueing methods: `push()` and `pop()`. These are described in the following sections.
 
 To be able to check messages in the queue, also a `FcmMessageCheckFunction` is defined.
@@ -70,41 +76,45 @@ Now it can be added to the message queue.
 queue.push_back(message);
 ```
 
-## Extract a message
-
-To extract, i.e. to pop, a message from the message queue, the  `pop()` method is called, which is a wrapper around the standard `std::list::pop()` method for the `queue` property. The message returns an optional to capture the situation in which the queue is empty.
+Finally, the `conditionVariable` is notified to wake up any threads that are waiting for a message.
 
 ```cpp
-std::optional<std::shared_ptr<FcmMessage>> pop();
+conditionVariable.notify_one();
 ```
 
-Again, the first step is to lock the `mutex`.
+## Waiting for a message
+
+To wait for a message to arrive, the `awaitMessage()` method is called. This method blocks until a message is available in the queue.
 
 ```cpp
-std::lock_guard<std::mutex> lock(mutex);
+std::shared_ptr<FcmMessage> awaitMessage();
 ```
 
-Before popping the message, first for safety, it must be checked if the queue is not empty and a `std::nullopt` must be returned if so.
+The method first locks the `mutex`.
 
 ```cpp
-if (queue.empty()) {return std::nullopt;}
+std::unique_lock<std::mutex> lock(mutex);
 ```
 
-Now, the first step is to _move_ the shared pointer out of the list.
+Next, the method waits for the `conditionVariable` to be notified. It does so by checking if the queue is not empty to avoid spurious wake ups.
+
+```cpp
+conditionVariable.wait(lock, [this]() { return !queue.empty(); });
+```
+
+Now, the first message in the queue is moved to a local variable. Using `std::move` is more efficient than copying it, and it ensures that the ownership of the message is transferred to the caller without increasing the reference count temporarily.
 
 ```cpp
 auto message = std::move(queue.front());
 ```
 
-This is more efficient than copying it, and it ensures that the ownership of the message is transferred to the caller without increasing the reference count temporarily.
-
-The message is now removed from the list by calling the <code>[std::list::pop_front()](https://cplusplus.com/reference/list/list/pop_front/)</code> method.
+The message is then removed from the queue by calling the [`std::list::pop_front()`](https://cplusplus.com/reference/list/list/pop_front/) method.
 
 ```cpp
 queue.pop_front();
 ```
 
-Note that the C++ specification states that this removes the first element from the list and destroys it. However, what is actually destroyed is the shared_ptr object that was in the list. The destructor of the `shared_ptr` decrements the reference count. Since the `shared_ptr` has already been moved to `message`, the reference count is not decremented. Therefore, the `FcmMessage` object itself remains valid as long as the `message` variable holds it and can now be returned.
+Finally, the message is returned.
 
 ```cpp
 return message;

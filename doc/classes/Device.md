@@ -33,68 +33,40 @@ Handlers will have interfaces which can only be used to send messages but not to
 
 The base class for a device is `FcmDevice` which has the following properties.
 
-<table>
-  <tr>
-   <td>Property
-   </td>
-   <td>Type
-   </td>
-   <td>Description
-   </td>
-  </tr>
-  <tr>
-   <td><code>timeStepMs</code>
-   </td>
-   <td><code>const uint</code>
-   </td>
-   <td>The time step is in milliseconds.
-   </td>
-  </tr>
-  <tr>
-   <td><code>messageQueue</code>
-   </td>
-   <td><code>std::shared_ptr&lt;FcmMessageQueue></code>
-   </td>
-   <td>The shared message queue.
-   </td>
-  </tr>
-  <tr>
-   <td><code>timerHandler</code>
-   </td>
-   <td><code>TimerHandler</code>
-   </td>
-   <td>The timer handler.
-   </td>
-  </tr>
-  <tr>
-   <td><code>components</code>
-   </td>
-   <td><code>std::vector&lt;std::shared_ptr&lt;FcmBaseComponent>></code>
-   </td>
-   <td>List of created components.
-   </td>
-  </tr>
-</table>
+| Property | Type | Description |
+| -------- | -------- | -------- |
+| `messageQueue` | `std::shared_ptr<FcmMessageQueue>` | The shared message queue. |
+| `timerHandler` | `TimerHandler` | The timer handler. |
+| `components` | `std::vector<std::shared_ptr<FcmBaseComponent>>` | List of created components. |
 
 ## Construction
 
-The constructor of the base class `FcmDevice` takes a single parameter, `timeStepMsParam`, which is the time step in milliseconds. This is the time step that the run-loop will use to control the rate of execution (see "_[Run loop](#run-loop)_").
+The constructor of the base class `FcmDevice` takes no parameters.
 
 ```cpp
-FcmDevice(int timeStepMsParam)
+FcmDevice()
 ```
 
-As part of the constructor, the message queue and the Timer Handler are initialized. All the other initializations are done in the derived classes by calling the overridden `initialize()` method as described further in the Initialize section. As such, the creation of a device in the main program is done by creating an instance of the derived class and calling its `initialize()` method and then calling the `run()` method.
-
+As part of the constructor, the Message Queue and the Timer Handler are initialized. All the other initializations are done in the derived classes by calling the overridden `initialize()` method as described further in the Initialize section. As such, the creation of a device in the main program is done by creating an instance of the derived class and calling its `initialize()` method and then calling the `run()` method.
 
 ## Initialize
 
 The base class `FcmDevice` has a virtual method `initialize()` which must be overridden by the derived classes to perform the following initializations:
 
-* Create components.
-* Connect interfaces.
-* Set reference to handlers in the relevant functional components.
-* Initialize the created components.
+1. **Define settings**
+   The settings for the device are defined.
+2. **Create handlers**
+   All handlers are created first in order to be able to add the relevant handlers to the settings.
+3. **Add relevant handlers to the settings**
+   Handlers cannot receive messages as they don’t possess a state machine. Instead, they supply a function interface to initiate asynchronous actions (e.g. start listening). To be able for a functional component to call these functions, the functional component must have a reference to the handler which must be set explicitly. This is done by adding the relevant handlers to the settings.
+4. **Create functional components**
+   Components are created supplying the name and the settings. As described, for those functional components that require a handler, the functional component will use the reference to the handler supplied in the settings.
+5. **Connect interfaces**
+   Interfaces are then connected between components.
+6. **Set log functions**
+   The log functions are set for each component.
+7. **Initialize the created components**
+   Finally, the created components are initialized.
 
 These steps are performed in the overridden `initialize()` method of the derived class and are described in the following sections.
 
@@ -153,10 +125,6 @@ if (dynamic_cast<FcmFunctionalComponent*>(firstComponent) != nullptr)
 }
 ```
 
-## Connect components to handlers
-
-Handlers cannot receive messages as they don’t possess a state machine. Instead, they supply a function interface to initiate asynchronous actions (e.g. start listening). To be able for a component to call these functions, the component must have a reference to the handler which must be set explicitly.
-
 ## Initialize the created components
 
 The last step of the initialization of the device is to initialize all the created components. This is done by calling the `initializeComponents()` method.
@@ -176,40 +144,35 @@ for (auto& component : components)
 
 ## Processing messages
 
-Inside the run-loop, the `processMessages()` method is called to handle any messages in the message queue.
+The `processMessages()` method is called to handle any messages in the message queue and that takes the reference to the message as a parameter.
 
 ```cpp
-void processMessages()
+void processMessages(std::shared_ptr<FcmMessage>& message)
 ```
 
-The message queue is processed by looping through all the messages in the queue until the message queue is empty. This is done by calling the `pop()` method of the message queue, which will no longer have a value when the last message was processed.
+Every message has a `sender` and `receiver` property.
 
 ```cpp
-std::optional<std::shared_ptr<FcmMessage>> message;
-while ((message = messageQueue->pop()).has_value())
-{
-    // ...
-}
-```
-
-Every message has a `receiver` property, if not, then this represents an error condition which happens when a message is sent to an unconnected interface. In this case, an exception is thrown.
-
-```cpp
+auto sender = (FcmBaseComponent*)message->sender;
 auto receiver = (FcmComponent*)message->receiver;
-auto sender = (FcmBaseComponent*)message.value()->sender;
+```
 
+If the receiver is not set, then this represents an error condition which happens when a message is sent to an unconnected interface.
+
+```cpp
 if (receiver == nullptr)
 {
-    throw std::runtime_error("Component \"" + sender->name +
-                            "\" sent the message \"" + message.value()->name +
-                            "\" to unconnected interface \"" + message.value()->interfaceName + "\"!");
+    auto errorMessage = "Sent the message \"" + message->_name +
+                        "\" to unconnected interface \"" + message->_interfaceName + "\"!";
+    sender->logError(errorMessage);
+    return;
 }
 ```
 
-The `receiver` property of the message is a functional component which has a `processMessage()` method that can be called to process the message.
+If the receiver is set, then the message can be processed by calling the `processMessage()` method of the receiver.
 
 ```cpp
-receiver->processMessage(message.value());
+receiver->processMessage(message);
 ```
 
 ## Run loop
@@ -220,13 +183,9 @@ The `run()` method is started after all initializations are performed.
 [[noreturn]] void run()
 ```
 
-It is marked with the `[[noreturn]]` attribute, indicating that it is an infinite loop that does not return. The method starts by capturing the current time.
+It is marked with the `[[noreturn]]` attribute, indicating that it is an infinite loop that does not return. 
 
-```cpp
-auto start = std::chrono::high_resolution_clock::now();
-```
-
-An infinite loop is then entered, which will continue to run until the program is terminated.
+An infinite loop is entered, which will continue to run until the program is terminated.
 
 ```cpp
 while (true)
@@ -235,34 +194,16 @@ while (true)
 }
 ```
 
-Inside the loop, the first operation is to call the `processMessages()` method which is responsible for processing all the messages in message queues.
+Inside the loop, the first operation is to wait until a message is available in the message queue.
 
 ```cpp
-processMessages();
+auto message = messageQueue.awaitMessage();
 ```
 
-After processing the messages, the thread is put to sleep for a duration specified by `timeStepMs`.
+When the message is available, it is passed to the `processMessages()` method which is responsible for processing the message.
 
 ```cpp
-std::this_thread::sleep_for(std::chrono::milliseconds(timeStepMs));
+processMessages(message);
 ```
 
-This pause allows for a controlled rate of execution. Once the thread wakes up, the current time is again captured.
-
-```cpp
-auto end = std::chrono::high_resolution_clock::now();
-```
-
-The duration between the start and end timestamps is then calculated. This is done by subtracting `start` from `end` and casting the result to milliseconds. The result is a `std::chrono::milliseconds` object, which is a type of `std::chrono::duration`.
-
-```cpp
-auto duration = std::chrono::duration_cast<std::chrono::milliseconds>(end - start);
-```
-
-The `duration` is then used to update the current time in the `timerHandler` by calling its `setCurrentTime()` method, after which the loop repeats.
-
-```cpp
-timerHandler.setCurrentTime(duration.count());
-```
-
-Note that setting the time at the `timerHandler` can result in "Timeout" messages.
+After processing the messages, the loop repeats.

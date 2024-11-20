@@ -2,29 +2,28 @@
 #include "FcmFunctionalComponent.h"
 #include <FcmMessageQueue.h>
 
-// ---------------------------------------------------------------------------------------------------------------------
-void FcmTimerHandler::setCurrentTime(FcmTime currentTimeParam)
-{
-    currentTime = currentTimeParam;
-
-    if (timeouts.empty()) { return; }
-
-    auto it = timeouts.begin();
-    while (it != timeouts.end() && it->first <= currentTime)
-    {
-        auto component = static_cast<FcmFunctionalComponent*>(it->second.component);
-        sendTimeoutMessage(it->second.timerId, component);
-        it = timeouts.erase(it);
-    }
-}
+#include <iostream>
 
 // ---------------------------------------------------------------------------------------------------------------------
 int FcmTimerHandler::setTimeout(FcmTime timeout, void* component)
 {
-    FcmTime time = currentTime + timeout;
-    FcmTimerInfo timerInfo = {nextTimerId++, component};
-    timeouts.insert(std::make_pair(time, timerInfo));
-    return timerInfo.timerId;
+    int timerId = nextTimerId++;
+
+    std::lock_guard<std::mutex> lock(mutex);
+    timeouts.emplace(std::make_pair(timerId, FcmTimerInfo{component, false}));
+
+    std::thread([this, timerId, timeout]() 
+    {
+        std::this_thread::sleep_for(std::chrono::milliseconds(timeout));
+        std::lock_guard<std::mutex> lock(mutex);
+        if (!timeouts[timerId].cancelled)
+        {
+            sendTimeoutMessage(timerId, timeouts[timerId].component);
+        }
+        timeouts.erase(timerId);
+    }).detach();
+
+    return timerId;
 }
 
 // ---------------------------------------------------------------------------------------------------------------------
@@ -37,15 +36,16 @@ void FcmTimerHandler::sendTimeoutMessage(int timerId, void* component)
 }
 
 // ---------------------------------------------------------------------------------------------------------------------
-bool FcmTimerHandler::cancelTimeout(int timerId)
+void FcmTimerHandler::cancelTimeout(int timerId)
 {
-    for (auto it = timeouts.begin(); it != timeouts.end(); ++it)
+    std::lock_guard<std::mutex> lock(mutex);
+    if (timeouts.find(timerId) != timeouts.end())
     {
-        if (it->second.timerId != timerId) {continue;}
-        timeouts.erase(it);
-        return true;
+        timeouts[timerId].cancelled = true;
+        return;
     }
-    return removeTimeoutMessage(timerId);
+
+    removeTimeoutMessage(timerId);
 }
 
 // ---------------------------------------------------------------------------------------------------------------------

@@ -1,30 +1,25 @@
 #include <thread>
 #include <chrono>
 #include <iostream>
+#include <condition_variable>
 
 #include "FcmDevice.h"
 #include "FcmFunctionalComponent.h"
 
 // ---------------------------------------------------------------------------------------------------------------------
-FcmDevice::FcmDevice(int timeStepMsParam) :
+FcmDevice::FcmDevice() :
     messageQueue(FcmMessageQueue::getInstance()), 
-    timerHandler(FcmTimerHandler::getInstance()), 
-    timeStepMs(timeStepMsParam) 
+    timerHandler(FcmTimerHandler::getInstance())
 {
 }
 
 // ---------------------------------------------------------------------------------------------------------------------
 void FcmDevice::run()
 {
-    auto start = std::chrono::high_resolution_clock::now();
-
     while (true)
     {
-        processMessages();
-        std::this_thread::sleep_for(std::chrono::milliseconds(timeStepMs));
-        auto end = std::chrono::high_resolution_clock::now();
-        auto duration = std::chrono::duration_cast<std::chrono::milliseconds>(end - start);
-        timerHandler.setCurrentTime(duration.count());        
+        auto message = messageQueue.awaitMessage();
+        processMessages(message);
     }
 }
 
@@ -38,23 +33,19 @@ void FcmDevice::initializeComponents()
 }
 
 // ---------------------------------------------------------------------------------------------------------------------
-void FcmDevice::processMessages()
+void FcmDevice::processMessages(std::shared_ptr<FcmMessage>& message)
 {
-    std::optional<std::shared_ptr<FcmMessage>> message;
-    while ((message = messageQueue.pop()).has_value())
-    {
-        auto receiver = (FcmFunctionalComponent*)message.value()->receiver;
-        auto sender = (FcmBaseComponent*)message.value()->sender;
+    auto receiver = (FcmFunctionalComponent*)message->receiver;
+    auto sender = (FcmBaseComponent*)message->sender;
 
-        if (receiver == nullptr)
-        {
-            auto errorMessage = "Sent the message \"" + message.value()->_name +
-                                "\" to unconnected interface \"" + message.value()->_interfaceName + "\"!";
-            sender->logError(errorMessage);
-            return;
-        }
-        receiver->processMessage(message.value());
+    if (receiver == nullptr)
+    {
+        auto errorMessage = "Sent the message \"" + message->_name +
+                            "\" to unconnected interface \"" + message->_interfaceName + "\"!";
+        sender->logError(errorMessage);
+        return;
     }
+    receiver->processMessage(message);
 }
 
 // ---------------------------------------------------------------------------------------------------------------------

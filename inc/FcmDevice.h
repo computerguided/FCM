@@ -15,7 +15,7 @@
 class FcmDevice
 {
 public:
-    explicit FcmDevice(int timeStepMsParam);
+    explicit FcmDevice();
     virtual void initialize() = 0;
     [[noreturn]] void run();
 
@@ -40,8 +40,7 @@ protected:
 private:
     FcmMessageQueue& messageQueue;
     FcmTimerHandler& timerHandler;
-    const int timeStepMs;
-    void processMessages();
+    void processMessages(std::shared_ptr<FcmMessage>& message);
 };
 // ---------------------------------------------------------------------------------------------------------------------
 #define FCM_CONNECT_INTERFACE(INTERFACE, FIRST_COMPONENT, SECOND_COMPONENT) \

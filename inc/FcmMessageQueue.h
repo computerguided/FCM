@@ -6,6 +6,7 @@
 #include <memory>
 #include <optional>
 #include <functional>
+#include <condition_variable>
 
 #include <FcmMessage.h>
 
@@ -17,6 +18,7 @@ class FcmMessageQueue
 private:
     std::list<std::shared_ptr<FcmMessage>> queue;
     std::mutex mutex;
+    std::condition_variable conditionVariable;
 
 public:
     FcmMessageQueue() = default;
@@ -30,7 +32,7 @@ public:
     }
     
     void push(const std::shared_ptr<FcmMessage>& message);
-    std::optional<std::shared_ptr<FcmMessage>> pop();
+    std::shared_ptr<FcmMessage> awaitMessage();
     bool removeMessage(const std::string& interfaceName,
                        const std::string& messageName,
                        const FcmMessageCheckFunction& checkFunction);

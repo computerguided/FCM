@@ -1,50 +1,128 @@
-# Timer Handler
-_To be able to generate timeouts, the "Timer Handler" is defined which is used by the components to set timeouts._
-
----
+# FcmTimerHandler
+_To be able to generate timeouts, the `FcmTimerHandler` class is defined which is used by the components to set timeouts._
 
 ## Description
 
-The basic functionality of the `FcmTimerHandler` is to administer a list with the upcoming timeouts.
+The `FcmTimerHandler` is implemented as a singleton and used by the components to set timeouts. To do this, it offers the following methods to the components.
 
-```cpp
-std::multimap<FcmTime, FcmTimerInfo> timeouts;
-```
+- `setTimeout()` to set a new timeout.
+- `cancelTimeout()` to cancel a timeout.
 
-Time in the FCM is represented as a `long long` type. The `FcmTime` type is defined as an alias for this type.
+Each timer will run in its own thread, sleep for the specified duration, and then invoke `sendTimeoutMessage()`.
 
-```cpp
-using FcmTime = long long;
-```
+To cancel a timer, the `cancelTimeout()` method can be called. This will set a `cancelled` flag for the timer which will be checked when the timer thread wakes up and will prevent the timeout message from being sent when the flag is set.
 
-Using the `std::multimap` type ensures that the list is sorted based on the timeout, while permitting multiple entries with the same timeout.
+## Timer info
 
-The `FcmTimerInfo` holds the timer ID and the reference to the component that started the timer.
+The `FcmTimerInfo` structure is used to hold the information of a timer. It has the following fields.
+
+| Field | Type | Description |
+|:-----|:-----|:------------|
+| `component` | `void*` | The reference to the component that started the timer, which is needed to send the timeout message. |
+| `cancelled` | `bool` | Indicates whether the timer has been cancelled. |
+
+The structure is defined as follows.
 
 ```cpp
 struct FcmTimerInfo
 {
-    int timerId;
     void* component;
+    bool cancelled;
 };
 ```
 
-The timer also needs to administer the current time which can be set as explained in the next section.
+A `std::unordered_map` is used to store the timers where the timer ID is the unique key and the timer information is the value.
 
 ```cpp
-FcmTime currentTime{};
+std::unordered_map<int, FcmTimerInfo> timeouts;
 ```
 
-To be able to send timeout messages, a reference to the message queue is stored which is set during construction.
+## Set timeout
+
+To be able to set timeouts, a component gets the reference to the `FcmTimerHandler` when it is constructed. To set a new timeout, the component calls the `setTimeout()` method of the Timer Handler.
 
 ```cpp
-FcmMessageQueue& messageQueue;
+[[nodiscard]] int setTimeout(FcmTime timeout, void* component);
 ```
 
-When a new timeout is scheduled (see “Set timeout”), a unique timer ID must be returned. The next timer ID that can be used must therefore be administered.
+The component is specified as void* to prevent circular dependencies with the `FcmFunctionalComponent` includes the header file of the `FcmTimerHandler`. Also note that for the method it is indicated that the return value should not be discarded as this is the timer ID that is required to cancel the timer as described in the following section.
+
+The first step is to create a unique timer ID. This is done by incrementing the `nextTimerId` which is a static member of the `FcmTimerHandler`.
 
 ```cpp
-int nextTimerId{};
+int timerId = nextTimerId++;
+```
+
+Then the timer information is created. This must be done in a thread-safe manner and therefore the mutex is used. Using the `emplace()` method is preferred over using the `insert()` method as it constructs the `FcmTimerInfo` object directly in the map, which avoids the need for a copy or move assignment, which would not work as the `FcmTimerInfo` object is not copyable.
+
+```cpp   
+std::lock_guard<std::mutex> lock(mutex);
+timeouts.emplace(std::make_pair(timerId, FcmTimerInfo{component, false, std::thread()}));
+```
+
+Next, the timer thread is started, which is detached to keep running after the function returns.
+
+```cpp
+std::thread([this, timerId, timeout]() 
+{
+    // ...
+}).detach();
+```
+
+Inside the thread lambda function, the thread will sleep for the duration of the timer.
+
+```cpp
+std::this_thread::sleep_for(std::chrono::milliseconds(timeout));
+```
+When the timer expires, the first thing that is done is to lock the mutex to make sure that the timer information is not changed while it is being accessed.
+
+```cpp
+std::lock_guard<std::mutex> lock(mutex);
+```
+
+If the timer has not been cancelled, the timeout message is sent.
+
+```cpp
+if (!timeouts[timerId].cancelled.load())
+{
+    sendTimeoutMessage(timerId, timeouts[timerId].component);
+}
+```
+
+After this is done, the element is erased from the `timeouts` map.
+
+```cpp
+timeouts.erase(timerId);
+```
+
+## Cancel timeout
+
+To cancel a running timer, a component must call the `cancelTimer()` method of the Timer Handler, supplying the timer ID as the argument.
+
+```cpp
+void cancelTimeout(int timerId);
+```
+
+The first step is to lock the mutex to make sure that the timer information is not changed while it is being accessed.
+
+```cpp
+std::lock_guard<std::mutex> lock(mutex);
+```
+
+Next, it must be checked whether the timer information exists. If so, the `cancelled` flag is set to `true` and the method returns.
+
+```cpp
+if (timeouts.find(timerId) != timeouts.end())
+{
+    timeouts[timerId].cancelled = true;
+    return;
+}
+```
+
+However, if the timer information does not exist, the timer has already expired and the timeout message has already been sent, i.e. is in the message queue. Because the component will not expect a timeout message after canceling the timer, the timeout message needs to be explicitly removed from the message queue by calling `removeTimeoutMessage()`.
+
+```cpp
+removeTimeoutMessage(timerId);
 ```
 
 ## Singleton
@@ -75,67 +153,6 @@ To be able to send timeout messages, the “Timer” interface is defined which 
 
 ```cpp
 FCM_SET_INTERFACE(Transceiving, FCM_DEFINE_MESSAGE( Timeout, int timerId{}; )
-```
-
-## Set current time
-
-When the time progresses to a new value, the `setCurrentTime()` method of the Timer Handler must be called.
-
-```cpp
-void setCurrentTime(FcmTime currentTimeParam)
-```
-
-The first step is of course to set the `currentTime` of the Timer Handler.
-
-```cpp
-currentTime = currentTimeParam;
-```
-
-If there are no timers running, then the method can return.
-
-```cpp
-if (timeouts.empty()) { return; }
-```
-
-With the `currentTime` set to the new value, it can be checked whether there is a timer that expired. This can be done by looping through timeouts and sending a timeout message for those that have expired. Because The list is sorted, the loop can stop when the timeout value is larger than the current time.
-
-```cpp
-auto it = timeouts.begin();
-while (it != timeouts.end() && it->first <= currentTime)
-{
-    auto component = static_cast<FcmFunctionalComponent*>(it->second.component);
-    sendTimeoutMessage(it->second.timerId, component);
-    ++it;
-}
-```
-
-## Set timeout
-
-To be able to set timeouts, a component gets the reference to the Timer Handler when it is constructed. To set a new timeout, the component calls the `setTimeout()` method of the Timer Handler.
-
-```cpp
-[[nodiscard]] int setTimeout(FcmTime timeout, void* component);
-```
-
-The component is specified as void* to prevent circular dependencies with the `FcmFunctionalComponent` includes the header file of the `FcmTimerHandler`. Also note that for the method it is indicated that the return value should not be discarded as this is the timer ID that is required to cancel the timer as described in the following section.
-
-Because the current time is set before the new processing loop is started, it can be used to set the time at which the timeout must be generated.
-
-```cpp
-FcmTime time = currentTime + timeout;
-```
-
-The timer info object must now be created to hold the `timerId` and the reference to the component in order to send the timeout message when the timer expires. While doing so, the `nextTimerId` can be incremented to have a unique value for the `timerId`.
-
-```cpp
-FcmTimerInfo timerInfo = {nextTimerId++, component};
-```
-
-The created timer can now be added to the list of timeouts and the created new `timerId` can be returned.
-
-```cpp
-timeouts.insert(std::make_pair(time, timerInfo));
-return timerInfo.timerId;
 ```
 
 ## Send timeout message
@@ -170,35 +187,6 @@ As the final step, the created timeout message is added to the message queue.
 
 ```cpp
 messageQueue->push(timeoutMessage);
-```
-
-## Cancel timeout
-
-To cancel a running timer, a component must call the `cancelTimer()` method of the Timer Handler, supplying the timer ID as the argument.
-
-```cpp
-void cancelTimeout(int timerId);
-```
-
-Find the timeout with the given timer id and remove it.
-
-```cpp
-for (auto it = timeouts.begin(); it != timeouts.end(); ++it)
-{
-    if (it->second.timerId == timerId)
-    {
-        timeouts.erase(it);
-        return;
-    }
-}
-```
-
-If the timeout was _not_ found, it is possible that the timeout has already expired but not been handled yet by the component because the timeout message is still in the message queue.
-
-Because the component will not expect a timeout message after canceling the timer, the timeout message needs to be explicitly removed from the message queue by calling `removeTimeoutMessage()` which will be described in the next section.
-
-```cpp
-removeTimeoutMessage(timerId);
 ```
 
 ## Remove timeout message

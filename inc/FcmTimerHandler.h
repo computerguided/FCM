@@ -2,6 +2,7 @@
 #define FCM_TIMER_HANDLER_H
 
 #include <map>
+#include <thread>
 
 #include <FcmMessage.h>
 #include <FcmMessageQueue.h>
@@ -12,8 +13,8 @@ using FcmTime = long long;
 // ---------------------------------------------------------------------------------------------------------------------
 struct FcmTimerInfo
 {
-    int timerId;
     void* component;
+    bool cancelled;
 };
 
 // ---------------------------------------------------------------------------------------------------------------------
@@ -36,13 +37,12 @@ public:
         return instance;
     }
 
-    void setCurrentTime(FcmTime currentTimeParam);
     [[nodiscard]] int setTimeout(FcmTime timeout, void* component);
-    bool cancelTimeout(int timerId);
+    void cancelTimeout(int timerId);
 
 private:  
-    std::multimap<FcmTime, FcmTimerInfo> timeouts;
-    FcmTime currentTime{};
+    std::unordered_map<int, FcmTimerInfo> timeouts;
+    std::mutex mutex;
     FcmMessageQueue& messageQueue;
     int nextTimerId{};
 
