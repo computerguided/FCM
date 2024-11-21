@@ -29,11 +29,9 @@ void FcmWorkerHandler::cancel()
 
     if (workerThread.joinable())
     {
-        // Block the main thread until the worker thread has handled the stop request in the run() method.
         workerThread.join();
     }
 
-    // Remove the possible finished message from the message queue
     auto checkFunction = [this](const std::shared_ptr<FcmMessage>& msg) -> bool
     {
         return msg->sender == this;
@@ -54,9 +52,6 @@ void FcmWorkerHandler::threadRun()
         return;
     }
 
-    finished();
-
-    // Send the finished message.
     finishedMessage = prepareFinishedMessage();
     sendMessage(finishedMessage);
 }

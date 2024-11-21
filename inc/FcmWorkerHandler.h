@@ -27,15 +27,14 @@ protected:
     // Method to be overridden by subclass to perform the long-running task
     virtual void run() = 0;
 
-    // Methods to be overridden by subclass to handle task completion
+    // Method to be overridden by subclass to prepare the finished message
     virtual std::shared_ptr<FcmMessage> prepareFinishedMessage() = 0;
-    virtual void finished() = 0;
 
 private:
     std::thread workerThread; // Empty thread object (not yet running)
     std::atomic<bool> cancelRequested{false};
 
-    // Internal thread function that runs the worker and calls finished()
+    // Internal thread function that runs the worker
     void threadRun();
 
     // Placeholder for the finished message

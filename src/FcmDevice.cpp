@@ -1,8 +1,3 @@
-#include <thread>
-#include <chrono>
-#include <iostream>
-#include <condition_variable>
-
 #include "FcmDevice.h"
 #include "FcmFunctionalComponent.h"
 

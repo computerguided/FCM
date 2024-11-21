@@ -1,8 +1,6 @@
 #include "FcmTimerHandler.h"
 #include "FcmFunctionalComponent.h"
-#include <FcmMessageQueue.h>
-
-#include <iostream>
+#include "FcmMessageQueue.h"
 
 // ---------------------------------------------------------------------------------------------------------------------
 int FcmTimerHandler::setTimeout(FcmTime timeout, void* component)
