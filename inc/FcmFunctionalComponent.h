@@ -42,7 +42,7 @@ public:
     virtual void _initialize() override;
 
 protected:
-    FcmTimerHandler& timerHandler;
+    FcmTimerHandler& timerHandler = FcmTimerHandler::getInstance();
     FcmStateTransitionTable stateTransitionTable;
     FcmChoicePointTable choicePointTable;
     std::shared_ptr<FcmMessage> lastReceivedMessage;
@@ -71,6 +71,9 @@ protected:
                                                   const std::string& interfaceName,
                                                   const std::string& messageName,
                                                         std::string* notFoundReason = nullptr) const;
+
+    [[nodiscard]] int setTimeout(FcmTime timeout);
+    void cancelTimeout(int timerId);
 };
 
 // ---------------------------------------------------------------------------------------------------------------------

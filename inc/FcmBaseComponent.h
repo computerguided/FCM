@@ -69,7 +69,7 @@ public:
 
 protected:
     std::map<std::string, std::vector<FcmBaseComponent*>> interfaces;
-    FcmMessageQueue& messageQueue;
+    FcmMessageQueue& messageQueue = FcmMessageQueue::getInstance();
 
     [[nodiscard]] std::string getLogPrefix(const std::string& logLevel) const;
 };

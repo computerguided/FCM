@@ -25,7 +25,7 @@ As an example on how to use this method, consider a component that is waiting fo
 addTransitionFunction<Transceiving::ConnectReq>("Advertising", "Correct server?",
     [this](const auto& message)
     {
-        timerHandler->cancelTimeout(timerId);
+        cancelTimeout(timerId);
         serverId = message.serverId;
         connectionId = message.connectionId;
     }
@@ -57,7 +57,7 @@ By specifying the `ACTION` as the last argument, the macro can be conveniently u
 ```cpp
 FCM_ADD_TRANSITION( "Advertising", Transceiving, ConnectReq, "Correct server?",
 {
-    timerHandler->cancelTimeout(timerId);
+    cancelTimeout(timerId);
     serverId = message.serverId;
     connectionId = message.connectionId;
 });
@@ -438,11 +438,11 @@ With this set, the timer can be used as shown in the code below.
 
 ```cpp
 FCM_ADD_TRANSITION("Idle", Database, ConnectedInd, "Connected",
-connectionTimer = timerHandler.setTimeout(connetionTimeoutMs, this);
+connectionTimer = setTimeout(connetionTimeoutMs);
 );
 FCM_ADD_TRANSITION("Connected", Database, KeepAliveInd, "Connected",
-    timerHandler.cancelTimeout(connectionTimer);
-    connectionTimer = timerHandler.setTimeout(connetionTimeoutMs, this);
+    cancelTimeout(connectionTimer);
+    connectionTimer = setTimeout(connetionTimeoutMs);
 );
 FCM_ADD_TRANSITION("Connected", Timer, Timeout, "Idle",
 // NOP

@@ -256,7 +256,7 @@ addTransitionFunction<Transceiving::ConnectReq>(
     "Advertising", "Correct server?",
     [this](const auto& message)
     {
-        timerHandler->cancelTimeout(timerId);
+        cancelTimeout(timerId);
         serverId = message.serverId;
         connectionId = message.connectionId;
     }
@@ -294,7 +294,7 @@ By specifying the `ACTION` as the last argument, the macro can be conveniently u
 ```cpp
 FCM_ADD_TRANSITION( "Advertising", Transceiving, ConnectReq, "Correct server?",
 {
-    timerHandler->cancelTimeout(timerId);
+    cancelTimeout(timerId);
     serverId = message.serverId;
     connectionId = message.connectionId;
 });

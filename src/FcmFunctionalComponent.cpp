@@ -3,8 +3,7 @@
 // ---------------------------------------------------------------------------------------------------------------------
 FcmFunctionalComponent::FcmFunctionalComponent(const std::string& nameParam,
                                                const FcmSettings& settingsParam):
-    FcmBaseComponent(nameParam,settingsParam),
-    timerHandler(FcmTimerHandler::getInstance())
+    FcmBaseComponent(nameParam,settingsParam)
 {
     interfaces["Timer"].push_back(this);
 }
@@ -214,4 +213,16 @@ std::optional<FcmSttTransition> FcmFunctionalComponent::getTransition(const std:
     }
 
     return message_it->second;
+}
+
+// ---------------------------------------------------------------------------------------------------------------------
+int FcmFunctionalComponent::setTimeout(FcmTime timeout)
+{
+    return timerHandler.setTimeout(timeout, this);
+}
+
+// ---------------------------------------------------------------------------------------------------------------------
+void FcmFunctionalComponent::cancelTimeout(int timerId)
+{
+    timerHandler.cancelTimeout(timerId);
 }
