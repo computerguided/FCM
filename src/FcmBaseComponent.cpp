@@ -18,9 +18,10 @@ void FcmBaseComponent::connectInterface(const std::string& interfaceName,
 
     if (std::find(componentList.begin(), componentList.end(), remoteComponent) != componentList.end())
     {
-        throw std::runtime_error("Interface \"" + interfaceName +
-                                 "\" of component \"" + name + "\" is already connected to component \"" +
-                                 remoteComponent->name + "\"!");
+        logError("Interface \"" + interfaceName +
+                 "\" is already connected to component \"" +
+                 remoteComponent->name + "\"!");
+        return;
     }
 
     componentList.push_back(remoteComponent);
@@ -29,23 +30,25 @@ void FcmBaseComponent::connectInterface(const std::string& interfaceName,
 // ---------------------------------------------------------------------------------------------------------------------
 void FcmBaseComponent::sendMessage(const std::shared_ptr<FcmMessage>& message, size_t index)
 {
-    try
+    auto interfaceIt = interfaces.find(message->_interfaceName);
+    if (interfaceIt == interfaces.end())
     {
-        auto& componentList = interfaces.at(message->_interfaceName);
-        if (index >= componentList.size())
-        {
-            throw std::out_of_range("Component \"" + name + "\" tries to send message \"" + message->_name +
-                                    "\" to interface \"" + message->_interfaceName + "\" on index " +
-                                    std::to_string(index) + " but there are only " +
-                                    std::to_string(componentList.size()) + " components connected!");
-        }
-        message->receiver = componentList[index];
-    }
-    catch (const std::out_of_range& e)
-    {
-        message->receiver = nullptr;
+        logError("Trying to send message \"" + message->_name +
+                 "\" to interface \"" + message->_interfaceName + "\" but the interface is not connected!");
+        return;
     }
 
+    auto& componentList = interfaceIt->second;
+    if (index >= componentList.size())
+    {
+        logError("Trying to send message \"" + message->_name +
+                 "\" to interface \"" + message->_interfaceName + "\" on index " +
+                 std::to_string(index) + " but there are only " +
+                 std::to_string(componentList.size()) + " components connected!");
+        return;
+    }
+
+    message->receiver = componentList[index];
     messageQueue.push(message);
 }
 
@@ -88,13 +91,17 @@ void FcmBaseComponent::sendMessage(const std::shared_ptr<FcmMessage>& message, s
 // ---------------------------------------------------------------------------------------------------------------------
 std::string FcmBaseComponent::getLogPrefix(const std::string& logLevel) const
 {
-    // Get the current printable time
+    // Get the current time
     auto now = std::chrono::system_clock::now();
-    auto now_c = std::chrono::system_clock::to_time_t(now);
-    std::string timeString = std::ctime(&now_c);
+    auto now_time_t = std::chrono::system_clock::to_time_t(now);
 
-    // Remove the newline character from the end of the string
-    timeString.pop_back();
+    // Convert to local time struct
+    std::tm local_tm = *std::localtime(&now_time_t);
+
+    // Format the time string
+    char buffer[20];
+    std::strftime(buffer, sizeof(buffer), "%Y-%m-%d %H:%M:%S", &local_tm);
+    std::string timeString(buffer);
 
     return timeString + " - " + logLevel + " - " + name + " - ";
 }
