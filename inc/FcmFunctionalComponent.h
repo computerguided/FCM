@@ -77,6 +77,25 @@ protected:
 };
 
 // ---------------------------------------------------------------------------------------------------------------------
+// Macros
+// ---------------------------------------------------------------------------------------------------------------------
+
+// ---------------------------------------------------------------------------------------------------------------------
+#define FCM_FUNCTIONAL_COMPONENT(NAME, ...) \
+    class NAME : public FcmFunctionalComponent \
+    { \
+    public: \
+        using FcmFunctionalComponent::FcmFunctionalComponent; \
+        void initialize() override; \
+    protected: \
+        void setStates() override; \
+        void setTransitions() override; \
+        void setChoicePoints() override; \
+    private: \
+        __VA_ARGS__ \
+    }
+
+// ---------------------------------------------------------------------------------------------------------------------
 #define FCM_ADD_TRANSITION(STATE, INTERFACE, MESSAGE, NEXT_STATE, ACTION)       \
     addTransition(STATE, #INTERFACE, #MESSAGE, NEXT_STATE,                      \
     [this](const std::shared_ptr<FcmMessage>& msg)                              \
@@ -106,9 +125,8 @@ protected:
 #define FCM_ADD_CHOICE_POINT(CHOICE_POINT, EVALUATION)  \
     addChoicePoint(CHOICE_POINT,                        \
     [this]()                                            \
-    {                                                   \
-        EVALUATION                                      \
-    })
+    EVALUATION                                          \
+    )
 
 // ---------------------------------------------------------------------------------------------------------------------
 #define FCM_CAST_LAST_RECEIVED_MESSAGE(MESSAGE, INTERFACE, MESSAGE_TYPE) \
