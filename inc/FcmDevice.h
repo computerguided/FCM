@@ -24,8 +24,8 @@ protected:
     std::vector<std::shared_ptr<FcmBaseComponent>> components;
 
     static void connectInterface(const std::string& interfaceName,
-                          FcmBaseComponent* firstComponent,
-                          FcmBaseComponent* secondComponent);
+                                 FcmBaseComponent* firstComponent,
+                                 FcmBaseComponent* secondComponent);
 
     void initializeComponents();
 

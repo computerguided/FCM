@@ -36,6 +36,7 @@ public:
     void connectInterface(const std::string& interfaceName, FcmBaseComponent* remoteComponent);
     void sendMessage(const std::shared_ptr<FcmMessage>& message, size_t index = 0);
 
+    // -----------------------------------------------------------------------------------------------------------------
     template <typename T>
     void setSetting(const std::string& settingName, T& stateVariable)
     {
@@ -54,6 +55,16 @@ public:
         }
     }
 
+    // -----------------------------------------------------------------------------------------------------------------
+    template <typename T>
+    std::shared_ptr<T> prepareMessage()
+    {
+        auto message = std::make_shared<T>();
+        message->sender = this;
+        return message;
+    }
+
+    // -----------------------------------------------------------------------------------------------------------------
     virtual ~FcmBaseComponent() = default;
     virtual void initialize() = 0;
     virtual void _initialize()
@@ -73,9 +84,5 @@ protected:
 
     [[nodiscard]] std::string getLogPrefix(const std::string& logLevel) const;
 };
-
-// ---------------------------------------------------------------------------------------------------------------------
-#define FCM_SEND_MESSAGE(MESSAGE, ...) \
-    sendMessage(MESSAGE, ##__VA_ARGS__)
 
 #endif // FCM_BASE_COMPONENT_H

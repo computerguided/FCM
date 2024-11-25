@@ -39,5 +39,4 @@ public:
     void resendMessage( const std::shared_ptr<FcmMessage>& message);
 };
 
-
 #endif //FCM_MESSAGE_QUEUE_H

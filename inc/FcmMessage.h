@@ -26,11 +26,6 @@ public:
 };
 
 // ---------------------------------------------------------------------------------------------------------------------
-#define FCM_PREPARE_MESSAGE(MESSAGE, INTERFACE, MESSAGE_TYPE)   \
-    auto MESSAGE = std::make_shared<INTERFACE::MESSAGE_TYPE>(); \
-    MESSAGE->sender = this
-
-// ---------------------------------------------------------------------------------------------------------------------
 #define FCM_DEFINE_MESSAGE(NAME, ...)                                    \
     class NAME : public FcmMessage                                       \
     {                                                                    \

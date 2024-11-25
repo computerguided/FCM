@@ -28,6 +28,7 @@ public:
     void initialize() override {}; // Override in derived classes if needed.
     void processMessage(const std::shared_ptr<FcmMessage>& message);
 
+    // -----------------------------------------------------------------------------------------------------------------
     template<typename MessageType, typename Action>
     inline void addTransitionFunction(const std::string& state, const std::string& nextState, Action action)
     {
@@ -38,6 +39,22 @@ public:
             action(message);
         });
     }
+
+    // -----------------------------------------------------------------------------------------------------------------
+    template<typename MessageType, typename Action>
+    inline void addMultipleStatesTransition(const std::vector<std::string>& states, const std::string& nextState, Action action)
+    {
+        for (const auto& state : states)
+        {
+            addTransition(state, MessageType::interfaceName, MessageType::name, nextState,
+            [action](const std::shared_ptr<FcmMessage>& msg)
+            {
+                const auto& message = dynamic_cast<const MessageType&>(*msg);
+                action(message);
+            });
+        }
+    }
+
 
     virtual void _initialize() override;
 
@@ -94,17 +111,6 @@ protected:
     private: \
         __VA_ARGS__ \
     }
-
-// ---------------------------------------------------------------------------------------------------------------------
-#define FCM_ADD_TRANSITION(STATE, INTERFACE, MESSAGE, NEXT_STATE, ACTION)       \
-    addTransition(STATE, #INTERFACE, #MESSAGE, NEXT_STATE,                      \
-    [this](const std::shared_ptr<FcmMessage>& msg)                              \
-    {                                                                           \
-        const auto& message = dynamic_cast<const INTERFACE::MESSAGE&>(*msg);    \
-        (void)message;                                                          \
-        (void)this;                                                             \
-        ACTION                                                                  \
-    })
 
 // ---------------------------------------------------------------------------------------------------------------------
 #define FCM_ADD_MULTIPLE_STATES_TRANSITION(STATES, INTERFACE, MESSAGE, NEXT_STATE, ACTION)  \
