@@ -3,8 +3,7 @@
 
 // ---------------------------------------------------------------------------------------------------------------------
 FcmDevice::FcmDevice() :
-    messageQueue(FcmMessageQueue::getInstance()), 
-    timerHandler(FcmTimerHandler::getInstance())
+    messageQueue(FcmMessageQueue::getInstance())
 {
 }
 

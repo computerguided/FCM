@@ -7,7 +7,6 @@ A system can be specified by identifying the _actors_, the _use cases_ and the _
 
 A device can be a real physical device like a network node just as well as a separate software module – like an application, service or task – that communicates with other software entities on a larger OS. More practically, a device is defined here as follows:
 
-
 * The functionality and behavior of the device is implemented in a modular way by defining a number of _functional components_ that operate in a synchronized manner.
 * These components are specified to be interconnected in a _component diagram_.
 * The components are connected via _interfaces_.
@@ -36,7 +35,6 @@ The base class for a device is `FcmDevice` which has the following properties.
 | Property | Type | Description |
 | -------- | -------- | -------- |
 | `messageQueue` | `std::shared_ptr<FcmMessageQueue>` | The shared message queue. |
-| `timerHandler` | `TimerHandler` | The timer handler. |
 | `components` | `std::vector<std::shared_ptr<FcmBaseComponent>>` | List of created components. |
 
 ## Construction
@@ -47,7 +45,7 @@ The constructor of the base class `FcmDevice` takes no parameters.
 FcmDevice()
 ```
 
-As part of the constructor, the Message Queue and the Timer Handler are initialized. All the other initializations are done in the derived classes by calling the overridden `initialize()` method as described further in the Initialize section. As such, the creation of a device in the main program is done by creating an instance of the derived class and calling its `initialize()` method and then calling the `run()` method.
+As part of the constructor, the Message Queue is initialized. All the other initializations are done in the derived classes by calling the overridden `initialize()` method as described further in the Initialize section. As such, the creation of a device in the main program is done by creating an instance of the derived class and calling its `initialize()` method and then calling the `run()` method.
 
 ## Initialize
 
@@ -57,15 +55,13 @@ The base class `FcmDevice` has a virtual method `initialize()` which must be ove
    The settings for the device are defined.
 2. **Create handlers**
    All handlers are created first in order to be able to add the relevant handlers to the settings.
-3. **Add relevant handlers to the settings**
-   Handlers cannot receive messages as they don’t possess a state machine. Instead, they supply a function interface to initiate asynchronous actions (e.g. start listening). To be able for a functional component to call these functions, the functional component must have a reference to the handler which must be set explicitly. This is done by adding the relevant handlers to the settings.
-4. **Create functional components**
+3. **Create functional components**
    Components are created supplying the name and the settings. As described, for those functional components that require a handler, the functional component will use the reference to the handler supplied in the settings.
-5. **Connect interfaces**
+4. **Connect interfaces**
    Interfaces are then connected between components.
-6. **Set log functions**
+5. **Set log functions**
    The log functions are set for each component.
-7. **Initialize the created components**
+6. **Initialize the created components**
    Finally, the created components are initialized.
 
 These steps are performed in the overridden `initialize()` method of the derived class and are described in the following sections.

@@ -20,6 +20,7 @@ public:
     [[noreturn]] void run();
 
 protected:
+    FcmSettings settings{};
     std::vector<std::shared_ptr<FcmBaseComponent>> components;
 
     static void connectInterface(const std::string& interfaceName,
@@ -29,17 +30,23 @@ protected:
     void initializeComponents();
 
     template <class ComponentType>
-    std::shared_ptr<ComponentType> createComponent(const std::string& name,
-                                                   const FcmSettings& settings)
+    std::shared_ptr<ComponentType> createComponent(const std::string& _name,
+                                                   const FcmSettings& _settings)
     {
-        auto component = std::make_shared<ComponentType>(name, settings);
+        auto component = std::make_shared<ComponentType>(_name, _settings);
         components.push_back(component);
+
+        // Add the component to the settings if it is a Asynchronous Interface Handler
+        if (dynamic_cast<FcmAsyncInterfaceHandler*>(component.get()) != nullptr)
+        {
+            settings[_name] = std::any(component);
+        }
+
         return component;
     }
 
 private:
     FcmMessageQueue& messageQueue;
-    FcmTimerHandler& timerHandler;
     void processMessages(std::shared_ptr<FcmMessage>& message);
 };
 // ---------------------------------------------------------------------------------------------------------------------

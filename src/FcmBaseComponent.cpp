@@ -49,6 +49,7 @@ void FcmBaseComponent::sendMessage(const std::shared_ptr<FcmMessage>& message, s
     }
 
     message->receiver = componentList[index];
+    message->interfaceIndex = index;
     messageQueue.push(message);
 }
 

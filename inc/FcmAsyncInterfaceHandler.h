@@ -13,7 +13,7 @@ class FcmAsyncInterfaceHandler: public FcmBaseComponent
 public:
     using FcmBaseComponent::FcmBaseComponent;
 
-    void initialize() override {}; // Override in derived classes if needed.
+    virtual void initialize() override {}; // Override in derived classes if needed.
 };
     
 #endif //FCM_ASYNC_INTERFACE_HANDLER_H

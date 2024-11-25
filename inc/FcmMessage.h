@@ -17,6 +17,7 @@ class FcmMessage
 public:
     void* receiver = nullptr;
     void* sender = nullptr;
+    int   interfaceIndex = 0;
     int64_t timestamp{};
     std::string _interfaceName;
     std::string _name;
