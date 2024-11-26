@@ -43,9 +43,9 @@ void FcmDevice::processMessages(std::shared_ptr<FcmMessage>& message)
 }
 
 // ---------------------------------------------------------------------------------------------------------------------
-void FcmDevice::connectInterface(const std::string& interfaceName,
-                                 FcmBaseComponent* firstComponent,
-                                 FcmBaseComponent* secondComponent)
+void FcmDevice::_connectInterface(const std::string& interfaceName,
+                                  FcmBaseComponent* firstComponent,
+                                  FcmBaseComponent* secondComponent)
 {
     if (dynamic_cast<FcmFunctionalComponent*>(secondComponent) != nullptr)
     {

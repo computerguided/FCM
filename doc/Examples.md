@@ -87,15 +87,16 @@ In several circumstances it might be useful to store or access the parameters of
 One way of doing this is to access the message parameters and copy the values in state variables.
 However, since this is such a common mechanism, the `lastReceivedMessage` attribute is defined for a Functional Component in which the last received message is stored.
 
-Since this attribute is stored as a `FcmMessage` base class, it needs to be first cast to the proper type. To do this, the `FCM_CAST_LAST_RECEIVED_MESSAGE` macro can be used.
+Since this attribute is stored as a `FcmMessage` base class, it needs to be first cast to the proper type. To do this, the `castLastReceivedMessage()` template method can be used.
 
 An example of the use is given in the code below where the lastReceivedMessage is cast to the `Commands::DataReq` message.
 
 ```cpp
-FCM_ADD_CHOICE_POINT("Correct Id?",
-    FCM_CAST_LAST_RECEIVED_MESSAGE(dataReq, Commands, DataReq);
+addChoicePoint("Correct Id?", [this]()
+{
+    auto dataReq = castLastReceivedMessage<Commands::DataReq>();
     return dataReq->id == myId;
-);
+});
 ```
 
 If the supplied interface and message type are incorrect, then a runtime error will be thrown, for example:
@@ -359,29 +360,34 @@ The state diagram that could be used to implement this could then be as given be
 The possible code for the transitions is given below.
 
 ```cpp
-FCM_ADD_TRANSITION("Idle", Database, UpdateInd, "Next Client?",
+addTransitionFunction<Database::UpdatedInd>("Idle", "Next Client?", [this](const auto& message)
+{
     clientIndex = 0;
-);
-FCM_ADD_TRANSITION("Next Client?", Logical, Yes, "Updating",
-    FCM_CAST_LAST_RECEIVED_MESSAGE(databaseUpdatedInd, Database, UpdatedInd);
-    FCM_PREPARE_MESSAGE(clientUpdateReq, Clients, UpdateReq);
-    clientUpdateReq = databaseUpdatedInd->data;
-    FCM_SEND_MESSAGE(clientUpdateReq, Clients, UpdateReq, nextClient);
-);
-FCM_ADD_TRANSITION("Next Client?", Logical, No, "Idle",
+});
+addTransitionFunction<Logical::Yes>("Next Client?", "Updating", [this](const auto& message)
+{
+    auto databaseUpdatedInd = castLastReceivedMessage<Database::UpdatedInd>();
+    prepareMessage<Clients::UpdateReq>(clientUpdateReq);
+    clientUpdateReq->data = databaseUpdatedInd->data;
+    sendMessage(clientUpdateReq, connectedClients[clientIndex]);
+});
+addTransitionFunction<Logical::No>("Next Client?", "Idle", [this](const auto& message)
+{
     databaseInterface.updated();
-);
-FCM_ADD_TRANSITION("Updating", Client, UpdatedInd, "Next Client?",
+});
+addTransitionFunction<Clients::UpdatedInd>("Updating", "Next Client?", [this](const auto& message)
+{
     clientIndex++;
-);
+});
 ```
 
 The choice-point that needs to be defined is as given below.
 
 ```cpp
-FCM_ADD_CHOICE_POINT("Next client?",
-    return clientIndex < connectedClients;
-);
+addChoicePoint("Next client?", [this]()
+{
+    return clientIndex < connectedClients.size();
+});
 ```
 
 ## Interface multiplication
@@ -397,9 +403,9 @@ This diagram can be simplified as shown in the figure below.
 When in this example the “Administrator” component wants to send a message to a specific “Client”, the index must be specified as an argument in the `FCM_SEND_MESSAGE` macro as shown in the transition code example below.
 
 ```cpp
-FCM_PREPARE_MESSAGE(dataInd, Update, DataInd);
+prepareMessage<Update::DataInd>(dataInd);
 dataInd->data = pendingData;
-FCM_SEND_MESSAGE(dataInd, clientIndex);
+sendMessage(dataInd, connectedClients[clientIndex]);
 ```
 
 ## Using the timer
@@ -437,17 +443,21 @@ const FcmSettings& settingsParam): FcmFunctionalComponent(nameParam, settingsPar
 With this set, the timer can be used as shown in the code below.
 
 ```cpp
-FCM_ADD_TRANSITION("Idle", Database, ConnectedInd, "Connected",
-connectionTimer = setTimeout(connetionTimeoutMs);
-);
-FCM_ADD_TRANSITION("Connected", Database, KeepAliveInd, "Connected",
+addTransitionFunction<Database::ConnectedInd>("Idle", "Connected", [this](const auto& message)
+{
+    connectionTimer = setTimeout(connetionTimeoutMs);
+});
+addTransitionFunction<Database::KeepAliveInd>("Connected", "Connected", [this](const auto& message)
+{
     cancelTimeout(connectionTimer);
     connectionTimer = setTimeout(connetionTimeoutMs);
-);
-FCM_ADD_TRANSITION("Connected", Timer, Timeout, "Idle",
-// NOP
-);
+});
+addTransitionFunction<Timer::Timeout>("Connected", "Idle", [this](const auto& message)
+{
+    // NOP
+});
 ```
+
 # Handling switch statements
 
 Consider an example in which a component sends a request on a specific interface – for example after it is connected to a remote server – and then receives a response with a `status` parameter indicating whether the request was “Accepted”, “Rejected” or “Pending”.
@@ -478,8 +488,8 @@ FCM_SET_INTERFACE( Responses,
 
 This interface can then be connected on both ends for the component.
 
-```cpp
-FCM_CONNECT_INTERFACE(Responses, Requester, Requester);
+```cpp  
+connectInterface<Responses>(Requester, Requester);
 ```
 
 This can be depicted in the component diagram as shown below.
@@ -496,20 +506,20 @@ In the “RequestRsp” transition the value of the parameter is checked and the
 switch message->status 
 {
     case ACCEPTED:
-        FCM_PREPARE_MESSAGE(acceptedInd, Responses, AcceptedInd);
-        FCM_SEND_MESSAGE(acceptedInd);
+        prepareMessage<Responses::AcceptedInd>(acceptedInd);
+        sendMessage(acceptedInd);
         break;
     case PENDING:
-        FCM_PREPARE_MESSAGE(pendingInd, Responses, PendingInd);
-        FCM_SEND_MESSAGE(pendingInd);
+        prepareMessage<Responses::PendingInd>(pendingInd);
+        sendMessage(pendingInd);
         break;
     case REJECTED:
-        FCM_PREPARE_MESSAGE(rejectedInd, Responses, RejectedInd);
-        FCM_SEND_MESSAGE(rejectedInd);
+        prepareMessage<Responses::RejectedInd>(rejectedInd);
+        sendMessage(rejectedInd);
         break;
     default:
-        FCM_PREPARE_MESSAGE(errorInd, Responses, ErrorInd);
-        FCM_SEND_MESSAGE(errorInd);
+        prepareMessage<Responses::ErrorInd>(errorInd);
+        sendMessage(errorInd);
         break;
 }
 ```
@@ -582,7 +592,7 @@ The following lists all the possible runtime errors that can occur.
   <tr>
    <td><code><em>Last received message cast to invalid message type "&lt;interface>:&lt;message_type>"!</em></code>
    </td>
-   <td>Calling the <code>FCM_CAST_LAST_RECEIVED_MESSAGE</code> macro.
+   <td>Calling the <code>castLastReceivedMessage()</code> method.
    </td>
   </tr>
   <tr>

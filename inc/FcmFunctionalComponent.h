@@ -55,6 +55,17 @@ public:
         }
     }
 
+    // -----------------------------------------------------------------------------------------------------------------
+    template<typename MessageType>
+    inline std::shared_ptr<MessageType> castLastReceivedMessage()
+    {
+        auto message = std::dynamic_pointer_cast<MessageType>(lastReceivedMessage);
+        if (message == nullptr)
+        {
+            throw std::runtime_error("Last received message cast to invalid message type \"" + MessageType::interfaceName + ":" + MessageType::name + "\"!");
+        }
+        return message;
+    }
 
     virtual void _initialize() override;
 
@@ -110,36 +121,6 @@ protected:
         void setChoicePoints() override; \
     private: \
         __VA_ARGS__ \
-    }
-
-// ---------------------------------------------------------------------------------------------------------------------
-#define FCM_ADD_MULTIPLE_STATES_TRANSITION(STATES, INTERFACE, MESSAGE, NEXT_STATE, ACTION)  \
-    do                                                                                      \
-    {                                                                                       \
-        for (const auto& state : std::vector<std::string>STATES)                            \
-        {                                                                                   \
-            addTransition(state, #INTERFACE, #MESSAGE, NEXT_STATE,                          \
-                [this](const std::shared_ptr<FcmMessage>& msg)                              \
-                {                                                                           \
-                    const auto& message = dynamic_cast<const INTERFACE::MESSAGE&>(*msg);    \
-                    ACTION                                                                  \
-                });                                                                         \
-        }                                                                                   \
-    } while (0)
-
-// ---------------------------------------------------------------------------------------------------------------------
-#define FCM_ADD_CHOICE_POINT(CHOICE_POINT, EVALUATION)  \
-    addChoicePoint(CHOICE_POINT,                        \
-    [this]()                                            \
-    EVALUATION                                          \
-    )
-
-// ---------------------------------------------------------------------------------------------------------------------
-#define FCM_CAST_LAST_RECEIVED_MESSAGE(MESSAGE, INTERFACE, MESSAGE_TYPE) \
-    const auto& MESSAGE = std::dynamic_pointer_cast<INTERFACE::MESSAGE_TYPE>(lastReceivedMessage); \
-    if (MESSAGE == nullptr)                                              \
-    { \
-        throw std::runtime_error("Last received message cast to invalid message type \""#INTERFACE":"#MESSAGE_TYPE"\"!"); \
     }
 
 #endif //FCM_FUNCTIONAL_COMPONENT_H

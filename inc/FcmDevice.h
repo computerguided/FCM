@@ -23,9 +23,18 @@ protected:
     FcmSettings settings{};
     std::vector<std::shared_ptr<FcmBaseComponent>> components;
 
-    static void connectInterface(const std::string& interfaceName,
-                                 FcmBaseComponent* firstComponent,
-                                 FcmBaseComponent* secondComponent);
+    // -----------------------------------------------------------------------------------------------------------------
+    template <class Interface>
+    static void connectInterface(std::shared_ptr<FcmBaseComponent> firstComponent,
+                                 std::shared_ptr<FcmBaseComponent> secondComponent)
+    {
+        _connectInterface(Interface::interfaceClassName, firstComponent.get(), secondComponent.get());
+    }
+
+    // -----------------------------------------------------------------------------------------------------------------
+    static void _connectInterface(const std::string& interfaceName,
+                                  FcmBaseComponent* firstComponent,
+                                  FcmBaseComponent* secondComponent);
 
     void initializeComponents();
 
@@ -49,8 +58,5 @@ private:
     FcmMessageQueue& messageQueue;
     void processMessages(std::shared_ptr<FcmMessage>& message);
 };
-// ---------------------------------------------------------------------------------------------------------------------
-#define FCM_CONNECT_INTERFACE(INTERFACE, FIRST_COMPONENT, SECOND_COMPONENT) \
-    connectInterface(#INTERFACE, FIRST_COMPONENT.get(), SECOND_COMPONENT.get())
 
 #endif //FCM_DEVICE_H

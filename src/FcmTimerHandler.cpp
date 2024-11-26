@@ -27,7 +27,7 @@ int FcmTimerHandler::setTimeout(FcmTime timeout, void* component)
 // ---------------------------------------------------------------------------------------------------------------------
 void FcmTimerHandler::sendTimeoutMessage(int timerId, void* component)
 {
-    FCM_PREPARE_MESSAGE(timeoutMessage, Timer, Timeout);
+    auto timeoutMessage = std::make_shared<Timer::Timeout>();
     timeoutMessage->timerId = timerId;
     timeoutMessage->receiver = component;
     messageQueue.push(timeoutMessage);

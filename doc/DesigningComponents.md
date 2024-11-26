@@ -196,20 +196,23 @@ void setStates() override
 void setChoicePoints() override
 {
     // Choice-Point: Is Id Valid?
-    FCM_ADD_CHOICE_POINT("Is Id Valid?",
-        auto dataReq = FCM_CAST_LAST_RECEIVED_MESSAGE(DataRequestMessage);
+    addChoicePoint("Is Id Valid?", [this]()
+    {
+        auto dataReq = castLastReceivedMessage<Commands::DataReq>();
         return dataReq->id == myId;
-    );
+    });
 
     // Choice-Point: Was Operation Remove?
-    FCM_ADD_CHOICE_POINT("Was Operation Remove?",
+    addChoicePoint("Was Operation Remove?", [this]()
+    {
         return operationType == Operation::Remove;
-    );
+    });
 
     // Choice-Point: Is Database Empty?
-    FCM_ADD_CHOICE_POINT("Is Database Empty?",
+    addChoicePoint("Is Database Empty?", [this]()
+    {
         return databaseEntries == 0;
-    );
+    });
 }
 ```
 
@@ -219,52 +222,66 @@ void setChoicePoints() override
 void setTransitions() override
 {
     // From Idle to Is Id Valid? on AddInd
-    FCM_ADD_TRANSITION("Idle", Database, AddInd, "Is Id Valid?",
+    addTransition("Idle", Database, AddInd, "Is Id Valid?", [this](const std::shared_ptr<FcmMessage>& msg)
+    {
         clientIndex = 0;
         operationType = Operation::Add;
-    );
+    });
 
     // From Idle to Is Id Valid? on RemoveInd
-    FCM_ADD_TRANSITION("Idle", Database, RemoveInd, "Is Id Valid?",
+    addTransition("Idle", Database, RemoveInd, "Is Id Valid?", [this](const std::shared_ptr<FcmMessage>& msg)
+    {
         clientIndex = 0;
         operationType = Operation::Remove;
-    );
+    });
 
     // From Is Id Valid? to Processing on Logical:Yes
-    FCM_ADD_TRANSITION("Is Id Valid?", Logical, Yes, "Processing",
+    addTransition("Is Id Valid?", Logical, Yes, "Processing", [this](const std::shared_ptr<FcmMessage>& msg)
+    {
         resendLastReceivedMessage();
-    );
+    });
 
     // From Is Id Valid? to Idle on Logical:No
-    FCM_ADD_TRANSITION("Is Id Valid?", Logical, No, "Idle",
+    addTransition("Is Id Valid?", Logical, No, "Idle", [this](const std::shared_ptr<FcmMessage>& msg)
+    {
         // Handle invalid id (e.g., log or ignore)
-    );
+        // ...
+    });
 
     // From Processing to Was Operation Remove? on ReadyInd
-    FCM_ADD_TRANSITION("Processing", Database, ReadyInd, "Was Operation Remove?",
-        auto readyInd = FCM_CAST_MESSAGE(message, ReadyIndMessage);
+    addTransition("Processing", Database, ReadyInd, "Was Operation Remove?", [this](const std::shared_ptr<FcmMessage>& msg)
+    {
+        auto readyInd = castLastReceivedMessage<Database::ReadyInd>();
         databaseEntries = readyInd->entriesCount;
-    );
+    });
 
     // From Was Operation Remove? to Is Database Empty? on Logical:Yes
-    FCM_ADD_TRANSITION("Was Operation Remove?", Logical, Yes, "Is Database Empty?",
+    addTransition("Was Operation Remove?", Logical, Yes, "Is Database Empty?", [this](const std::shared_ptr<FcmMessage>& msg)
+    {
         // No action needed
-    );
+        (void)this;
+    });
 
     // From Was Operation Remove? to Idle on Logical:No
-    FCM_ADD_TRANSITION("Was Operation Remove?", Logical, No, "Idle",
+    addTransition("Was Operation Remove?", Logical, No, "Idle", [this](const std::shared_ptr<FcmMessage>& msg)
+    {
         // No action needed
-    );
+        (void)this;
+    });
 
     // From Is Database Empty? to Idle on Logical:Yes
-    FCM_ADD_TRANSITION("Is Database Empty?", Logical, Yes, "Idle",
+    addTransition("Is Database Empty?", Logical, Yes, "Idle", [this](const std::shared_ptr<FcmMessage>& msg)
+    {
         // Perform actions when database is empty
-    );
+        // ...
+    });
 
     // From Is Database Empty? to Idle on Logical:No
-    FCM_ADD_TRANSITION("Is Database Empty?", Logical, No, "Idle",
+    addTransition("Is Database Empty?", Logical, No, "Idle", [this](const std::shared_ptr<FcmMessage>& msg)
+    {
         // No action needed
-    );
+        (void)this;
+    });
 }
 ```
 
