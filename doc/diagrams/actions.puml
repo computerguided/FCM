@@ -1,7 +1,0 @@
-@startuml
-"Actor A" -> "Actor B": Connect request
-note over "Actor B"
- Add to list
-end note
-"Actor B" -> "Actor A": Connect acknowledge
-@enduml
