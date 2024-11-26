@@ -13,7 +13,7 @@
 
 using FcmSettings = std::map<std::string, std::any>;
 
-// Optional log function type
+// Optional log-function type
 using FcmLogFunction = std::optional<std::function<void(const std::string& message)>>;
 
 // ---------------------------------------------------------------------------------------------------------------------
