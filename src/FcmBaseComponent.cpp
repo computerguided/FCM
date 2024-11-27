@@ -90,6 +90,15 @@ void FcmBaseComponent::sendMessage(const std::shared_ptr<FcmMessage>& message, s
 }
 
 // ---------------------------------------------------------------------------------------------------------------------
+[[maybe_unused]] void FcmBaseComponent::fatalError(const std::string& message)
+{
+    if (fatalErrorFunction.has_value())
+    {
+        fatalErrorFunction.value()(getLogPrefix("FATAL ERROR") + message);
+    }
+}
+
+// ---------------------------------------------------------------------------------------------------------------------
 std::string FcmBaseComponent::getLogPrefix(const std::string& logLevel) const
 {
     // Get the current time

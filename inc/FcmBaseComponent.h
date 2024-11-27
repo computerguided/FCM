@@ -29,6 +29,7 @@ public:
     FcmLogFunction logErrorFunction;
     FcmLogFunction logDebugFunction;
     FcmLogFunction logTransitionFunction;
+    FcmLogFunction fatalErrorFunction;
 
     explicit FcmBaseComponent(std::string nameParam,
                              const FcmSettings& settingsParam = {});
@@ -47,11 +48,11 @@ public:
 
         catch (const std::bad_any_cast& e)
         {
-            logError("Settings error for '" + settingName + "' : cast error");
+            fatalError("Settings error for '" + settingName + "' : cast error");
         }
         catch (const std::out_of_range& e)
         {
-            logError("Settings error for '" + settingName + "' : key not found");
+            fatalError("Settings error for '" + settingName + "' : key not found");
         }
     }
 
@@ -77,6 +78,7 @@ public:
     [[maybe_unused]] void logWarning(const std::string& message);
     [[maybe_unused]] void logInfo(const std::string& message);
     [[maybe_unused]] void logDebug(const std::string& message);
+    [[maybe_unused]] void fatalError(const std::string& message);
 
 protected:
     std::map<std::string, std::vector<FcmBaseComponent*>> interfaces;
