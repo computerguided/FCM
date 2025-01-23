@@ -35,7 +35,7 @@ public:
         addTransition(state, MessageType::interfaceName, MessageType::name, nextState,
         [action](const std::shared_ptr<FcmMessage>& msg)
         {
-            const auto& message = dynamic_cast<const MessageType&>(*msg);
+            const auto& message = static_cast<const MessageType&>(*msg);
             action(message);
         });
     }
@@ -49,7 +49,7 @@ public:
             addTransition(state, MessageType::interfaceName, MessageType::name, nextState,
             [action](const std::shared_ptr<FcmMessage>& msg)
             {
-                const auto& message = dynamic_cast<const MessageType&>(*msg);
+                const auto& message = static_cast<const MessageType&>(*msg);
                 action(message);
             });
         }

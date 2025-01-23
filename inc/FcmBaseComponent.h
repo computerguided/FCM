@@ -34,7 +34,7 @@ public:
     explicit FcmBaseComponent(std::string nameParam,
                              const FcmSettings& settingsParam = {});
 
-    void connectInterface(const std::string& interfaceName, FcmBaseComponent* remoteComponent);
+    virtual void connectInterface(const std::string& interfaceName, FcmBaseComponent* remoteComponent);
     void sendMessage(const std::shared_ptr<FcmMessage>& message, size_t index = 0);
 
     // -----------------------------------------------------------------------------------------------------------------

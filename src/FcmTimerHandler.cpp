@@ -51,7 +51,7 @@ bool FcmTimerHandler::removeTimeoutMessage(int timerId)
 {
     auto checkFunction = [timerId](const std::shared_ptr<FcmMessage>& msg) -> bool
     {
-        auto timeoutMessage = dynamic_cast<const Timer::Timeout*>(msg.get());
+        auto timeoutMessage = static_cast<const Timer::Timeout*>(msg.get());
         return timeoutMessage && timeoutMessage->timerId != timerId;
     };
 

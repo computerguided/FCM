@@ -28,11 +28,11 @@ protected:
     static void connectInterface(std::shared_ptr<FcmBaseComponent> firstComponent,
                                  std::shared_ptr<FcmBaseComponent> secondComponent)
     {
-        _connectInterface(Interface::interfaceClassName, firstComponent.get(), secondComponent.get());
+        connectInterfaces(Interface::interfaceClassName, firstComponent.get(), secondComponent.get());
     }
 
     // -----------------------------------------------------------------------------------------------------------------
-    static void _connectInterface(const std::string& interfaceName,
+    static void connectInterfaces(const std::string& interfaceName,
                                   FcmBaseComponent* firstComponent,
                                   FcmBaseComponent* secondComponent);
 
@@ -44,13 +44,6 @@ protected:
     {
         auto component = std::make_shared<ComponentType>(_name, _settings);
         components.push_back(component);
-
-        // Add the component to the settings if it is a Asynchronous Interface Handler
-        if (dynamic_cast<FcmAsyncInterfaceHandler*>(component.get()) != nullptr)
-        {
-            settings[_name] = std::any(component);
-        }
-
         return component;
     }
 
