@@ -36,7 +36,7 @@ bool FcmMessageQueue::removeMessage(const std::string& interfaceName,
     for (auto it = queue.begin(); it != queue.end(); ++it)
     {
         const auto& message = *it;
-        if (message->_interfaceName == interfaceName && message->_name == messageName)
+        if (message->getInterfaceName() == interfaceName && message->getName() == messageName)
         {
             if (checkFunction && !checkFunction(message)) {continue;}
             queue.erase(it);
