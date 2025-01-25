@@ -30,19 +30,19 @@ void FcmBaseComponent::connectInterface(const std::string& interfaceName,
 // ---------------------------------------------------------------------------------------------------------------------
 void FcmBaseComponent::sendMessage(const std::shared_ptr<FcmMessage>& message, size_t index)
 {
-    auto interfaceIt = interfaces.find(message->_interfaceName);
+    auto interfaceIt = interfaces.find(message->getInterfaceName());
     if (interfaceIt == interfaces.end())
     {
-        logError("Trying to send message \"" + message->_name +
-                 "\" to interface \"" + message->_interfaceName + "\" but the interface is not connected!");
+        logError("Trying to send message \"" + message->getName() +
+                 "\" to interface \"" + message->getInterfaceName() + "\" but the interface is not connected!");
         return;
     }
 
     auto& componentList = interfaceIt->second;
     if (index >= componentList.size())
     {
-        logError("Trying to send message \"" + message->_name +
-                 "\" to interface \"" + message->_interfaceName + "\" on index " +
+        logError("Trying to send message \"" + message->getName() +
+                 "\" to interface \"" + message->getInterfaceName() + "\" on index " +
                  std::to_string(index) + " but there are only " +
                  std::to_string(componentList.size()) + " components connected!");
         return;

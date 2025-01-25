@@ -93,8 +93,8 @@ bool FcmFunctionalComponent::evaluateChoicePoint(const std::string &choicePointN
 // ---------------------------------------------------------------------------------------------------------------------
 bool FcmFunctionalComponent::performTransition(const std::shared_ptr<FcmMessage>& message)
 {
-    auto interfaceName = message->_interfaceName;
-    auto messageName = message->_name;
+    auto interfaceName = message->getInterfaceName();
+    auto messageName = message->getName();
     std::string notFoundReason;
 
     // Find the action for the current state, interface and message.

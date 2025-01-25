@@ -34,8 +34,8 @@ void FcmDevice::processMessages(std::shared_ptr<FcmMessage>& message)
 
     if (receiver == nullptr)
     {
-        auto errorMessage = "Sent the message \"" + message->_name +
-                            "\" to unconnected interface \"" + message->_interfaceName + "\"!";
+        auto errorMessage = "Sent the message \"" + message->getName() +
+                            "\" to unconnected interface \"" + message->getInterfaceName() + "\"!";
         sender->logError(errorMessage);
         return;
     }

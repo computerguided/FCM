@@ -37,8 +37,8 @@ void FcmWorkerHandler::cancel()
         return msg->sender == this;
     };
 
-    messageQueue.removeMessage(finishedMessage->_interfaceName,
-                               finishedMessage->_name,
+    messageQueue.removeMessage(finishedMessage->getInterfaceName(),
+                               finishedMessage->getName(),
                                checkFunction);
 }
 

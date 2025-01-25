@@ -21,6 +21,8 @@ public:
     int64_t timestamp{};
     std::string getInterfaceName() const { return interfaceName; }
     std::string getName() const { return name; }
+    void setInterfaceName(const std::string& newInterfaceName) { interfaceName = newInterfaceName; }
+    void setName(const std::string& newName) { name = newName; }
 
     virtual ~FcmMessage() = default;
 private:
@@ -36,7 +38,7 @@ private:
         __VA_ARGS__                                                      \
         static constexpr const char* interfaceName = interfaceClassName; \
         static constexpr const char* name = #NAME;                       \
-        NAME() { _interfaceName = interfaceClassName; _name = #NAME; }   \
+        NAME() { setInterfaceName(interfaceClassName); setName(#NAME); }   \
     }
 
 // ---------------------------------------------------------------------------------------------------------------------
