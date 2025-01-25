@@ -42,9 +42,9 @@ public:
 
     // -----------------------------------------------------------------------------------------------------------------
     template<typename MessageType, typename Action>
-    inline void addMultipleStatesTransition(const std::vector<std::string>& states, const std::string& nextState, Action action)
+    inline void addMultipleStatesTransition(const std::vector<std::string>& multipleStates, const std::string& nextState, Action action)
     {
-        for (const auto& state : states)
+        for (const auto& state : multipleStates)
         {
             addTransition(state, MessageType::interfaceName, MessageType::name, nextState,
             [action](const std::shared_ptr<FcmMessage>& msg)
@@ -68,6 +68,8 @@ public:
     }
 
     virtual void _initialize() override;
+
+    FcmComponentType getType() const override { return FcmComponentType::Functional; }
 
 protected:
     FcmTimerHandler& timerHandler = FcmTimerHandler::getInstance();
@@ -122,5 +124,7 @@ protected:
     private: \
         __VA_ARGS__ \
     }
+
+#define NOP (void)this
 
 #endif //FCM_FUNCTIONAL_COMPONENT_H

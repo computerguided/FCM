@@ -47,6 +47,13 @@ void FcmDevice::connectInterfaces(const std::string& interfaceName,
                                   FcmBaseComponent* firstComponent,
                                   FcmBaseComponent* secondComponent)
 {
-    firstComponent->connectInterface(interfaceName, secondComponent);
-    secondComponent->connectInterface(interfaceName, firstComponent);
+    if (secondComponent->getType() != FcmComponentType::AsyncInterfaceHandler)
+    {
+        firstComponent->connectInterface(interfaceName, secondComponent);
+    }
+
+    if (firstComponent->getType() != FcmComponentType::AsyncInterfaceHandler)
+    {
+        secondComponent->connectInterface(interfaceName, firstComponent);
+    }
 }

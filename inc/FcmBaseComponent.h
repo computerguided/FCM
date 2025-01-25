@@ -16,10 +16,18 @@ using FcmSettings = std::map<std::string, std::any>;
 // Optional log-function type
 using FcmLogFunction = std::optional<std::function<void(const std::string& message)>>;
 
+enum class FcmComponentType 
+{
+    Base,
+    Functional,
+    AsyncInterfaceHandler
+};
+
 // ---------------------------------------------------------------------------------------------------------------------
 class FcmBaseComponent
 {
 public:
+
     const std::string name;
     const FcmSettings& settings;
 
@@ -79,6 +87,8 @@ public:
     [[maybe_unused]] void logInfo(const std::string& message);
     [[maybe_unused]] void logDebug(const std::string& message);
     [[maybe_unused]] void fatalError(const std::string& message);
+
+    virtual FcmComponentType getType() const { return FcmComponentType::Base; }
 
 protected:
     std::map<std::string, std::vector<FcmBaseComponent*>> interfaces;
