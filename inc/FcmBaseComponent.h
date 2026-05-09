@@ -7,6 +7,7 @@
 #include <functional>
 #include <memory>
 #include <optional>
+#include <stdexcept>
 
 #include "FcmMessage.h"
 #include "FcmMessageQueue.h"

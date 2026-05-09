@@ -8,6 +8,7 @@
 #include <map>
 #include <queue>
 #include <any>
+#include <stdexcept>
 
 #include "FcmBaseComponent.h"
 #include "FcmMessage.h"
