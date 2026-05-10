@@ -9,6 +9,7 @@
 
 // ---------------------------------------------------------------------------------------------------------------------
 using FcmTime = long long;
+using FcmTimerID = int;
 
 // ---------------------------------------------------------------------------------------------------------------------
 struct FcmTimerInfo
@@ -19,7 +20,7 @@ struct FcmTimerInfo
 
 // ---------------------------------------------------------------------------------------------------------------------
 FCM_SET_INTERFACE(Timer, 
-    FCM_DEFINE_MESSAGE( Timeout, int timerId{}; );
+    FCM_DEFINE_MESSAGE( Timeout, FcmTimerID timerId{}; );
 );
 
 // ---------------------------------------------------------------------------------------------------------------------
@@ -37,17 +38,17 @@ public:
         return instance;
     }
 
-    [[nodiscard]] int setTimeout(FcmTime timeout, void* component);
-    void cancelTimeout(int timerId);
+    void setTimeout(FcmTimerID& timerId, FcmTime timeout, void* component);
+    void cancelTimeout(FcmTimerID timerId);
 
 private:  
-    std::unordered_map<int, FcmTimerInfo> timeouts;
+    std::unordered_map<FcmTimerID, FcmTimerInfo> timeouts;
     std::mutex mutex;
     FcmMessageQueue& messageQueue;
     int nextTimerId{};
 
-    void sendTimeoutMessage(int timerId, void* component);
-    bool removeTimeoutMessage(int timerId);
+    void sendTimeoutMessage(FcmTimerID timerId, void* component);
+    bool removeTimeoutMessage(FcmTimerID timerId);
 };
 
 #endif //FCM_TIMER_HANDLER_H

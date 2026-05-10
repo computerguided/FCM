@@ -3,9 +3,9 @@
 #include "FcmMessageQueue.h"
 
 // ---------------------------------------------------------------------------------------------------------------------
-int FcmTimerHandler::setTimeout(FcmTime timeout, void* component)
+void FcmTimerHandler::setTimeout(FcmTimerID& timerId, FcmTime timeout, void* component)
 {
-    int timerId = nextTimerId++;
+    timerId = nextTimerId++;
 
     std::lock_guard<std::mutex> lock(mutex);
     timeouts.emplace(std::make_pair(timerId, FcmTimerInfo{component, false}));
@@ -20,12 +20,10 @@ int FcmTimerHandler::setTimeout(FcmTime timeout, void* component)
         }
         timeouts.erase(timerId);
     }).detach();
-
-    return timerId;
 }
 
 // ---------------------------------------------------------------------------------------------------------------------
-void FcmTimerHandler::sendTimeoutMessage(int timerId, void* component)
+void FcmTimerHandler::sendTimeoutMessage(FcmTimerID timerId, void* component)
 {
     auto timeoutMessage = std::make_shared<Timer::Timeout>();
     timeoutMessage->timerId = timerId;
@@ -34,7 +32,7 @@ void FcmTimerHandler::sendTimeoutMessage(int timerId, void* component)
 }
 
 // ---------------------------------------------------------------------------------------------------------------------
-void FcmTimerHandler::cancelTimeout(int timerId)
+void FcmTimerHandler::cancelTimeout(FcmTimerID timerId)
 {
     std::lock_guard<std::mutex> lock(mutex);
     if (timeouts.find(timerId) != timeouts.end())
@@ -47,7 +45,7 @@ void FcmTimerHandler::cancelTimeout(int timerId)
 }
 
 // ---------------------------------------------------------------------------------------------------------------------
-bool FcmTimerHandler::removeTimeoutMessage(int timerId)
+bool FcmTimerHandler::removeTimeoutMessage(FcmTimerID timerId)
 {
     auto checkFunction = [timerId](const std::shared_ptr<FcmMessage>& msg) -> bool
     {
