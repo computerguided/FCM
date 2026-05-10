@@ -15,6 +15,9 @@
 #include "FcmStateTransitionTable.h"
 #include "FcmTimerHandler.h"
 #include "FcmMessageQueue.h"
+#include "FcmAsyncInterfaceHandler.h"
+
+using FcmHandlers = std::map<std::string, std::shared_ptr<FcmAsyncInterfaceHandler>>;
 
 // ---------------------------------------------------------------------------------------------------------------------
 class FcmFunctionalComponent: public FcmBaseComponent
@@ -28,6 +31,7 @@ public:
 
     void initialize() override {}; // Override in derived classes if needed.
     void processMessage(const std::shared_ptr<FcmMessage>& message);
+    void addHandler(const std::string& handlerName, std::shared_ptr<FcmAsyncInterfaceHandler> handler);
 
     // -----------------------------------------------------------------------------------------------------------------
     template<typename MessageType, typename Action>
@@ -73,6 +77,7 @@ public:
     FcmComponentType getType() const override { return FcmComponentType::Functional; }
 
 protected:
+    FcmHandlers handlers;
     FcmTimerHandler& timerHandler = FcmTimerHandler::getInstance();
     FcmStateTransitionTable stateTransitionTable;
     FcmChoicePointTable choicePointTable;

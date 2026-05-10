@@ -9,6 +9,12 @@ FcmFunctionalComponent::FcmFunctionalComponent(const std::string& nameParam,
 }
 
 // ---------------------------------------------------------------------------------------------------------------------
+void FcmFunctionalComponent::addHandler(const std::string& handlerName, std::shared_ptr<FcmAsyncInterfaceHandler> handler)
+{
+    handlers[handlerName] = handler;
+}
+
+// ---------------------------------------------------------------------------------------------------------------------
 void FcmFunctionalComponent::_initialize()
 {
     setStates();
