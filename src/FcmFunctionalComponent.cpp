@@ -222,13 +222,13 @@ std::optional<FcmSttTransition> FcmFunctionalComponent::getTransition(const std:
 }
 
 // ---------------------------------------------------------------------------------------------------------------------
-int FcmFunctionalComponent::setTimeout(FcmTime timeout)
+void FcmFunctionalComponent::setTimeout(FcmTimerID& timerId, FcmTime timeout)
 {
-    return timerHandler.setTimeout(timeout, this);
+    timerHandler.setTimeout(timerId, timeout, this);
 }
 
 // ---------------------------------------------------------------------------------------------------------------------
-void FcmFunctionalComponent::cancelTimeout(int timerId)
+void FcmFunctionalComponent::cancelTimeout(FcmTimerID timerId)
 {
     timerHandler.cancelTimeout(timerId);
 }

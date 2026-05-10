@@ -108,8 +108,8 @@ protected:
                                                   const std::string& messageName,
                                                         std::string* notFoundReason = nullptr) const;
 
-    [[nodiscard]] int setTimeout(FcmTime timeout);
-    void cancelTimeout(int timerId);
+    void setTimeout(FcmTimerID& timerId, FcmTime timeout);
+    void cancelTimeout(FcmTimerID timerId);
 };
 
 // ---------------------------------------------------------------------------------------------------------------------
